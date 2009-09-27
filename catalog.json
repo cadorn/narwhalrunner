@@ -38,7 +38,16 @@
                 "url": "tusk://localhost.org.cadorn.github/test",
                 "installMethod": "inherit"
             }
+        },
+        "devtools": {
+            "manifest": {
+                "name": "devtools"
+            },
+            "origin": {
+                "url": "file://./packages/devtools",
+                "installMethod": "link"
+            }
         }
     },
-    "revision": "40AA12D84E2AE1F67AEBEA354A2B74AD"
+    "revision": "4A70EE867340BCF856B0AFE727DD3AE6"
 }

@@ -12,6 +12,9 @@
         ],
         [
             "narwhal-xulrunner"
+        ],
+        [
+            "devtools"
         ]
     ]
 }
