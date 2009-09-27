@@ -1,0 +1,20 @@
+{
+    "name": "narwhalrunner",
+    "dependencies": [
+        [
+            "narwhal"
+        ],
+        [
+            "common"
+        ],
+        [
+            "extension"
+        ],
+        [
+            "narwhal-xulrunner"
+        ],
+        [
+            "test"
+        ]
+    ]
+}
