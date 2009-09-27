@@ -1,0 +1,44 @@
+{
+    "name": "localhost.narwhalrunner",
+    "type": "sea",
+    "packages": {
+        "common": {
+            "manifest": {
+                "name": "common"
+            },
+            "origin": {
+                "url": "file://./packages/common",
+                "installMethod": "none"
+            }
+        },
+        "extension": {
+            "manifest": {
+                "name": "extension"
+            },
+            "origin": {
+                "url": "file://./packages/extension",
+                "installMethod": "none"
+            }
+        },
+        "narwhal-xulrunner": {
+            "manifest": {
+                "name": "narwhal-xulrunner",
+                "engine": "xulrunner"
+            },
+            "origin": {
+                "url": "tusk://narwhal/narwhal-xulrunner",
+                "installMethod": "inherit"
+            }
+        },
+        "test": {
+            "manifest": {
+                "name": "test"
+            },
+            "origin": {
+                "url": "tusk://localhost.org.cadorn.github/test",
+                "installMethod": "inherit"
+            }
+        }
+    },
+    "revision": "40AA12D84E2AE1F67AEBEA354A2B74AD"
+}
