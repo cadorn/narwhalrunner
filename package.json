@@ -15,6 +15,12 @@
         ],
         [
             "devtools"
+        ],
+        [
+            "test-firefox-extension"
+        ],
+        [
+            "template"
         ]
     ]
 }

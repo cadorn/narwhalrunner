@@ -111,6 +111,72 @@ command.helpful();
 
 
 
+command = parser.command('add-extension', function(options) {
+    
+    var path = fs.Path(options.args[0]).absolute(),
+        profile = options.profile,
+        link = options.link;
+    
+    if(!path.exists()) {
+        print("error: extension path does not exist: " + path);
+        return;
+    }
+    
+    var manifestPath = path.join("install.rdf");
+    if(!manifestPath.exists()) {
+        print("error: no install.rdf found at: " + manifestPath);
+        return;
+    }
+    
+    if(!profile) {
+        print("error: you must specify a profile with --profile");
+        return;
+    }
+
+    var profileDirectory = profilesPath.join(profile);
+    if(!profileDirectory.exists(profileDirectory)) {
+        print("error: profile with name '" + profile + "' does not exist at: " + profileDirectory);
+        return;
+    }
+    
+    // determine extension ID
+    
+    var id = manifestPath.read().match(/<em:id>(.*)<\/em:id>/);
+    if(!id) {
+        print("error: could not determine extension ID from: " + manifestPath);
+        return;
+    }
+    id = id[1];
+    
+    var targetPath = profileDirectory.join("extensions", id);
+    targetPath.dirname().mkdirs();
+    
+    if(targetPath.exists()) {
+        print("error: extension already exists at path: " + targetPath);
+        return;
+    }
+    
+    if(link) {        
+        
+        path.symlink(targetPath);
+        
+        print("Linked extension '" + id + "' to: " + targetPath);
+        
+    } else {
+        
+        fs.copyTree(path, targetPath);
+        
+        print("Copied extension '" + id + "' to: " + targetPath);
+    }
+
+});
+command.help('Add an extension to a profile');
+command.arg('path');
+command.option('--profile', 'profile').set().help("The profile to add the extension to");
+command.option('-l', '--link', 'link').bool().help("Link the path instead of copying it");
+command.helpful();
+
+
 command = parser.command('create-profile', function(options) {
     
     var name = options.args[0],
@@ -184,8 +250,6 @@ command = parser.command('create-profile', function(options) {
 
     print("Running: " + cmd);
     os.system(cmd);
-
-    // TODO: link extensions
     
     print("Created profile with name '" + name + "' at: " + profileDirectory);
 

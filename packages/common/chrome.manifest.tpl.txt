@@ -1,0 +1,5 @@
+
+content  %%InternalName%%-narwhalrunner         narwhalrunner/chrome/content/
+
+
+overlay  chrome://browser/content/browser.xul         chrome://%%InternalName%%-narwhalrunner/content/common/browserOverlay.xul

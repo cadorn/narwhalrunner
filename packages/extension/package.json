@@ -1,3 +1,13 @@
 {
-    "name": "extension"
+    "name": "extension",
+    "build": {
+        "dependencies": [
+            "template"
+        ],
+        "defaultTarget": "dev",
+        "targets": {
+            "dev": "build/dev",
+            "sceleton": "build/sceleton",
+        }
+    }
 }

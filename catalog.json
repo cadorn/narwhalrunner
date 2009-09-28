@@ -30,15 +30,6 @@
                 "installMethod": "inherit"
             }
         },
-        "test": {
-            "manifest": {
-                "name": "test"
-            },
-            "origin": {
-                "url": "tusk://localhost.org.cadorn.github/test",
-                "installMethod": "inherit"
-            }
-        },
         "devtools": {
             "manifest": {
                 "name": "devtools"
@@ -47,7 +38,35 @@
                 "url": "file://./packages/devtools",
                 "installMethod": "link"
             }
+        },
+        "test-firefox-extension": {
+            "manifest": {
+                "name": "test-firefox-extension"
+            },
+            "origin": {
+                "url": "file://./packages/test-firefox-extension",
+                "installMethod": "link"
+            }
+        },
+        "template": {
+            "manifest": {
+                "name": "template",
+                "description": "A simple templating engine",
+                "keywords": [
+                    "template",
+                    "text",
+                    "json"
+                ],
+                "author": "George Moschovitis",
+                "email": "george.moschovitis@gmail.com",
+                "dependencies": [],
+                "lib": "lib"
+            },
+            "origin": {
+                "url": "tusk://narwhal/template",
+                "installMethod": "inherit"
+            }
         }
     },
-    "revision": "4A70EE867340BCF856B0AFE727DD3AE6"
+    "revision": "EFE22EC71A1C26EFD926A41EB9622E79"
 }
