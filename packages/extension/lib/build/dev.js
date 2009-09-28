@@ -18,17 +18,18 @@ exports.main = function(args) { with(HARNESS.initialize(args)) {
     
     SKELETON.main(args);
     
+        
 
-    // link chrome directories
+    // link narwhal directory
     
-    fromPath = locatePath("chrome/content", "common");
-    toPath = targetBuildPath.join("narwhalrunner", "chrome", "content", "common");
+    fromPath = FILE.Path(system.prefix);
+    toPath = targetBuildPath.join("narwhalrunner", "narwhal");
     if(!toPath.exists()) {
         toPath.dirname().mkdirs();    
         fromPath.symlink(toPath);
     }
-    
-        
+    print("Linked '" + toPath + "' to '" + fromPath + "'");    
+
 
 }}
 
