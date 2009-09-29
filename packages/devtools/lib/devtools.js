@@ -12,6 +12,7 @@ var MD5 = require("md5");
 var STRUCT = require("struct");
 var CONFIG = require("./config");
 var SEA = require("narwhal/tusk/sea");
+var MANIFEST = require("narwhal/tusk/manifest");
 var STREAM = require('term').stream;
 
 parser.help('xulrunner developer tools');
@@ -31,8 +32,7 @@ command = parser.command('launch', function(options) {
     
     var app = options.app,
         version = options.version,
-        profile = options.profile,
-        dev = options.dev;
+        profile = options.profile;
     
     if(!app) {
         print("error: you must specify --app");
@@ -61,8 +61,45 @@ command = parser.command('launch', function(options) {
             return;
         }        
         cmd.push("-P " + profile + "-" + profileSeaKey);
+
+        if(options.build) {
+            
+            var extensionsDirectory = profileDirectory.join("extensions");
+            extensionsDirectory.listPaths().forEach(function(extensionDirectory) {
+                
+                var manifest = MANIFEST.Manifest(extensionDirectory.join("package.json"));
+                if(manifest.exists()) {
+                    
+                    // get the ID of the extension
+                    var ID = manifest.getName();
+                    
+                    // with the ID we can now find the package name to build
+                    var packageName;
+                    SEA.getActive().forEachPackage(function(name, info) {
+                        if(packageName) {
+                            return;
+                        }
+                        if(UTIL.has(info, "narwhalrunner") &&
+                           info.narwhalrunner.ID == ID) {
+                            packageName = name;
+                        }
+                    });
+                    
+                    // build the package
+                    if(packageName) {
+                        os.system("tusk package build " + packageName);
+                    }
+                }
+            });
+        }
+
+    } else
+    if(options.build) {
+        print("error: you can only use the --build flag if --profile is also specified");
+        return;
     }
-    if(dev) {
+        
+    if(options.dev) {
         cmd.push("-jsconsole");
     }
     cmd.push("-no-remote");
@@ -78,6 +115,7 @@ command.option('--app', 'app').set().help("The binary name");
 command.option('--version', 'version').set().help("The binary version");
 command.option('--profile', 'profile').set().help("The profile to launch with");
 command.option('--dev', 'dev').bool().help("Start binary in development mode");
+command.option('--build', 'build').bool().help("Build all narwhalrunner extensions (from the active sea) in the profile before launch");
 command.helpful();
 
 
