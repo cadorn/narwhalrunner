@@ -155,32 +155,9 @@ function bootstrapNarwhal(bootstrap) {
 
             var sandbox = Cu.Sandbox(Cc["@mozilla.org/systemprincipal;1"].createInstance(Ci.nsIPrincipal));
             sandbox.__narwhal_args__ = ARGUMENTS;
-/*
-            sandbox.__system_tunnel__ = {
-				
-				test: function() {
-					dump('TUNNEL IS WORKING');
-					return tunnelScope;
-				}
-				
-			};
-*/			
+
             Cu.evalInSandbox(readFile(bootstrap), sandbox, "1.8", bootstrap.path, 0);
             Narwhal.prototype.__proto__ = sandbox;
-
-//            var sandbox = {__narwhal_args__: ARGUMENTS,
-//			               system: null,
-//						   };
-//dump('bootstrap: '+bootstrap.path+'\n');
-//			with (sandbox) {
-			
-//				eval(readFile(bootstrap));
-//			}
-//            Narwhal.prototype.__proto__ = sandbox;
-//            Narwhal.prototype.__proto__ = {system:'hello system'};
-			
-			
-//			Narwhal.prototype.__proto__ = sandbox;
 			
         } catch(e) {
             dump("narwhal> Error:" + e.message + "\nStack:" + e.stack + "\n");

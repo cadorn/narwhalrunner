@@ -31,6 +31,38 @@ exports.main = function(args) { with(HARNESS.initialize(args)) {
     print("Linked '" + toPath + "' to '" + fromPath + "'");    
 
 
+    // link chrome directory for extension
+    
+    fromPath = pkg.getPath().join("chrome");
+    if(fromPath.exists()) {
+        toPath = targetBuildPath.join("chrome");
+        if(!toPath.exists()) {
+            toPath.dirname().mkdirs();    
+            fromPath.symlink(toPath);
+        }
+        print("Linked '" + toPath + "' to '" + fromPath + "'");    
+    }
+
+    // link packages
+
+    targetBuildPath.join("packages").mkdirs();
+    
+    var packages = [
+        "common",
+        "extension"
+    ];
+
+    packages.forEach(function(name) {
+        
+        fromPath = locatePath("", name);
+        toPath = targetBuildPath.join("packages", name);
+        if(!toPath.exists()) {
+            fromPath.symlink(toPath);
+        }
+        print("Linked '" + toPath + "' to '" + fromPath + "'");    
+         
+    });
+
 }}
 
 

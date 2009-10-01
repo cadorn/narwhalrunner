@@ -70,25 +70,8 @@ command = parser.command('launch', function(options) {
                 var manifest = MANIFEST.Manifest(extensionDirectory.join("package.json"));
                 if(manifest.exists()) {
                     
-                    // get the ID of the extension
-                    var ID = manifest.getName();
-                    
-                    // with the ID we can now find the package name to build
-                    var packageName;
-                    SEA.getActive().forEachPackage(function(name, info) {
-                        if(packageName) {
-                            return;
-                        }
-                        if(UTIL.has(info, "narwhalrunner") &&
-                           info.narwhalrunner.ID == ID) {
-                            packageName = name;
-                        }
-                    });
-                    
                     // build the package
-                    if(packageName) {
-                        os.system("tusk package build " + packageName);
-                    }
+                    os.system("tusk package build " + manifest.getName());
                 }
             });
         }
