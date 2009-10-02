@@ -10,7 +10,7 @@
     <!-- Load a narwhal module for the package -->
     <script src="%%PackageNarwhalizeURL%%" type="application/x-javascript"/>
     <script type="application/x-javascript">
-        require("test-application/main-window").main({});
+        require("main-window", "test-application").main({});
     </script>
 
     <label value="%%PackageChromeURLPrefix%%"/>

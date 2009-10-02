@@ -1,5 +1,5 @@
 
-var CHROME = require("common/chrome");
+var CHROME = require("chrome", "common");
 
 exports.main = function() {
     

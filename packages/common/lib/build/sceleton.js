@@ -12,7 +12,7 @@ var HARNESS = require("./harness");
 exports.main = function(args, options) { with(HARNESS.initialize(args, options)) {
         
     var vars = options.vars;
-    vars.QueryString = "";
+    vars.PackageName = packageName; 
 
     var templateVars = {
         build: {

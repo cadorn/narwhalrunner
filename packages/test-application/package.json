@@ -1,7 +1,8 @@
 {
     "name": "test-application",
     "dependencies": [
-        "application"
+        ["application", "tusk:///application"],
+        ["common", "tusk:///common"]
     ],
     "build": {
         "dependencies": [
@@ -9,7 +10,7 @@
         ],
         "defaultTarget": "dev",
         "targets": {
-            "dev": "application:application/build/dev",
+            "dev": "application:build/dev",
         }
     },
     "narwhalrunner": {

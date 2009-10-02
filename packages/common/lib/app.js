@@ -49,10 +49,11 @@ App.prototype.registerProtocolHandler = function() {
             var parts = chromeEnv["PATH_INFO"].substr(1).split("/"),
                 packageName = parts.shift(),
                 packageID = STRUCT.bin2hex(MD5.hash(self.getInternalName() + ":" + packageName)),
-                baseName = parts[parts.length-1];
+                baseName = parts[parts.length-1],
                 extension = baseName.split(".").pop();
-     
+
             if(!UTIL.has(PACKAGES.catalog, packageName)) {
+                print("error: Package not found: " + packageName);
                 return {
                     status: 500,
                     headers: {"Content-Type":"text/plain"},
@@ -63,8 +64,9 @@ App.prototype.registerProtocolHandler = function() {
             var packageInfo = PACKAGES.catalog[packageName],
                 packagePath = FILE.Path(packageInfo.directory),
                 filePath = packagePath.join("chrome", parts.join("/"));
-                
+
             if(!filePath.exists()) {
+                print("error: File not found: " + filePath);
                 return {
                     status: 404,
                     headers: {"Content-Type":"text/plain"},
@@ -140,7 +142,7 @@ App.prototype.start = function(type, loaderWindow, args) {
     
     // Call the main.js module of the app once the loaderWindow is completely loaded
     this.onLoaderWindowLoad = function() {
-        var main = require(self.manifest.name + "/main");  // TODO: use require(module, package) when available
+        var main = require("main", self.manifest.name);
         main.main(args);
     }
     loaderWindow.addEventListener("load", this.onLoaderWindowLoad, false);

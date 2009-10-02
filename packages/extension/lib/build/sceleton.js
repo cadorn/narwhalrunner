@@ -7,25 +7,21 @@ var UTIL = require("util");
 var JSON = require('json');
 var STREAM = require('term').stream;
 
-var HARNESS = require("common/build/harness");
-var SKELETON = require("common/build/sceleton");
+var HARNESS = require("build/harness", "common");
+var SKELETON = require("build/sceleton", "common");
 
 
-exports.main = function(args) { with(HARNESS.initialize(args, {type: "application"})) {
+exports.main = function(args) { with(HARNESS.initialize(args, {type: "extension"})) {
 
     var vars = pkg.getManifest().manifest.narwhalrunner;
-
-    vars.Type = "application";
+    
+    vars.Type = "extension";
     vars.PackageChromeURL = "narwhalrunner://" + vars.InternalName + "/" + packageName + "/";
     vars.PackagePrefix = "NRID_" + packageID + "_";
     
-    var date =  new Date();
-    vars.BuildID = String(date.getFullYear()) +
-                   String(UTIL.padBegin(date.getMonth(),2)) +
-                   String(UTIL.padBegin(date.getDate(),2));
-
+    
     SKELETON.main(args, {
-        type: "application",
+        type: "extension",
         vars: vars
     });
 
@@ -41,7 +37,7 @@ exports.main = function(args) { with(HARNESS.initialize(args, {type: "applicatio
     // chrome.manifest
     
     fromPath = locatePath("chrome.manifest.tpl.txt");
-    toPath = targetBuildPath.join("chrome", "chrome.manifest");
+    toPath = targetBuildPath.join("chrome.manifest");
     
     templateVars.build.common.file = locatePath("chrome.manifest.tpl.txt", "common");
     
@@ -51,20 +47,10 @@ exports.main = function(args) { with(HARNESS.initialize(args, {type: "applicatio
     ]);
     
     
-    // application.ini
+    // install.rdf    
     
-    fromPath = locatePath("application.ini.tpl.txt");
-    toPath = targetBuildPath.join("application.ini");
-
-    copyWhile(fromPath, toPath, [
-        [replaceVariables, [vars]]
-    ]);
-
-
-    // defaults/preferences/prefs.js
-    
-    fromPath = locatePath("defaults/preferences/prefs.js");
-    toPath = targetBuildPath.join("defaults", "preferences", "prefs.js");
+    fromPath = locatePath("install.rdf.tpl.xml");
+    toPath = targetBuildPath.join("install.rdf");
 
     copyWhile(fromPath, toPath, [
         [replaceVariables, [vars]]

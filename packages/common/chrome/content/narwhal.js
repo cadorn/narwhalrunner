@@ -14,12 +14,10 @@
     // -----------------------------------
     // initialize narwhalrunner utilities
     // -----------------------------------
-    
-    // TODO: use require("...", "common") once implemented in narwhal
 
     var FILE = narwhal.require("file");
-    var CHROME = narwhal.require("common/chrome");
-    var APP = narwhal.require("common/app");
+    var CHROME = narwhal.require("chrome", "common");    
+    var APP = narwhal.require("app", "common");
 
     CHROME.set(this);
     

@@ -1,12 +1,15 @@
 {
     "name": "application",
+    "dependencies": [
+        ["common", "tusk:///common"]
+    ],
     "build": {
         "dependencies": [
             "common"
         ],
         "defaultTarget": "dev",
         "targets": {
-            "dev": "application/build/dev",
+            "dev": "build/dev",
         }
     }
 }

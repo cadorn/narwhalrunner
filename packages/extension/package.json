@@ -7,7 +7,7 @@
         ],
         "defaultTarget": "dev",
         "targets": {
-            "dev": "extension/build/dev"
+            "dev": "build/dev"
         }
     }
 }

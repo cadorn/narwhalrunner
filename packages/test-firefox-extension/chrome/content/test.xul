@@ -10,7 +10,7 @@
     <!-- Load a narwhal module for the package -->
     <script src="%%PackageNarwhalizeURL%%" type="application/x-javascript"/>
     <script type="application/x-javascript">
-        require("test-firefox-extension/test").main({});
+        require("test", "test-firefox-extension").main({});
     </script>
 
     <label value="%%PackageChromeURLPrefix%%"/>

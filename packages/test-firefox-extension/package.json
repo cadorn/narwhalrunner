@@ -9,7 +9,7 @@
         ],
         "defaultTarget": "dev",
         "targets": {
-            "dev": "extension:extension/build/dev",
+            "dev": "extension:build/dev",
         }
     },
     "narwhalrunner": {
