@@ -1,4 +1,3 @@
 
 content  %%InternalName%%-narwhalrunner         narwhalrunner/chrome/content/
 resource %%InternalName%%-narwhalrunner         narwhalrunner/
-
