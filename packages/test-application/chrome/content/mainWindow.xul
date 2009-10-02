@@ -5,12 +5,12 @@
         id="main" title="NarwhalRunner Test" width="600" height="300">
 
     <!-- Load a chrome JS file for the package -->
-    <script src="%%PackageChromeURLPrefix%%content/test.js" type="application/x-javascript"/>
+    <script src="%%PackageChromeURLPrefix%%content/mainWindow.js" type="application/x-javascript"/>
 
     <!-- Load a narwhal module for the package -->
     <script src="%%PackageNarwhalizeURL%%" type="application/x-javascript"/>
     <script type="application/x-javascript">
-        require("test-firefox-extension/test").main({});
+        require("test-application/main-window").main({});
     </script>
 
     <label value="%%PackageChromeURLPrefix%%"/>

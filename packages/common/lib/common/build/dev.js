@@ -8,22 +8,16 @@ var STREAM = require('term').stream;
 var SEA = require("narwhal/tusk/sea");
 
 var HARNESS = require("./harness");
-var SKELETON = require("./sceleton");
 
 
 
-exports.main = function(args) { with(HARNESS.initialize(args)) {
+exports.main = function(args, options) { with(HARNESS.initialize(args, options)) {
     
-    // copy everything required for proper extension registration
-    
-    SKELETON.main(args);
-    
-        
 
     // link narwhal directory
     
     fromPath = FILE.Path(system.prefix);
-    toPath = targetBuildPath.join("narwhalrunner", "narwhal");
+    toPath = targetBuildChromePath.join("narwhalrunner", "narwhal");
     if(!toPath.exists()) {
         toPath.dirname().mkdirs();    
         fromPath.symlink(toPath);
@@ -31,11 +25,11 @@ exports.main = function(args) { with(HARNESS.initialize(args)) {
     print("Linked '" + toPath + "' to '" + fromPath + "'");    
 
 
-    // link chrome directory for extension
+    // link chrome/content
     
-    fromPath = pkg.getPath().join("chrome");
+    fromPath = pkg.getPath().join("chrome", "content");
     if(fromPath.exists()) {
-        toPath = targetBuildPath.join("chrome");
+        toPath = targetBuildChromePath.join("content");
         if(!toPath.exists()) {
             toPath.dirname().mkdirs();    
             fromPath.symlink(toPath);
@@ -49,7 +43,8 @@ exports.main = function(args) { with(HARNESS.initialize(args)) {
     
     var packages = [
         "common",
-        "extension"
+        options.type,
+        packageName
     ];
 
     packages.forEach(function(name) {

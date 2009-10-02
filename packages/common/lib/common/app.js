@@ -8,6 +8,7 @@ var UTIL = require("util");
 var FILE = require("file");
 var STRUCT = require("struct");
 var MD5 = require("md5");
+var BASE64 = require("base64");
 var PACKAGES = require("packages");
 
 
@@ -37,12 +38,13 @@ App.prototype.getInternalName = function() {
     return this.manifest.narwhalrunner.InternalName;
 }
 
-
 App.prototype.registerProtocolHandler = function() {
     var self = this;
     CHROME.registerProtocolHandler({
         internalAppName : self.getInternalName(),
         app: function(chromeEnv) {
+
+            print("Processing: " + chromeEnv["PATH_INFO"]);
             
             var parts = chromeEnv["PATH_INFO"].substr(1).split("/"),
                 packageName = parts.shift(),
@@ -74,35 +76,83 @@ App.prototype.registerProtocolHandler = function() {
                 
             if(extension=="xul") {
                 app = function(env) {
+
+                    print("Serving: " + filePath);
                     
                     var body = filePath.read();
                     
-                    body = body.replace(/%%PackageChromeURL%%/g, "narwhalrunner://" +
+                    body = body.replace(/%%PackageChromeURLPrefix%%/g, "narwhalrunner://" +
                             self.manifest.narwhalrunner.InternalName + "/" + packageName + "/");
 
                     body = body.replace(/%%PackagePrefix%%/g, "NRID_" + packageID + "_");
                     
+                    body = body.replace(/%%PackageNarwhalizeURL%%/g, "chrome://" +
+                            self.manifest.narwhalrunner.InternalName +
+                            "-narwhalrunner/content/common/narwhalize.js");
+/*
+                    body = body.replace(/%%PackageNarwhalizeURL%%/g, "narwhalrunner://" +
+                            self.manifest.narwhalrunner.InternalName +
+                            "/common/content/narwhalize.js");
+*/
                     return {
                         status: 200,
-                        headers: {"Content-Type":"text/xml"},
+                        headers: {"Content-Type":"application/vnd.mozilla.xul+xml"},
                         body: [body]
                     }
                 }
             } else {
+                var contentType = "text/plain";
+                if(extension=="js") {
+                    contentType = "application/x-javascript";
+                }            
                 app = function(env) {
+                    
+                    print("Serving: " + filePath);
+
+                    var body = filePath.read();
+
+                    body = body.replace(/%%QueryString%%/g, chromeEnv["QUERY_STRING"]);
+                    
                     return {
                         status: 200,
-                        headers: {"Content-Type":"text/plain"},
-                        body: [filePath.read()]
+                        headers: {"Content-Type": contentType},
+                        body: [body]
                     }
                 }
             }
             
-            return app(chromeEnv);
+            var result = app(chromeEnv);
+            
+            // base64 encode the body
+            for( var i=0 ; i<result.body.length ; i++ ) {
+                result.body[i] = BASE64.encode(result.body[i]);
+            }
+            
+            return result;
         }
     });
 }
 
+App.prototype.start = function(type, loaderWindow, args) {
+    var self = this;
+    this.type = type;
+    this.loaderWindow = loaderWindow;
+    
+    // Call the main.js module of the app once the loaderWindow is completely loaded
+    this.onLoaderWindowLoad = function() {
+        var main = require(self.manifest.name + "/main");  // TODO: use require(module, package) when available
+        main.main(args);
+    }
+    loaderWindow.addEventListener("load", this.onLoaderWindowLoad, false);
+}
+
+App.prototype.started = function() {
+
+    if(this.type=="application" && this.loaderWindow) {
+        this.loaderWindow.close();
+    }
+
+}
 
 
 

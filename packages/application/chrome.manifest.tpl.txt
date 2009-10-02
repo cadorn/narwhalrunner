@@ -1,0 +1,6 @@
+
+content  %%InternalName%%         file:content/
+skin     %%InternalName%%  global file:skin/global/
+locale   %%InternalName%%  en-US  file:locale/en-US/
+
+{build.common.file|includeFile}

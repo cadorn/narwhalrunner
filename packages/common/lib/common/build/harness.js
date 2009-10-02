@@ -7,26 +7,37 @@ var UTIL = require("util");
 var STREAM = require('term').stream;
 var SEA = require("narwhal/tusk/sea");
 var TEMPLATE = require("template");
+var STRUCT = require("struct");
+var MD5 = require("md5");
 
 
 var initialized = false;
 
 var sea = SEA.getActive(),
     buildDirectory = sea.getBuildPath(),
+    applicationPackage = sea.getPackage("application"),  // TODO: We need a way to fetch packages even if installed as dependencies
     extensionPackage = sea.getPackage("extension"),  // TODO: We need a way to fetch packages even if installed as dependencies
     commonPackage = sea.getPackage("common"),  // TODO: We need a way to fetch packages even if installed as dependencies
     packageName,
+    packageID,
     targetBuildPath,
+    targetBuildChromePath,
     fromPath,
     toPath,
-    pkg;
+    pkg,
+    pkgType;
     
 
-exports.initialize = function(args) {
+exports.initialize = function(args, options) {
     if(!initialized) {
         packageName = args["package"];
-        targetBuildPath = buildDirectory.join(packageName);
+        targetBuildChromePath = targetBuildPath = buildDirectory.join(packageName);
+        if(options.type=="application") {
+            targetBuildChromePath = targetBuildChromePath.join("chrome");
+        }
         pkg = sea.getPackage(packageName);
+        pkgType = options.type;        
+        packageID = STRUCT.bin2hex(MD5.hash(pkg.getManifest().manifest.narwhalrunner.InternalName + ":" + packageName));
 
         targetBuildPath.mkdirs();
 
@@ -40,19 +51,22 @@ exports.initialize = function(args) {
         commonPackage: commonPackage,
         packageName: packageName,
         targetBuildPath: targetBuildPath,
+        targetBuildChromePath: targetBuildChromePath,
         fromPath: fromPath,
         toPath: toPath,
         pkg: pkg,
         copyWhile: exports.copyWhile,
         runTemplate: exports.runTemplate,
         replaceVariables: exports.replaceVariables,
-        locatePath: exports.locatePath
+        locatePath: exports.locatePath,
+        packageID: packageID
     }
 }
 
 
 exports.copyWhile = function(fromPath, toPath, callbacks) {
     print("Copying '" + fromPath + "' to '" + toPath + "':");
+    toPath.dirname().mkdirs();
     var data = fromPath.read();
     callbacks.forEach(function(callback) {
         var args = UTIL.copy(callback[1]);
@@ -99,10 +113,10 @@ exports.replaceVariables = function(callbacks, data, vars) {
  * in any of the default packages
  */
 exports.locatePath = function(path, name) {
-    
+
     var tests = [
         pkg,
-        extensionPackage,
+        ((pkgType=="application")?applicationPackage:extensionPackage),
         commonPackage
     ];
     
@@ -117,6 +131,7 @@ exports.locatePath = function(path, name) {
             return;
         }
         test = pkg.getPath().join(path);
+        
         if(test.exists()) {
             file = test;
         }

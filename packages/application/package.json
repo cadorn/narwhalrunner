@@ -1,13 +1,12 @@
 {
-    "name": "extension",
+    "name": "application",
     "build": {
         "dependencies": [
-            "template",
             "common"
         ],
         "defaultTarget": "dev",
         "targets": {
-            "dev": "extension/build/dev"
+            "dev": "application/build/dev",
         }
     }
 }

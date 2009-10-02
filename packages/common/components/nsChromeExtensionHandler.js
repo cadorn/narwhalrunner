@@ -82,7 +82,8 @@ const kPROTOCOL_NAME = "Chrome Extension Protocol for NarwhalRunner";
 // Dummy chrome URL used to obtain a valid chrome channel
 // This one was chosen at random and should be able to be substituted
 // for any other well known chrome URL in the browser installation
-const kDUMMY_CHROME_URL = "chrome://mozapps/content/xpinstall/xpinstallConfirm.xul";
+//const kDUMMY_CHROME_URL = "chrome://mozapps/content/xpinstall/xpinstallConfirm.xul";
+const kDUMMY_CHROME_URL = "chrome://global/content/console.xul";
 
 // Mozilla defined
 const kCHROMEHANDLER_CID_STR = "{61ba33c0-3031-11d3-8cd0-0060b0fc14a3}";
@@ -393,7 +394,7 @@ ChromeExtensionHandler.prototype = {
         contentType = "text/plain";
     }
     
-    uri_str += contentType + ",";
+    uri_str += contentType + ";base64,";
     
     var chunk;
     for( var i=0 ; i<result.body.length ; i++ ) {

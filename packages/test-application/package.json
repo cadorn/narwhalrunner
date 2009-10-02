@@ -1,7 +1,7 @@
 {
-    "name": "test-firefox-extension",
+    "name": "test-application",
     "dependencies": [
-        "extension"
+        "application"
     ],
     "build": {
         "dependencies": [
@@ -9,22 +9,20 @@
         ],
         "defaultTarget": "dev",
         "targets": {
-            "dev": "extension:extension/build/dev",
+            "dev": "application:application/build/dev",
         }
     },
     "narwhalrunner": {
-        "InternalName": "narwhalrunner-test-firefox-extension",
-        "ID": "test-firefox-extension@narwhalrunner.cadorn.github.com",
+        "InternalName": "narwhalrunner-test-application",
+        "ID": "test-application@narwhalrunner.cadorn.github.com",
         "Name": "NarwhalRunner Test",
         "Version": "0.1",
         "Release": "",
+        "Vendor": "Christoph Dorn",
         "Creator": "Christoph Dorn",
         "Copyright": "Copyright (c) 2009 Christoph Dorn",
-        "Description": "A NarwhalRunner firefox extension for testing",
+        "Description": "A NarwhalRunner application for testing",
         "HomepageURL": "http://github.com/cadorn/narwhalrunner",
-        "IconURL": "",
-        "OptionsURL": "",
-        "UpdateURL": "",
-        "UpdateKey": ""
+        "IconURL": ""
     }
 }

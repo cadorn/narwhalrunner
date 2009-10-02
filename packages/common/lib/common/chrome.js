@@ -17,3 +17,17 @@ exports.registerProtocolHandler = function(handler) {
     chrome_ext.wrappedJSObject.registerExtension(handler);
     
 }
+
+exports.getWindow = function() {
+    return chrome.window;
+}
+
+exports.getBrowser = function() {
+    return chrome.getBrowser();
+}
+
+exports.getConsoleService = function() {
+    
+    return Components.classes["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);
+
+}

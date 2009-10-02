@@ -32,7 +32,8 @@ command = parser.command('launch', function(options) {
     
     var app = options.app,
         version = options.version,
-        profile = options.profile;
+        profile = options.profile,
+        packageName = options["package"];
     
     if(!app) {
         print("error: you must specify --app");
@@ -54,6 +55,32 @@ command = parser.command('launch', function(options) {
         return;
     }
     
+    if(packageName) {
+        
+        if(profile) {
+            print("error: you cannot specify --profile and --package at the same time");
+            return;
+        }
+        
+        var packagePath = seaPath.join("build", packageName);        
+        
+        if(options.build) {
+            os.system("tusk package build " + packageName);
+        }
+        
+        if(!packagePath.exists()) {
+            print("error: package not found at: " + packagePath);
+            return;
+        }
+        
+        if(app=="xulrunner") {
+            cmd.push(packagePath.join("application.ini").valueOf());
+        } else
+        if(app="firefox") {
+            cmd.push("-app " + packagePath.join("application.ini").valueOf());
+        }
+        
+    } else
     if(profile) {
         var profileDirectory = profilesPath.join(profile);
         if(!profileDirectory.exists(profileDirectory)) {
@@ -99,6 +126,7 @@ command.option('--version', 'version').set().help("The binary version");
 command.option('--profile', 'profile').set().help("The profile to launch with");
 command.option('--dev', 'dev').bool().help("Start binary in development mode");
 command.option('--build', 'build').bool().help("Build all narwhalrunner extensions (from the active sea) in the profile before launch");
+command.option('--package', 'package').set().help("The package to launch for xulrunner apps");
 command.helpful();
 
 
@@ -107,16 +135,20 @@ command = parser.command('add-bin', function(options) {
     
     var path = fs.Path(options.args[0]).absolute();
 
-    var result = os.command(path + " -v").trim(),
+    var result = exports.command(path + " -v").trim(),
         parts,
         app,
         version;
-    
+
     if(parts = result.match(/Mozilla Firefox ([\d.]*), Copyright \(c\) 1998 - \d{4} mozilla.org/)) {
         app = "firefox";
         version = parts[1];
+    } else
+    if(parts = result.match(/Mozilla XULRunner ([\d.]*) - \d*/)) {
+        app = "xulrunner";
+        version = parts[1];
     } else {
-        print("error: no match found for version string: "+result);
+        print("error: no match found for version string: " + result);
         return;
     }
     
@@ -126,7 +158,7 @@ command = parser.command('add-bin', function(options) {
         print("error: binary already exists for path");
     }
 });
-command.help("Add a xulrunner-based binary (firefox)")
+command.help("Add a xulrunner-based binary (firefox or xulrunner)")
     .arg('path');
 command.helpful();
 
@@ -338,3 +370,14 @@ exports.main = function (args) {
         parser.printHelp(options);
     }
 }
+
+
+exports.command = function (command) {
+    var process = os.popen(command);
+    var result = process.communicate();
+    if (result.status !== 0)
+        throw new Error(result.stderr.read());
+    var stdout = result.stdout.read() || result.stderr.read();
+    return stdout;
+};
+

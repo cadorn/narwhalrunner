@@ -205,3 +205,4 @@ Narwhal.prototype = {
 
 var components = [CommandLineBoot, AppStartupBoot, Narwhal];
 function NSGetModule(compMgr, fileSpec) XPCOMUtils.generateModule(components);
+

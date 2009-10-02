@@ -1,7 +1,8 @@
 
 content  %%InternalName%%         chrome/content/
-resource %%InternalName%%         modules/
 skin     %%InternalName%%  global chrome/skin/global/
 locale   %%InternalName%%  en-US  chrome/locale/en-US/
 
 {build.common.file|includeFile}
+
+overlay  chrome://browser/content/browser.xul         chrome://%%InternalName%%-narwhalrunner/content/extension/browserOverlay.xul
