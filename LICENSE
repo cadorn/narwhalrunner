@@ -1,26 +1,4 @@
-
-NarwhalRunner
-=============
-
-NarwhalRunner is a toolkit for building [XULRunner](https://developer.mozilla.org/en/XULRunner)
-applications and extensions with [Narwhal](http://narwhaljs.org/).
-
-*STATUS: Under development. Not functional yet!*
-
-
-Setup
------
-
-*COMING SOON*
-
-
-
-
-
-License
-=======
-
-[New BSD License](http://www.opensource.org/licenses/bsd-license.php)
+New BSD License: http://www.opensource.org/licenses/bsd-license.php
 
 Copyright (c) 2009, Christoph Dorn
 

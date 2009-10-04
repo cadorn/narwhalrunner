@@ -10,7 +10,7 @@ const Env = Cc["@mozilla.org/process/environment;1"].getService(Ci.nsIEnvironmen
 const ResourceHandler = Cc['@mozilla.org/network/protocol;1?name=resource'].getService(Ci.nsIResProtocolHandler);
 const IOService = Cc['@mozilla.org/network/io-service;1'].getService(Ci.nsIIOService)
 const FileService = IOService.getProtocolHandler("file").QueryInterface(Ci.nsIFileProtocolHandler);
-
+const ObserverService = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 var NARWHAL_HOME = "NARWHAL_HOME",
@@ -18,9 +18,8 @@ var NARWHAL_HOME = "NARWHAL_HOME",
     PATH = "NARWHAL_PATH",
     JS_PATH = "JS_PATH";
 var APP_STARTUP = "app-startup";
+var PROFILE_READY = "profile-do-change";
 var ARGUMENTS = [];
-
-var tunnelScope = this;
 
 /**
  * Utility function which returns file for a correspoding path.
@@ -56,8 +55,8 @@ function readFile(file) {
             result.push(line.value);
         } while (haveMore)
     } catch(e) {
-        print('Error:' + e.message);
-        print('Stack:' + e.stack);
+            if (typeof e == "String") dump(e + "\n");
+            else for (var key in e) dump('Error:' + key + ": " + e[key] + "\n");
     } finally {
         fis.close();
     }
@@ -85,13 +84,8 @@ CommandLineBoot.prototype = {
     _xpcom_categories: [{ category: "command-line-handler" }],
     handle: function(cmdLine) {
         try {
-            var flag = false;
-            for (var i=0; i < cmdLine.length; i++) {
-                var arg = cmdLine.getArgument(i);
-                if (flag) ARGUMENTS.push(arg.charAt(0) == "-" ? "-" + arg : arg);
-                var flag = (flag || arg == "-narwhal-args")
-            }
-            ARGUMENTS.shift();
+            for (var i=0; i < cmdLine.length; i++)
+                ARGUMENTS.push(cmdLine.getArgument(i));
         } catch (e) {}
         // trying to get file for passed bootstrap.js (narwhal-xulrunner will pass it)
         var bootstrap;
@@ -107,6 +101,7 @@ CommandLineBoot.prototype = {
     },
     helpInfo: "-narwhal [path]             Bootstrap narwhal\nwill boot narwhal from the bootstar path. If not specified will look for ENV variable NARWHAL_HOME"
 }
+
 /**
  * XPCOM observes application startup. If there is narwhal extension installed
  * it will use as a path to the bootstarp.js to load, Otherwise looks for.
@@ -119,12 +114,21 @@ AppStartupBoot.prototype = {
     QueryInterface: XPCOMUtils.generateQI([Ci.nsISupports, Ci.nsIObserver]),
     _xpcom_categories: [{ category: APP_STARTUP, service: true }],
     observe: function(subject, topic, data) {
-        if (topic == APP_STARTUP) this.boot();
+        if (topic == APP_STARTUP) this.register();
+        else if (topic == PROFILE_READY) this.boot();
+    },
+    register: function() {
+        ObserverService.addObserver(this, PROFILE_READY, false);
+    },
+    unregister: function() {
+        ObserverService.removeObserver(this, PROFILE_READY);
     },
     boot: function() {
         try {
-            bootstrapNarwhal(getResourceFile("resource://%%InternalName%%-narwhalrunner/narwhal/engines/xulrunner/bootstrap.js"));
-        } catch(e) {}
+            bootstrapNarwhal(getResourceFile("resource://narwhal/engines/xulrunner/bootstrap.js"));
+        } finally {
+            this.unregister();
+        }
     }
 };
 /**
@@ -152,15 +156,13 @@ function bootstrapNarwhal(bootstrap) {
                 if (Env.exists(JS_PATH)) path.push(Env.get(JS_PATH))
                 Env.set(PATH, path.join(":"))
             }
-
             var sandbox = Cu.Sandbox(Cc["@mozilla.org/systemprincipal;1"].createInstance(Ci.nsIPrincipal));
-            sandbox.__narwhal_args__ = ARGUMENTS;
-
+            sandbox.args = ARGUMENTS;
             Cu.evalInSandbox(readFile(bootstrap), sandbox, "1.8", bootstrap.path, 0);
             Narwhal.prototype.__proto__ = sandbox;
-			
         } catch(e) {
-            dump("narwhal> Error:" + e.message + "\nStack:" + e.stack + "\n");
+            if (typeof e == "string") dump(e + "\n");
+            else for (var key in e) dump('Error:' + key + ": " + e[key] + "\n");
         }
 }
 /**
@@ -203,6 +205,5 @@ Narwhal.prototype = {
     }
 };
 
-var components = [CommandLineBoot, AppStartupBoot, Narwhal];
+var components = [AppStartupBoot, Narwhal];
 function NSGetModule(compMgr, fileSpec) XPCOMUtils.generateModule(components);
-

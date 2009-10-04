@@ -1,3 +1,5 @@
 
+resource narwhal         narwhalrunner/narwhal/
+
 content  %%InternalName%%-narwhalrunner         narwhalrunner/chrome/content/
 resource %%InternalName%%-narwhalrunner         narwhalrunner/
