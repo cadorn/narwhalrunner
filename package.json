@@ -10,20 +10,10 @@
     ],
     "author": "Christoph Dorn (http://www.christophdorn.com/)",
     "dependencies": [
-        [
-            ["common", "tusk:///common"]
-        ],
-        [
-            ["extension", "tusk:///extension"]
-        ],
-        [
-            ["devtools", "tusk:///devtools"]
-        ],
-        [
-            ["test-firefox-extension", "tusk:///test-firefox-extension"]
-        ],
-        [
-            ["test-application", "tusk:///test-application"]
-        ]
+        ["common", "tusk:///common"],
+        ["extension", "tusk:///extension"],
+        ["devtools", "tusk:///devtools"],
+        ["test-firefox-extension", "tusk:///test-firefox-extension"],
+        ["test-application", "tusk:///test-application"]
     ]
 }
