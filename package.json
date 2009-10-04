@@ -2,7 +2,12 @@
     "name": "narwhalrunner",
     "license": "BSD",
     "description": "A toolkit for building XULRunner applications and extensions with Narwhal",
-    "keywords": ["javascript", "xulrunner", "firefox", "narwhal"],
+    "keywords": [
+        "javascript",
+        "xulrunner",
+        "firefox",
+        "narwhal"
+    ],
     "author": "Christoph Dorn (http://www.christophdorn.com/)",
     "dependencies": [
         [
@@ -25,6 +30,9 @@
         ],
         [
             "template"
+        ],
+        [
+            "test-application"
         ]
     ]
 }

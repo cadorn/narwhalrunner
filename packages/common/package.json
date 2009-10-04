@@ -1,5 +1,8 @@
 {
     "name": "common",
-    "dependencies": [
-    ]
+    "build": {
+        "dependencies": [
+            ["template", "tusk:///template"]
+        ]
+    }
 }

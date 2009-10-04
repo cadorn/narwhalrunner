@@ -20,16 +20,6 @@
                 "installMethod": "none"
             }
         },
-        "narwhal-xulrunner": {
-            "manifest": {
-                "name": "narwhal-xulrunner",
-                "engine": "xulrunner"
-            },
-            "origin": {
-                "url": "tusk://narwhal/narwhal-xulrunner",
-                "installMethod": "inherit"
-            }
-        },
         "devtools": {
             "manifest": {
                 "name": "devtools"
@@ -48,25 +38,47 @@
                 "installMethod": "link"
             }
         },
-        "template": {
+        "test-application": {
             "manifest": {
-                "name": "template",
-                "description": "A simple templating engine",
-                "keywords": [
-                    "template",
-                    "text",
-                    "json"
+                "name": "test-application",
+                "dependencies": [
+                    [
+                        "application",
+                        "tusk:///application"
+                    ],
+                    [
+                        "common",
+                        "tusk:///common"
+                    ]
                 ],
-                "author": "George Moschovitis",
-                "email": "george.moschovitis@gmail.com",
-                "dependencies": [],
-                "lib": "lib"
+                "build": {
+                    "dependencies": [
+                        "template"
+                    ],
+                    "defaultTarget": "dev",
+                    "targets": {
+                        "dev": "application:build/dev"
+                    }
+                },
+                "narwhalrunner": {
+                    "InternalName": "narwhalrunner-test-application",
+                    "ID": "test-application@narwhalrunner.cadorn.github.com",
+                    "Name": "NarwhalRunner Test",
+                    "Version": "0.1",
+                    "Release": "",
+                    "Vendor": "Christoph Dorn",
+                    "Creator": "Christoph Dorn",
+                    "Copyright": "Copyright (c) 2009 Christoph Dorn",
+                    "Description": "A NarwhalRunner application for testing",
+                    "HomepageURL": "http://github.com/cadorn/narwhalrunner",
+                    "IconURL": ""
+                }
             },
             "origin": {
-                "url": "tusk://narwhal/template",
-                "installMethod": "inherit"
+                "url": "file:///pinf/packages-birth/PINF/OpenSource/org.cadorn.github/packages/narwhalrunner/packages/test-application/",
+                "installMethod": "copy"
             }
         }
     },
-    "revision": "EFE22EC71A1C26EFD926A41EB9622E79"
+    "revision": "136630CBF295C75FE50952845A580781"
 }

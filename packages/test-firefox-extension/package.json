@@ -1,11 +1,12 @@
 {
     "name": "test-firefox-extension",
     "dependencies": [
-        "extension"
+        ["extension", "tusk:///extension"],
+        ["common", "tusk:///common"]
     ],
     "build": {
         "dependencies": [
-            "template"
+            ["template", "tusk:///template"]
         ],
         "defaultTarget": "dev",
         "targets": {

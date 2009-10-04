@@ -4,9 +4,6 @@
         ["common", "tusk:///common"]
     ],
     "build": {
-        "dependencies": [
-            "common"
-        ],
         "defaultTarget": "dev",
         "targets": {
             "dev": "build/dev",

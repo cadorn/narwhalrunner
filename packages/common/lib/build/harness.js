@@ -6,7 +6,7 @@ var FILE = require('file');
 var UTIL = require("util");
 var STREAM = require('term').stream;
 var SEA = require("narwhal/tusk/sea");
-var TEMPLATE = require("template");
+var TEMPLATE = require("template", "template");
 var STRUCT = require("struct");
 var MD5 = require("md5");
 
@@ -26,7 +26,7 @@ var sea = SEA.getActive(),
     toPath,
     pkg,
     pkgType;
-    
+
 
 exports.initialize = function(args, options) {
     if(!initialized) {

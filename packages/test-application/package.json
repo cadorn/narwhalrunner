@@ -6,7 +6,7 @@
     ],
     "build": {
         "dependencies": [
-            "template"
+            ["template", "tusk:///template"]
         ],
         "defaultTarget": "dev",
         "targets": {

@@ -1,10 +1,9 @@
 {
     "name": "extension",
+    "dependencies": [
+        ["common", "tusk:///common"]
+    ],
     "build": {
-        "dependencies": [
-            "template",
-            "common"
-        ],
         "defaultTarget": "dev",
         "targets": {
             "dev": "build/dev"
