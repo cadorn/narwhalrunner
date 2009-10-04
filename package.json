@@ -11,28 +11,19 @@
     "author": "Christoph Dorn (http://www.christophdorn.com/)",
     "dependencies": [
         [
-            "narwhal"
+            ["common", "tusk:///common"]
         ],
         [
-            "common"
+            ["extension", "tusk:///extension"]
         ],
         [
-            "extension"
+            ["devtools", "tusk:///devtools"]
         ],
         [
-            "narwhal-xulrunner"
+            ["test-firefox-extension", "tusk:///test-firefox-extension"]
         ],
         [
-            "devtools"
-        ],
-        [
-            "test-firefox-extension"
-        ],
-        [
-            "template"
-        ],
-        [
-            "test-application"
+            ["test-application", "tusk:///test-application"]
         ]
     ]
 }
