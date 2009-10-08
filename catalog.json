@@ -1,84 +1,88 @@
 {
-    "name": "localhost.narwhalrunner",
+    "name": "com.github.cadorn.narwhalrunner",
     "type": "sea",
+    "origin": {
+        "locate": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
+        "revision": "136630CBF295C75FE50952845A580781"
+    }
     "packages": {
-        "common": {
-            "manifest": {
-                "name": "common"
-            },
-            "origin": {
-                "url": "file://./packages/common",
-                "installMethod": "none"
-            }
-        },
-        "extension": {
-            "manifest": {
-                "name": "extension"
-            },
-            "origin": {
-                "url": "file://./packages/extension",
-                "installMethod": "none"
-            }
-        },
-        "devtools": {
-            "manifest": {
-                "name": "devtools"
-            },
-            "origin": {
-                "url": "file://./packages/devtools",
-                "installMethod": "link"
-            }
-        },
-        "test-firefox-extension": {
-            "manifest": {
-                "name": "test-firefox-extension"
-            },
-            "origin": {
-                "url": "file://./packages/test-firefox-extension",
-                "installMethod": "link"
-            }
-        },
-        "test-application": {
-            "manifest": {
-                "name": "test-application",
-                "dependencies": [
-                    [
-                        "application",
-                        "tusk:///application"
-                    ],
-                    [
-                        "common",
-                        "tusk:///common"
-                    ]
-                ],
-                "build": {
-                    "dependencies": [
-                        "template"
-                    ],
-                    "defaultTarget": "dev",
-                    "targets": {
-                        "dev": "application:build/dev"
-                    }
-                },
-                "narwhalrunner": {
-                    "InternalName": "narwhalrunner-test-application",
-                    "ID": "test-application@narwhalrunner.cadorn.github.com",
-                    "Name": "NarwhalRunner Test",
-                    "Version": "0.1",
-                    "Release": "",
-                    "Vendor": "Christoph Dorn",
-                    "Creator": "Christoph Dorn",
-                    "Copyright": "Copyright (c) 2009 Christoph Dorn",
-                    "Description": "A NarwhalRunner application for testing",
-                    "HomepageURL": "http://github.com/cadorn/narwhalrunner",
-                    "IconURL": ""
-                }
-            },
-            "origin": {
-                "url": "file:///pinf/packages-birth/PINF/OpenSource/org.cadorn.github/packages/narwhalrunner/packages/test-application/",
-                "installMethod": "copy"
-            }
-        }
-    },
-    "revision": "136630CBF295C75FE50952845A580781"
+        "common": [
+            ["source", {
+                "locate": "file://./packages/common",
+                "package": "common",
+                "revision": "latest"
+            }],
+            ["latest", {
+                "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
+                "path": "packages/common",
+                "package": "common",
+                "revision": "latest"
+            }]
+        ],
+        "application": [
+            ["source", {
+                "locate": "file://./packages/application",
+                "package": "application",
+                "revision": "latest"
+            }],
+            ["latest", {
+                "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
+                "path": "packages/application",
+                "package": "application",
+                "revision": "latest"
+            }]
+        ],
+        "extension": [
+            ["source", {
+                "locate": "file://./packages/extension",
+                "package": "extension",
+                "revision": "latest"
+            }],
+            ["latest", {
+                "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
+                "path": "packages/extension",
+                "package": "extension",
+                "revision": "latest"
+            }]
+        ],
+        "devtools": [
+            ["source", {
+                "locate": "file://./packages/devtools",
+                "package": "devtools",
+                "revision": "latest"
+            }],
+            ["latest", {
+                "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
+                "path": "packages/devtools",
+                "package": "devtools",
+                "revision": "latest"
+            }]
+        ],
+        "test-firefox-extension": [
+            ["source", {
+                "locate": "file://./packages/test-firefox-extension",
+                "package": "test-firefox-extension",
+                "revision": "latest"
+            }],
+            ["latest", {
+                "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
+                "path": "packages/test-firefox-extension",
+                "package": "test-firefox-extension",
+                "revision": "latest"
+            }]
+        ],
+        "test-application": [
+            ["source", {
+                "locate": "file://./packages/test-application",
+                "package": "test-application",
+                "revision": "latest"
+            }],
+            ["latest", {
+                "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
+                "path": "packages/test-application",
+                "package": "test-application",
+                "revision": "latest"
+            }]
+        ]
+    }
 }
