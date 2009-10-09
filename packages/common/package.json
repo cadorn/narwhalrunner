@@ -1,11 +1,19 @@
 {
     "name": "common",
     "dependencies": [
-        ["narwhal-xulrunner", "tusk://narwhal/narwhal-xulrunner"]
+        ["narwhal-xulrunner", {
+            "locate": "http://github.com/cadorn/narwhal-xulrunner/zipball/master/",
+            "package": "narwhal-xulrunner",
+            "revision": "master"
+        }]
     ],
     "build": {
         "dependencies": [
-            ["template", "tusk:///template"]
+            ["template", {
+                "catalog": "http://github.com/cadorn/narwhal/raw/tusk-catalog/catalog.json",
+                "package": "template",
+                "revision": "latest"
+            }]
         ]
     }
 }

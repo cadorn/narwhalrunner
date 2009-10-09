@@ -125,7 +125,7 @@ AppStartupBoot.prototype = {
     },
     boot: function() {
         try {
-            bootstrapNarwhal(getResourceFile("resource://narwhal/engines/xulrunner/bootstrap.js"));
+            bootstrapNarwhal(getResourceFile("resource://%%InternalName%%-packages/%%XULRunnerEnginePath%%/bootstrap.js"));
         } finally {
             this.unregister();
         }

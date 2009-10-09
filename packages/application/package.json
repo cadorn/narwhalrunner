@@ -1,9 +1,20 @@
 {
     "name": "application",
     "dependencies": [
-        ["common", "tusk:///common"]
+        ["common", {
+            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
+            "package": "common",
+            "revision": "latest"
+        }]
     ],
     "build": {
+        "dependencies": [
+            ["common", {
+                "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
+                "package": "common",
+                "revision": "latest"
+            }]
+        ],
         "defaultTarget": "dev",
         "targets": {
             "dev": "build/dev",

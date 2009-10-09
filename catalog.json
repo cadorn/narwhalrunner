@@ -2,9 +2,8 @@
     "name": "com.github.cadorn.narwhalrunner",
     "type": "sea",
     "origin": {
-        "locate": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-        "revision": "136630CBF295C75FE50952845A580781"
-    }
+        "locate": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json"
+    },
     "packages": {
         "common": [
             ["source", {
@@ -16,7 +15,7 @@
                 "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
                 "path": "packages/common",
                 "package": "common",
-                "revision": "latest"
+                "revision": "master"
             }]
         ],
         "application": [
@@ -29,7 +28,7 @@
                 "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
                 "path": "packages/application",
                 "package": "application",
-                "revision": "latest"
+                "revision": "master"
             }]
         ],
         "extension": [
@@ -42,7 +41,7 @@
                 "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
                 "path": "packages/extension",
                 "package": "extension",
-                "revision": "latest"
+                "revision": "master"
             }]
         ],
         "devtools": [
@@ -55,7 +54,7 @@
                 "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
                 "path": "packages/devtools",
                 "package": "devtools",
-                "revision": "latest"
+                "revision": "master"
             }]
         ],
         "test-firefox-extension": [
@@ -68,7 +67,7 @@
                 "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
                 "path": "packages/test-firefox-extension",
                 "package": "test-firefox-extension",
-                "revision": "latest"
+                "revision": "master"
             }]
         ],
         "test-application": [
@@ -81,7 +80,7 @@
                 "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
                 "path": "packages/test-application",
                 "package": "test-application",
-                "revision": "latest"
+                "revision": "master"
             }]
         ]
     }

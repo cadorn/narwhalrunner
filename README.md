@@ -9,9 +9,67 @@ applications and extensions with [Narwhal](http://narwhaljs.org/).
 
 
 Setup
------
+=====
 
-*COMING SOON*
+Assumptions:
+
+ * You must be using Christoph Dorn's **tusk-catalog** branch.
+
+TODO: instructions
+
+ * You have firefox installed
+
+ * You are on:
+   * **Mac OS X**  - *fully tested*
+   * UNIX - *should be working*
+   * Windows - *tusk-catalog* still needs some work:
+     * Primarily to do with symlinks and paths
+
+Instructions:
+
+    // Add the narwhalrunner catalog
+    tusk catalog add magic://com.github.cadorn.narwhalrunner
+
+    // Create a new sea to play in and switch to it
+    tusk create sea -s --name playground ./playground
+
+    // Install developer tool
+    tusk package install --catalog com.github.cadorn.narwhalrunner devtools
+    
+    // Add firefox binary
+    dev add-bin /Applications/Firefox.app/Contents/MacOS/firefox-bin
+
+test-application
+----------------
+    
+    // Install the test application
+    tusk package install --catalog com.github.cadorn.narwhalrunner test-application
+    
+    // Build the test application
+    tusk package build test-application
+    
+    // Launch the test application
+    dev launch --dev --app firefox --package test-application
+
+test-firefox-extension
+----------------------
+    
+    // Install the test extension
+    tusk package install --catalog com.github.cadorn.narwhalrunner test-firefox-extension
+    
+    // Build the test extension
+    tusk package build test-application
+    
+    // Create a dev firefox profile
+    dev create-profile --dev test1
+    
+    // Add test extension to profile
+    dev add-extension -l --profile test1 build/test-firefox-extension
+    
+    // Launch firefox with the test extension
+    dev launch --dev --app firefox --profile test1
+
+
 
 
 

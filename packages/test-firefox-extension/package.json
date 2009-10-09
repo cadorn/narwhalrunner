@@ -1,13 +1,18 @@
 {
     "name": "test-firefox-extension",
     "dependencies": [
-        ["extension", "tusk:///extension"],
-        ["common", "tusk:///common"]
+        ["extension", {
+            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
+            "package": "extension",
+            "revision": "latest"
+        }],
+        ["common", {
+            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
+            "package": "common",
+            "revision": "latest"
+        }]
     ],
     "build": {
-        "dependencies": [
-            ["template", "tusk:///template"]
-        ],
         "defaultTarget": "dev",
         "targets": {
             "dev": "extension:build/dev",

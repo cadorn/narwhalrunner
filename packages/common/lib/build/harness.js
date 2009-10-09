@@ -5,7 +5,7 @@ function dump(obj) { print(require('test/jsdump').jsDump.parse(obj)) };
 var FILE = require('file');
 var UTIL = require("util");
 var STREAM = require('term').stream;
-var SEA = require("narwhal/tusk/sea");
+var TUSK = require("narwhal/tusk/tusk");
 var TEMPLATE = require("template", "template");
 var STRUCT = require("struct");
 var MD5 = require("md5");
@@ -13,11 +13,11 @@ var MD5 = require("md5");
 
 var initialized = false;
 
-var sea = SEA.getActive(),
+var sea = TUSK.getActive().getSea(),
     buildDirectory = sea.getBuildPath(),
-    applicationPackage = sea.getPackage("application"),  // TODO: We need a way to fetch packages even if installed as dependencies
-    extensionPackage = sea.getPackage("extension"),  // TODO: We need a way to fetch packages even if installed as dependencies
-    commonPackage = sea.getPackage("common"),  // TODO: We need a way to fetch packages even if installed as dependencies
+    applicationPackage,
+    extensionPackage,
+    commonPackage,
     packageName,
     packageID,
     targetBuildPath,
@@ -29,11 +29,19 @@ var sea = SEA.getActive(),
 
 
 exports.initialize = function(args, options) {
+    
     if(!initialized) {
         packageName = args["package"];
+
+        commonPackage = sea.getPackage(packageName).getPackage("common");
+        
         targetBuildChromePath = targetBuildPath = buildDirectory.join(packageName);
         if(options.type=="application") {
             targetBuildChromePath = targetBuildChromePath.join("chrome");
+            applicationPackage = sea.getPackage("application");
+        } else
+        if(options.type=="extension") {
+            extensionPackage = sea.getPackage("extension");
         }
         pkg = sea.getPackage(packageName);
         pkgType = options.type;        

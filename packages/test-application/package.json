@@ -1,13 +1,18 @@
 {
     "name": "test-application",
     "dependencies": [
-        ["application", "tusk:///application"],
-        ["common", "tusk:///common"]
+        ["application", {
+            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
+            "package": "application",
+            "revision": "latest"
+        }],
+        ["common", {
+            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
+            "package": "common",
+            "revision": "latest"
+        }]
     ],
     "build": {
-        "dependencies": [
-            ["template", "tusk:///template"]
-        ],
         "defaultTarget": "dev",
         "targets": {
             "dev": "application:build/dev",

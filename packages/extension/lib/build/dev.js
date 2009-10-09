@@ -6,11 +6,9 @@ var FILE = require('file');
 var UTIL = require("util");
 var STREAM = require('term').stream;
 var SEA = require("narwhal/tusk/sea");
-
 var HARNESS = require("build/harness", "common");
 var DEV = require("build/dev", "common");
 var SKELETON = require("./sceleton");
-
 
 
 exports.main = function(args) { with(HARNESS.initialize(args, {type: "extension"})) {

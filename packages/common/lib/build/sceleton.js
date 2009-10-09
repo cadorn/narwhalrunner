@@ -12,8 +12,15 @@ var HARNESS = require("./harness");
 exports.main = function(args, options) { with(HARNESS.initialize(args, options)) {
         
     var vars = options.vars;
-    vars.PackageName = packageName; 
+    vars.PackageName = packageName;
+    
+    
+    // determine xulrunner engine path
+    var enginePath = commonPackage.getPackage("narwhal-xulrunner").getPath();
+    var dependenciesPath = sea.getDependenciesPath();
+    vars.XULRunnerEnginePath = "dependencies" + enginePath.substr(dependenciesPath.valueOf().length);
 
+    
     var templateVars = {
         build: {
             common: {
@@ -87,7 +94,7 @@ exports.main = function(args, options) { with(HARNESS.initialize(args, options))
 
                                     path = path.dirname().join(".autoreg");
                                     
-                                    path.touch()
+                                    path.touch();
                                     
                                     print("Touched: " + path);
                                 }

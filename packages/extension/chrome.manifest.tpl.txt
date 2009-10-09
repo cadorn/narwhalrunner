@@ -1,7 +1,8 @@
 
-content  %%InternalName%%         chrome/content/
-skin     %%InternalName%%  global chrome/skin/global/
-locale   %%InternalName%%  en-US  chrome/locale/en-US/
+content  %%InternalName%%          chrome/content/
+skin     %%InternalName%%  global  chrome/skin/global/
+locale   %%InternalName%%  en-US   chrome/locale/en-US/
+resource %%InternalName%%-packages packages/
 
 
 {build.common.file|includeFile}
