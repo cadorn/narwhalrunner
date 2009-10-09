@@ -29,7 +29,8 @@ EXPORTED_SYMBOLS = ["system", "require", "print", "prefix"];
     var UTIL = require("util");
     var FILE = require("file");
     var SANDBOX = require("sandbox");
-    var Loader = SANDBOX.Loader;
+    var LOADER = require("loader");
+    var Loader = LOADER.Loader;
     var Sandbox = SANDBOX.Sandbox;
     
     
@@ -74,8 +75,7 @@ EXPORTED_SYMBOLS = ["system", "require", "print", "prefix"];
 
     require('packages').load(paths);
 
-        
-    
+            
 
 
     function getPath(path) {

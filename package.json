@@ -28,12 +28,12 @@
         }],
         ["test-firefox-extension", {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "common",
+            "package": "test-firefox-extension",
             "revision": "latest"
         }],
         ["test-application", {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "common",
+            "package": "test-application",
             "revision": "latest"
         }]
     ],
