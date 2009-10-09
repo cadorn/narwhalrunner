@@ -36,6 +36,7 @@ EXPORTED_SYMBOLS = ["system", "require", "print", "prefix"];
     
     var system = UTIL.copy(narwhal.system);
     //system.engines = UTIL.copy(system.engines);
+
     
     var loader = Loader({"paths": UTIL.copy(require.paths)});
     var sandbox = Sandbox({
@@ -46,7 +47,7 @@ EXPORTED_SYMBOLS = ["system", "require", "print", "prefix"];
         }
     });
     
-    sandbox.force("system");
+    sandbox.force("system").env["SEA"] = getPath('/');
     sandbox("global");
     
     // everything goes through the sandbox from now on
@@ -75,7 +76,6 @@ EXPORTED_SYMBOLS = ["system", "require", "print", "prefix"];
 
     require('packages').load(paths);
 
-            
 
 
     function getPath(path) {

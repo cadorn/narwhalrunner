@@ -16,6 +16,11 @@
             "package": "common",
             "revision": "latest"
         }],
+        ["application", {
+            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
+            "package": "application",
+            "revision": "latest"
+        }],
         ["extension", {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
             "package": "extension",

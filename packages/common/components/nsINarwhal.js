@@ -15,6 +15,7 @@ Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 var NARWHAL_HOME = "NARWHAL_HOME",
     ENGINE_HOME = "NARWHAL_ENGINE_HOME",
+    SEA = "SEA",
     PATH = "NARWHAL_PATH",
     JS_PATH = "JS_PATH";
 var APP_STARTUP = "app-startup";
@@ -125,7 +126,8 @@ AppStartupBoot.prototype = {
     },
     boot: function() {
         try {
-            bootstrapNarwhal(getResourceFile("resource://%%InternalName%%-packages/%%XULRunnerEnginePath%%/bootstrap.js"));
+//            bootstrapNarwhal(getResourceFile("resource://%%InternalName%%-packages/%%XULRunnerEnginePath%%/bootstrap.js"));
+            bootstrapNarwhal(getResourceFile("resource://narwhal/engines/xulrunner/bootstrap.js"));
         } finally {
             this.unregister();
         }

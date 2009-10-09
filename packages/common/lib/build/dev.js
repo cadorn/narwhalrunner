@@ -27,6 +27,7 @@ exports.main = function(args, options) { with(HARNESS.initialize(args, options))
 
 
     // link dependencies
+/*    
     fromPath = sea.getDependenciesPath();
     toPath = targetBuildPath.join("packages", "dependencies");
     if(!toPath.exists()) {
@@ -34,7 +35,7 @@ exports.main = function(args, options) { with(HARNESS.initialize(args, options))
         fromPath.symlink(toPath);
     }
     print("Linked '" + toPath + "' to '" + fromPath + "'");
-
+*/
 
 
     // link chrome/content
