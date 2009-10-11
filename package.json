@@ -1,6 +1,6 @@
 {
     "name": "narwhalrunner",
-    "license": "BSD",
+    "license": "MIT",
     "description": "A toolkit for building XULRunner applications and extensions with Narwhal",
     "keywords": [
         "javascript",
