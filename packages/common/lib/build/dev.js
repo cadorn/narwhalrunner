@@ -42,7 +42,19 @@ exports.main = function(args, options) { with(HARNESS.initialize(args, options))
     
     fromPath = pkg.getPath().join("chrome", "content");
     if(fromPath.exists()) {
-        toPath = targetBuildChromePath.join("content");
+        toPath = targetBuildPath.join("chrome", "content");
+        if(!toPath.exists()) {
+            toPath.dirname().mkdirs();    
+            fromPath.symlink(toPath);
+        }
+        print("Linked '" + toPath + "' to '" + fromPath + "'");    
+    }
+
+    // link lib
+    
+    fromPath = pkg.getPath().join("lib");
+    if(fromPath.exists()) {
+        toPath = targetBuildPath.join("lib");
         if(!toPath.exists()) {
             toPath.dirname().mkdirs();    
             fromPath.symlink(toPath);
@@ -56,8 +68,7 @@ exports.main = function(args, options) { with(HARNESS.initialize(args, options))
     
     var packages = [
         "common",
-        options.type,
-        packageName
+        options.type
     ];
 
     packages.forEach(function(name) {
