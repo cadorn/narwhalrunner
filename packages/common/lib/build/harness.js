@@ -33,15 +33,15 @@ exports.initialize = function(args, options) {
     if(!initialized) {
         packageName = args["package"];
 
-        commonPackage = sea.getPackage(packageName).getPackage("common");
+        commonPackage = sea.getPackage(module["package"]);
         
         targetBuildChromePath = targetBuildPath = buildDirectory.join(packageName);
         if(options.type=="application") {
             targetBuildChromePath = targetBuildChromePath.join("chrome");
-            applicationPackage = sea.getPackage("application");
+            applicationPackage = args["platform"];
         } else
         if(options.type=="extension") {
-            extensionPackage = sea.getPackage("extension");
+            extensionPackage = args["platform"];
         }
         pkg = sea.getPackage(packageName);
         pkgType = options.type;        

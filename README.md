@@ -75,15 +75,33 @@ Your own application
 --------------------
 
 As a sea package:
+    
+    // Create a new sea for your application and switch to it
+    tusk sea create -s --name test-application ./test-application
+    
+    // Install the NarwhalRunner developer tools
+    tusk package install --alias nr-devtools http://github.com/cadorn/narwhalrunner/raw/master/catalog.json devtools
+    
+    // Write some code
+    nr inject-sample helloworld-application
+    
+    // Install all dependencies
+    tusk package install -f
+    
+    // Build the application
+    tusk package build
 
-    tusk sea create -s --name test-application ./test-application    
-    tusk package add --alias nr-app http://github.com/cadorn/narwhalrunner/raw/master/catalog.json application
+
 
 As a deep-sea package:
 
     tusk sea create -s --name test-project ./test-project    
-    tusk package create test-application 
-    tusk package --package test-application add --alias nr-app http://github.com/cadorn/narwhalrunner/raw/master/catalog.json application
+    tusk package create test-application
+    tusk package install --alias nr-devtools http://github.com/cadorn/narwhalrunner/raw/master/catalog.json devtools
+
+    // Write some code
+    nr inject-sample --package test-application helloworld-application
+    tusk package install -f
 
 
 

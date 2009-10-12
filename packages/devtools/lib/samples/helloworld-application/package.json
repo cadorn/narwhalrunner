@@ -1,0 +1,34 @@
+{
+    "name": "%%PackageName%%",
+    "dependencies": [
+        ["nr-app", {
+            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
+            "package": "application",
+            "revision": "latest"
+        }],
+        ["nr-common", {
+            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
+            "package": "common",
+            "revision": "latest"
+        }]
+    ],
+    "build": {
+        "defaultTarget": "dev",
+        "targets": {
+            "dev": "nr-app:build/dev",
+        }
+    },
+    "narwhalrunner": {
+        "InternalName": "%%PackageName%%",
+        "ID": "%%PackageName%%@domain.com",
+        "Name": "%%PackageName%%",
+        "Version": "0.1",
+        "Release": "",
+        "Vendor": "Vendor",
+        "Creator": "Creator",
+        "Copyright": "Copyright",
+        "Description": "Description",
+        "HomepageURL": "http://github.com/cadorn/narwhalrunner",
+        "IconURL": ""
+    }
+}

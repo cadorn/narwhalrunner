@@ -8,7 +8,7 @@ exports.main = function(args) {
 
     var browser = CHROME.getBrowser();
     
-    browser.addTab("narwhalrunner://narwhalrunner-test-firefox-extension/test-firefox-extension/content/test.xul");
+    browser.addTab("narwhalrunner://"+APP.getApp().getInternalName()+"/"+APP.getApp().getPackageName()+"/content/test.xul");
     browser.mTabContainer.advanceSelectedTab(1, true);
 
     // notify NarwhalRunner that extension is loaded    

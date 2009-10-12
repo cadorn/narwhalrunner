@@ -38,6 +38,10 @@ App.prototype.getInternalName = function() {
     return this.manifest.narwhalrunner.InternalName;
 }
 
+App.prototype.getPackageName = function() {
+    return this.manifest.name;
+}
+
 App.prototype.registerProtocolHandler = function() {
     var self = this;
     CHROME.registerProtocolHandler({
@@ -83,6 +87,8 @@ App.prototype.registerProtocolHandler = function() {
                     
                     var body = filePath.read();
                     
+                    body = body.replace(/%%PackageName%%/g, packageName);
+
                     body = body.replace(/%%PackageChromeURLPrefix%%/g, "narwhalrunner://" +
                             self.manifest.narwhalrunner.InternalName + "/" + packageName + "/");
 

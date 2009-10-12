@@ -1,6 +1,6 @@
 
-var CHROME = require("chrome", "common");
-var APP = require("app", "common");
+var CHROME = require("chrome", "nr-common");
+var APP = require("app", "nr-common");
 
 
 exports.main = function(args) {

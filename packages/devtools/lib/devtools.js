@@ -8,10 +8,12 @@ var os = require('os');
 var args = require("args");
 var parser = exports.parser = new args.Parser();
 var UTIL = require("util");
+var FILE = require("file");
 var MD5 = require("md5");
 var STRUCT = require("struct");
 var CONFIG = require("./config");
 var SEA = require("narwhal/tusk/sea");
+var TUSK = require("narwhal/tusk/tusk");
 var MANIFEST = require("narwhal/tusk/manifest");
 var STREAM = require('term').stream;
 
@@ -98,7 +100,7 @@ command = parser.command('launch', function(options) {
                 if(manifest.exists()) {
                     
                     // build the package
-                    os.system("tusk package build " + manifest.getName());
+                    os.system("tusk package --package " + manifest.getName() + " build");
                 }
             });
         }
@@ -362,6 +364,52 @@ command = parser.command('list-bin', function(options) {
 command.help("List all registered binaries");
 command.helpful();
     
+
+
+
+
+command = parser.command('inject-sample', function(options) {
+    
+    var sampleName = options.args[0];
+    if(!sampleName) {
+        print("No sample name provided");
+        return;
+    }
+    var packageName = options["package"] || false;
+    
+    // if no package was provided we use the sea package
+    var pkg;
+    if(!packageName) {
+        pkg = TUSK.getActiveSea().getSeaPackage();
+        packageName = pkg.getName();
+    } else {
+        pkg = TUSK.getActiveSea().getPackage(packageName);
+    }
+    if(!pkg || !pkg.exists()) {
+        print("Package does not exist");
+        return;
+    }
+
+    var sourcePath = FILE.Path(module.path).dirname().join("samples", sampleName);
+    var targetPath = pkg.getPath();
+
+    print("Copying from '"+sourcePath.valueOf()+"' to '"+targetPath.valueOf()+"'.");
+    
+    FILE.copyTree(sourcePath.join("chrome"), targetPath.join("chrome"));
+    FILE.copyTree(sourcePath.join("lib"), targetPath.join("lib"));
+    
+    var manifest = sourcePath.join("package.json").read();
+    manifest = manifest.replace(/%%PackageName%%/g, packageName);
+    targetPath.join("package.json").write(manifest);
+
+    print("Done");
+});
+command.help("Inject sample code into a package")
+    .arg('name');
+command.option('--package').set().help("The package to inject the sample code into");
+command.helpful();
+
+
 
 
 exports.main = function (args) {
