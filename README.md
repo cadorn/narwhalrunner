@@ -20,7 +20,7 @@ You must be using Christoph Dorn's **tusk-catalog** branch.
     // Switch to branch
     git checkout tusk-catalog
 
-You have the [narwhal-xulrunner]http://github.com/cadorn/narwhal-xulrunner) engine installed
+You have the [narwhal-xulrunner](http://github.com/cadorn/narwhal-xulrunner) engine installed
  
     TODO: tusk package install ...
 
