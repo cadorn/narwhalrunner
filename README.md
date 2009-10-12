@@ -9,9 +9,10 @@ applications and extensions with [Narwhal](http://narwhaljs.org/).
 Setup
 =====
 
-Assumptions:
+Assumptions
+-----------
 
- * You must be using Christoph Dorn's **tusk-catalog** branch.
+You must be using Christoph Dorn's **tusk-catalog** branch.
  
     // Fresh clone
     git clone git://github.com/cadorn/narwhal.git
@@ -19,19 +20,21 @@ Assumptions:
     // Switch to branch
     git checkout tusk-catalog
 
- * You have the [narwhal-xulrunner]http://github.com/cadorn/narwhal-xulrunner) engine installed
+You have the [narwhal-xulrunner]http://github.com/cadorn/narwhal-xulrunner) engine installed
  
     TODO: tusk package install ...
 
- * You have [firefox](http://www.mozilla.com/en-US/firefox/) installed
+You have [firefox](http://www.mozilla.com/en-US/firefox/) installed
 
- * You are on:
+You are on:
+
    * **Mac OS X**  - *fully tested*
    * UNIX - *should be working*
    * Windows - *tusk-catalog* still needs some work:
      * Primarily to do with symlinks and paths
 
-Instructions:
+Instructions
+------------
 
     // Create a new sea to play in and switch to it
     tusk sea create -s --name playground ./playground
