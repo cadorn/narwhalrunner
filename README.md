@@ -29,11 +29,8 @@ TODO: instructions
 
 Instructions:
 
-    // Add the narwhalrunner catalog
-    tusk catalog add magic://com.github.cadorn.narwhalrunner
-
     // Create a new sea to play in and switch to it
-    tusk create sea -s --name playground ./playground
+    tusk sea create -s --name playground ./playground
 
     // Install developer tool
     tusk package install --catalog com.github.cadorn.narwhalrunner devtools
@@ -81,7 +78,7 @@ As a sea package:
     
     // Install the NarwhalRunner developer tools
     tusk package install --alias nr-devtools http://github.com/cadorn/narwhalrunner/raw/master/catalog.json devtools
-    
+        
     // Write some code
     nr inject-sample helloworld-application
     
@@ -91,20 +88,37 @@ As a sea package:
     // Build the application
     tusk package build
 
+    // Add firefox binary
+    nr add-bin /Applications/Firefox.app/Contents/MacOS/firefox-bin
+
     // Launch the test application
     nr launch --dev --app firefox --package test-application
 
 As a deep-sea package:
 
+    // Create a new sea for your project and switch to it
     tusk sea create -s --name test-project ./test-project    
+    
+    // Create a new package for your application
     tusk package create test-application
+        
+    // Install the NarwhalRunner developer tools
     tusk package install --alias nr-devtools http://github.com/cadorn/narwhalrunner/raw/master/catalog.json devtools
 
     // Write some code
     nr inject-sample --package test-application helloworld-application
-    tusk package install -f
 
+    // Install all dependencies
+    tusk package --package test-application install -f
+    
+    // Build the application
+    tusk package --package test-application build
 
+    // Add firefox binary
+    nr add-bin /Applications/Firefox.app/Contents/MacOS/firefox-bin
+
+    // Launch the test application
+    nr launch --dev --app firefox --package test-application
 
 
 

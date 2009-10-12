@@ -66,7 +66,7 @@ exports.main = function(args, options) { with(HARNESS.initialize(args, options))
 
     targetBuildPath.join("packages").mkdirs();
     
-    fromPath = pkg.getPath().join("packages", "dependencies");
+    fromPath = sea.getPath().join("packages", "dependencies");
     if(fromPath.exists()) {
         toPath = targetBuildPath.join("packages", "dependencies");
         if(!toPath.exists()) {
