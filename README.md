@@ -39,10 +39,10 @@ Instructions:
     tusk package install --catalog com.github.cadorn.narwhalrunner devtools
     
     // Add firefox binary
-    dev add-bin /Applications/Firefox.app/Contents/MacOS/firefox-bin
+    nr add-bin /Applications/Firefox.app/Contents/MacOS/firefox-bin
 
-test-application
-----------------
+Demo: test-application
+----------------------
     
     // Install the test application
     tusk package install --catalog com.github.cadorn.narwhalrunner test-application
@@ -53,8 +53,8 @@ test-application
     // Launch the test application
     nr launch --dev --app firefox --package test-application
 
-test-firefox-extension
-----------------------
+Demo: test-firefox-extension
+----------------------------
     
     // Install the test extension
     tusk package install --catalog com.github.cadorn.narwhalrunner test-firefox-extension
@@ -91,7 +91,8 @@ As a sea package:
     // Build the application
     tusk package build
 
-
+    // Launch the test application
+    nr launch --dev --app firefox --package test-application
 
 As a deep-sea package:
 

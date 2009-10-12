@@ -18,6 +18,7 @@ var sea = TUSK.getActive().getSea(),
     applicationPackage,
     extensionPackage,
     commonPackage,
+    commonPackageName,
     packageName,
     packageID,
     targetBuildPath,
@@ -33,7 +34,8 @@ exports.initialize = function(args, options) {
     if(!initialized) {
         packageName = args["package"];
 
-        commonPackage = sea.getPackage(module["package"]);
+        commonPackageName = module["package"];
+        commonPackage = sea.getPackage(commonPackageName);
         
         targetBuildChromePath = targetBuildPath = buildDirectory.join(packageName);
         if(options.type=="application") {
@@ -57,6 +59,7 @@ exports.initialize = function(args, options) {
         buildDirectory: buildDirectory,
         extensionPackage: extensionPackage,
         commonPackage: commonPackage,
+        commonPackageName: commonPackageName,
         packageName: packageName,
         targetBuildPath: targetBuildPath,
         targetBuildChromePath: targetBuildChromePath,

@@ -13,6 +13,7 @@ exports.main = function(args, options) { with(HARNESS.initialize(args, options))
         
     var vars = options.vars;
     vars.PackageName = packageName;
+    vars.CommonPackageName = commonPackageName;
     
     
     // determine xulrunner engine path

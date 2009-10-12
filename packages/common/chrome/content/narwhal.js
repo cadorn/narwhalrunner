@@ -16,8 +16,8 @@
     // -----------------------------------
 
     var FILE = narwhal.require("file");
-    var CHROME = narwhal.require("chrome", "common");    
-    var APP = narwhal.require("app", "common");
+    var CHROME = narwhal.require("chrome", "%%CommonPackageName%%");    
+    var APP = narwhal.require("app", "%%CommonPackageName%%");
 
     CHROME.set(this);
     
