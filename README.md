@@ -13,15 +13,15 @@ Assumptions:
 
  * You must be using Christoph Dorn's **tusk-catalog** branch.
  
-     // Fresh clone
-     git clone git://github.com/cadorn/narwhal.git
+    // Fresh clone
+    git clone git://github.com/cadorn/narwhal.git
      
-     // Switch to branch
-     git checkout tusk-catalog
+    // Switch to branch
+    git checkout tusk-catalog
 
  * You have the [narwhal-xulrunner]http://github.com/cadorn/narwhal-xulrunner) engine installed
  
-     TODO: tusk package install ...
+    TODO: tusk package install ...
 
  * You have [firefox](http://www.mozilla.com/en-US/firefox/) installed
 
