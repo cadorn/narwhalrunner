@@ -15,10 +15,13 @@ var initialized = false;
 
 var sea = TUSK.getActive().getSea(),
     buildDirectory = sea.getBuildPath(),
-    applicationPackage,
-    extensionPackage,
+    applicationPackage,     // deprecated
+    extensionPackage,       // deprecated
+    platformPackage,
+    platformPackageId,
     commonPackage,
-    commonPackageName,
+    commonPackageName,      // deprecated
+    commonPackageId,
     packageName,
     packageID,
     targetBuildPath,
@@ -34,16 +37,20 @@ exports.initialize = function(args, options) {
     if(!initialized) {
         packageName = args["package"];
 
-        commonPackageName = module["package"];
+        commonPackageId = commonPackageName = module["package"];
         commonPackage = sea.getPackage(commonPackageName);
+        
+        platformPackageId = args["platform"];
+        platformPackage = sea.getPackage(args["platform"]);
+
         
         targetBuildChromePath = targetBuildPath = buildDirectory.join(packageName);
         if(options.type=="application") {
             targetBuildChromePath = targetBuildChromePath.join("chrome");
-            applicationPackage = args["platform"];
+            applicationPackage = platformPackage;
         } else
         if(options.type=="extension") {
-            extensionPackage = args["platform"];
+            extensionPackage = platformPackage;
         }
         pkg = sea.getPackage(packageName);
         pkgType = options.type;        
@@ -58,8 +65,11 @@ exports.initialize = function(args, options) {
         sea: sea,
         buildDirectory: buildDirectory,
         extensionPackage: extensionPackage,
+        platformPackage: platformPackage,
+        platformPackageId: platformPackageId,
         commonPackage: commonPackage,
         commonPackageName: commonPackageName,
+        commonPackageId: commonPackageId,
         packageName: packageName,
         targetBuildPath: targetBuildPath,
         targetBuildChromePath: targetBuildChromePath,
@@ -127,7 +137,7 @@ exports.locatePath = function(path, name) {
 
     var tests = [
         pkg,
-        ((pkgType=="application")?applicationPackage:extensionPackage),
+        platformPackage,
         commonPackage
     ];
     

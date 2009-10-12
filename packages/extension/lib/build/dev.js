@@ -12,7 +12,7 @@ var SKELETON = require("./sceleton");
 
 
 exports.main = function(args) {
-    args["platform"] = TUSK.getActive().getSea().getPackage(module["package"]);
+    args["platform"] = module["package"];
     with(HARNESS.initialize(args, {type: "extension"})) {
     
     SKELETON.main(args);

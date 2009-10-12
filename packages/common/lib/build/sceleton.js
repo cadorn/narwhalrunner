@@ -7,6 +7,7 @@ var UTIL = require("util");
 var JSON = require('json');
 var STREAM = require('term').stream;
 var HARNESS = require("./harness");
+var MANIFEST = require("narwhal/tusk/manifest");
 
 
 exports.main = function(args, options) { with(HARNESS.initialize(args, options)) {
@@ -110,15 +111,13 @@ exports.main = function(args, options) { with(HARNESS.initialize(args, options))
             print("Copied '" + path + "' to '" + toPath + "'");    
         }
     });
-    
-    
+        
     // copy package.json for extension
-    
     fromPath = pkg.getManifest().path;
     toPath = targetBuildPath.join("package.json");
     fromPath.copy(toPath);
     print("Copied '" + fromPath + "' to '" + toPath + "'");    
-
+    
 }}
 
 if (module.id == require.main)

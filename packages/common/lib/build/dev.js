@@ -62,14 +62,30 @@ exports.main = function(args, options) { with(HARNESS.initialize(args, options))
         print("Linked '" + toPath + "' to '" + fromPath + "'");    
     }
 
-    // link packages
+    // link dependencies
 
     targetBuildPath.join("packages").mkdirs();
     
-    var packages = [
-        "common",
-        options.type
-    ];
+    fromPath = pkg.getPath().join("packages", "dependencies");
+    if(fromPath.exists()) {
+        toPath = targetBuildPath.join("packages", "dependencies");
+        if(!toPath.exists()) {
+            toPath.dirname().mkdirs();    
+            fromPath.symlink(toPath);
+        }
+        print("Linked '" + toPath + "' to '" + fromPath + "'");    
+    }
+
+    // link packages
+    
+    var packages = [];
+    
+    if(commonPackageId.split("/").pop()=="common") {
+        packages.push("common");
+    }
+    if(platformPackageId.split("/").pop()=="application") {
+        packages.push("application");
+    }
 
     packages.forEach(function(name) {
         
@@ -81,7 +97,6 @@ exports.main = function(args, options) { with(HARNESS.initialize(args, options))
         print("Linked '" + toPath + "' to '" + fromPath + "'");    
          
     });
-
 }}
 
 
