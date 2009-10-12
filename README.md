@@ -5,21 +5,25 @@ NarwhalRunner
 NarwhalRunner is a toolkit for building [XULRunner](https://developer.mozilla.org/en/XULRunner)
 applications and extensions with [Narwhal](http://narwhaljs.org/).
 
-**STATUS: Under development. Not functional yet!**
-
 
 Setup
 =====
 
-**STATUS: Under development. Not functional yet! The commands below (or similar) are in the works.**
-
 Assumptions:
 
  * You must be using Christoph Dorn's **tusk-catalog** branch.
+ 
+     // Fresh clone
+     git clone git://github.com/cadorn/narwhal.git
+     
+     // Switch to branch
+     git checkout tusk-catalog
 
-TODO: instructions
+ * You have the [narwhal-xulrunner]http://github.com/cadorn/narwhal-xulrunner) engine installed
+ 
+     TODO: tusk package install ...
 
- * You have firefox installed
+ * You have [firefox](http://www.mozilla.com/en-US/firefox/) installed
 
  * You are on:
    * **Mac OS X**  - *fully tested*
@@ -32,8 +36,8 @@ Instructions:
     // Create a new sea to play in and switch to it
     tusk sea create -s --name playground ./playground
 
-    // Install developer tool
-    tusk package install --catalog com.github.cadorn.narwhalrunner devtools
+    // Install developer tools
+    tusk package install http://github.com/cadorn/narwhalrunner/raw/master/catalog.json devtools
     
     // Add firefox binary
     nr add-bin /Applications/Firefox.app/Contents/MacOS/firefox-bin
@@ -42,10 +46,10 @@ Demo: test-application
 ----------------------
     
     // Install the test application
-    tusk package install --catalog com.github.cadorn.narwhalrunner test-application
+    tusk package install http://github.com/cadorn/narwhalrunner/raw/master/catalog.json test-application
     
     // Build the test application
-    tusk package build test-application
+    tusk package --package test-application build
     
     // Launch the test application
     nr launch --dev --app firefox --package test-application
@@ -54,10 +58,10 @@ Demo: test-firefox-extension
 ----------------------------
     
     // Install the test extension
-    tusk package install --catalog com.github.cadorn.narwhalrunner test-firefox-extension
+    tusk package install http://github.com/cadorn/narwhalrunner/raw/master/catalog.json test-firefox-extension
     
     // Build the test extension
-    tusk package build test-application
+    tusk package --package test-firefox-extension build
     
     // Create a dev firefox profile
     nr create-profile --dev test1
