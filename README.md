@@ -20,11 +20,11 @@ You must be using Christoph Dorn's **tusk-catalog** branch.
     // Switch to branch
     git checkout tusk-catalog
 
-You have the [narwhal-xulrunner](http://github.com/cadorn/narwhal-xulrunner) engine installed
+You have the [narwhal-xulrunner](http://github.com/cadorn/narwhal-xulrunner) engine installed:
  
     TODO: tusk package install ...
 
-You have [firefox](http://www.mozilla.com/en-US/firefox/) installed
+You have [firefox 3.5+](http://www.mozilla.com/en-US/firefox/) installed.
 
 You are on:
 
@@ -35,6 +35,9 @@ You are on:
 
 Instructions
 ------------
+
+    // Clear the tusk cache (this will not be necessary soon)
+    rm -Rf ~/.tusk/cache/*
 
     // Create a new sea to play in and switch to it
     tusk sea create -s --name playground ./playground
@@ -75,10 +78,18 @@ Demo: test-firefox-extension
     // Launch firefox with the test extension
     nr launch --dev --app firefox --profile test1
 
+Other Examples
+--------------
+
+    You can find more sample applications and extensions in the [narwhalrunner-examples](http://github.com/cadorn/narwhalrunner-examples) project.    
+
 Your own application
 --------------------
 
 As a sea package:
+
+    // Clear the tusk cache (this will not be necessary soon)
+    rm -Rf ~/.tusk/cache/*
     
     // Create a new sea for your application and switch to it
     tusk sea create -s --name test-application ./test-application
@@ -102,6 +113,9 @@ As a sea package:
     nr launch --dev --app firefox --package test-application
 
 As a deep-sea package:
+
+    // Clear the tusk cache (this will not be necessary soon)
+    rm -Rf ~/.tusk/cache/*
 
     // Create a new sea for your project and switch to it
     tusk sea create -s --name test-project ./test-project    
