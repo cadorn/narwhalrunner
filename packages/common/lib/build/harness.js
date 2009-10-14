@@ -148,7 +148,7 @@ exports.locatePath = function(path, name) {
         if(file) {
             return;
         }
-        if(name && pkg.getName()!=name) {
+        if(name && pkg.getId()!=name && pkg.getName()!=name) {
             return;
         }
         test = pkg.getPath().join(path);

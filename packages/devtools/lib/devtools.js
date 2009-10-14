@@ -67,7 +67,7 @@ command = parser.command('launch', function(options) {
         var packagePath = seaPath.join("build", packageName);        
         
         if(options.build) {
-            os.system("tusk package build " + packageName);
+            os.system("tusk package --package " + packageName + " build");
         }
         
         if(!packagePath.exists()) {
@@ -98,7 +98,7 @@ command = parser.command('launch', function(options) {
                 
                 var manifest = MANIFEST.Manifest(extensionDirectory.join("package.json"));
                 if(manifest.exists()) {
-                    
+
                     // build the package
                     os.system("tusk package --package " + manifest.getName() + " build");
                 }

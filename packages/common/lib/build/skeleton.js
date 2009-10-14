@@ -116,7 +116,39 @@ exports.main = function(args, options) { with(HARNESS.initialize(args, options))
     fromPath = pkg.getManifest().path;
     toPath = targetBuildPath.join("package.json");
     fromPath.copy(toPath);
-    print("Copied '" + fromPath + "' to '" + toPath + "'");    
+    print("Copied '" + fromPath + "' to '" + toPath + "'");
+    
+    
+      
+    // copy defaults/preferences for packages
+
+    var packages = [
+        commonPackageId,
+        platformPackageId,
+        packageName
+    ];
+    var fromBasePath;
+    packages.forEach(function(name) {
+
+        fromBasePath = locatePath("defaults/preferences", name);
+        
+        if(fromBasePath && fromBasePath.exists()) {
+
+            targetBuildPath.join("defaults", "preferences").mkdirs();
+            
+            fromBasePath.listPaths().forEach(function(entry) {
+                if(entry.isFile()) {
+
+                    fromPath = fromBasePath.join(entry.basename());
+                    toPath = targetBuildPath.join("defaults", "preferences", entry.basename());
+
+                    copyWhile(fromPath, toPath, [
+                        [replaceVariables, [vars]]
+                    ]);
+                }
+            });
+        }
+    });
     
 }}
 

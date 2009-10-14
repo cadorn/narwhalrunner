@@ -50,6 +50,18 @@ exports.main = function(args, options) { with(HARNESS.initialize(args, options))
         print("Linked '" + toPath + "' to '" + fromPath + "'");    
     }
 
+    // link chrome/skin
+    
+    fromPath = pkg.getPath().join("chrome", "skin");
+    if(fromPath.exists()) {
+        toPath = targetBuildPath.join("chrome", "skin");
+        if(!toPath.exists()) {
+            toPath.dirname().mkdirs();    
+            fromPath.symlink(toPath);
+        }
+        print("Linked '" + toPath + "' to '" + fromPath + "'");    
+    }
+
     // link lib
     
     fromPath = pkg.getPath().join("lib");
@@ -65,7 +77,7 @@ exports.main = function(args, options) { with(HARNESS.initialize(args, options))
     // link dependencies
 
     targetBuildPath.join("packages").mkdirs();
-    
+
     fromPath = sea.getPath().join("packages", "dependencies");
     if(fromPath.exists()) {
         toPath = targetBuildPath.join("packages", "dependencies");
@@ -85,6 +97,9 @@ exports.main = function(args, options) { with(HARNESS.initialize(args, options))
     }
     if(platformPackageId.split("/").pop()=="application") {
         packages.push("application");
+    }
+    if(platformPackageId.split("/").pop()=="extension") {
+        packages.push("extension");
     }
 
     packages.forEach(function(name) {

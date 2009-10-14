@@ -78,56 +78,82 @@ App.prototype.registerProtocolHandler = function() {
                 }                
             }
 
-            var app;
+            var app,
+                info = {};
                 
-            if(extension=="xul") {
-                app = function(env) {
+            switch(extension) {
+                
+                // ASCII
 
-                    print("Serving: " + filePath);
-                    
-                    var body = filePath.read();
-                    
+                case "xul":
+                    if(!UTIL.has(info, "contentType")) info.contentType = "application/vnd.mozilla.xul+xml";
+
+                case "htm":
+                case "html":
+                    if(!UTIL.has(info, "contentType")) info.contentType = "text/html";
+
+                case "css":
+                    if(!UTIL.has(info, "contentType")) info.contentType = "text/css";
+
+                case "js":
+                    if(!UTIL.has(info, "contentType")) info.contentType = "application/vnd.mozilla.xul+xml";
+
+
+                if(!UTIL.has(info, "binary")) info.binary = false;
+
+                // Binary
+
+                case "png":
+                    if(!UTIL.has(info, "contentType")) info.contentType = "image/png";
+                
+
+                default:
+
+                if(!UTIL.has(info, "binary")) info.binary = true;
+                if(!UTIL.has(info, "contentType")) info.contentType = "application/binary";
+            }
+
+            app = function(env) {
+
+                print("Serving: " + filePath);
+                
+                var body;
+                
+                if(info.binary) {
+                    body = filePath.read("b");
+                } else {
+                    body = filePath.read();
+
+                    if(body["decodeToString"]) {
+                        body = body.decodeToString('utf-8');
+                    }
+                
                     body = body.replace(/%%PackageName%%/g, packageName);
-
+    
                     body = body.replace(/%%PackageChromeURLPrefix%%/g, "narwhalrunner://" +
                             self.manifest.narwhalrunner.InternalName + "/" + packageName + "/");
-
+    
                     body = body.replace(/%%PackagePrefix%%/g, "NRID_" + packageID + "_");
                     
                     body = body.replace(/%%PackageNarwhalizeURL%%/g, "chrome://" +
                             self.manifest.narwhalrunner.InternalName +
                             "-narwhalrunner/content/common/narwhalize.js");
-/*
+                            
+                    body = body.replace(/%%QueryString%%/g, chromeEnv["QUERY_STRING"]);
+                            
+    /*
                     body = body.replace(/%%PackageNarwhalizeURL%%/g, "narwhalrunner://" +
                             self.manifest.narwhalrunner.InternalName +
                             "/common/content/narwhalize.js");
-*/
-                    return {
-                        status: 200,
-                        headers: {"Content-Type":"application/vnd.mozilla.xul+xml"},
-                        body: [body]
-                    }
+    */
                 }
-            } else {
-                var contentType = "text/plain";
-                if(extension=="js") {
-                    contentType = "application/x-javascript";
-                }            
-                app = function(env) {
-                    
-                    print("Serving: " + filePath);
-
-                    var body = filePath.read();
-
-                    body = body.replace(/%%QueryString%%/g, chromeEnv["QUERY_STRING"]);
-                    
-                    return {
-                        status: 200,
-                        headers: {"Content-Type": contentType},
-                        body: [body]
-                    }
+   
+                return {
+                    status: 200,
+                    headers: {"Content-Type": info.contentType},
+                    body: [body]
                 }
-            }
+            }   
             
             var result = app(chromeEnv);
             

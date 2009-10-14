@@ -8,7 +8,7 @@ var JSON = require('json');
 var STREAM = require('term').stream;
 
 var HARNESS = require("build/harness", "common");
-var SKELETON = require("build/sceleton", "common");
+var SKELETON = require("build/skeleton", "common");
 
 
 exports.main = function(args) { with(HARNESS.initialize(args, {type: "application"})) {
@@ -55,16 +55,6 @@ exports.main = function(args) { with(HARNESS.initialize(args, {type: "applicatio
     
     fromPath = locatePath("application.ini.tpl.txt");
     toPath = targetBuildPath.join("application.ini");
-
-    copyWhile(fromPath, toPath, [
-        [replaceVariables, [vars]]
-    ]);
-
-
-    // defaults/preferences/prefs.js
-    
-    fromPath = locatePath("defaults/preferences/prefs.js");
-    toPath = targetBuildPath.join("defaults", "preferences", "prefs.js");
 
     copyWhile(fromPath, toPath, [
         [replaceVariables, [vars]]

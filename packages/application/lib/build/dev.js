@@ -9,7 +9,7 @@ var TUSK = require("narwhal/tusk/tusk");
 
 var HARNESS = require("build/harness", "common");
 var DEV = require("build/dev", "common");
-var SKELETON = require("./sceleton");
+var SKELETON = require("./skeleton");
 
 
 
