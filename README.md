@@ -81,7 +81,7 @@ Demo: test-firefox-extension
 Other Examples
 --------------
 
-    You can find more sample applications and extensions in the [narwhalrunner-examples](http://github.com/cadorn/narwhalrunner-examples) project.    
+You can find more sample applications and extensions in the [narwhalrunner-examples](http://github.com/cadorn/narwhalrunner-examples) project.    
 
 Your own application
 --------------------
