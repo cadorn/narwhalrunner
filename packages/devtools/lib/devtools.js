@@ -23,7 +23,8 @@ parser.helpful();
 
 
 
-var seaPath = SEA.getActive().path,
+var tusk = TUSK.Tusk().activate(),
+    seaPath = TUSK.getActive().getSea().getPath(),
     config = CONFIG.Config(seaPath),
     profilesPath = seaPath.join("build", "profiles"),
     profileSeaKey = STRUCT.bin2hex(MD5.hash(profilesPath.valueOf())),
@@ -380,10 +381,10 @@ command = parser.command('inject-sample', function(options) {
     // if no package was provided we use the sea package
     var pkg;
     if(!packageName) {
-        pkg = TUSK.getActiveSea().getSeaPackage();
+        pkg = tusk.getSea().getSeaPackage();
         packageName = pkg.getName();
     } else {
-        pkg = TUSK.getActiveSea().getPackage(packageName);
+        pkg = tusk.getSea().getPackage(packageName);
     }
     if(!pkg || !pkg.exists()) {
         print("Package does not exist");
