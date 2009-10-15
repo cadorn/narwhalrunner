@@ -128,9 +128,8 @@ App.prototype.registerProtocolHandler = function() {
                     }
 
                     body = body.replace(/%%QueryString%%/g, chromeEnv["QUERY_STRING"]);
-print(body);
+
                     body = pkg.replaceTemplateVariables(self, body);
-print(body);
                 }
    
                 return {
