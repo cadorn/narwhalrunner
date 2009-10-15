@@ -6,10 +6,10 @@ var CHROME = require("./chrome");
 var JSON = require("json");
 var UTIL = require("util");
 var FILE = require("file");
-var STRUCT = require("struct");
-var MD5 = require("md5");
 var BASE64 = require("base64");
 var PACKAGES = require("packages");
+
+var PACKAGE = require("./package");
 
 
 
@@ -52,7 +52,6 @@ App.prototype.registerProtocolHandler = function() {
             
             var parts = chromeEnv["PATH_INFO"].substr(1).split("/"),
                 packageName = parts.shift(),
-                packageID = STRUCT.bin2hex(MD5.hash(self.getInternalName() + ":" + packageName)),
                 baseName = parts[parts.length-1],
                 extension = baseName.split(".").pop();
 
@@ -66,8 +65,8 @@ App.prototype.registerProtocolHandler = function() {
             }
             
             var packageInfo = PACKAGES.catalog[packageName],
-                packagePath = FILE.Path(packageInfo.directory),
-                filePath = packagePath.join("chrome", parts.join("/"));
+                pkg = PACKAGE.Package(packageInfo.directory),
+                filePath = pkg.getPath().join("chrome", parts.join("/"));
 
             if(!filePath.exists()) {
                 print("error: File not found: " + filePath);
@@ -127,25 +126,11 @@ App.prototype.registerProtocolHandler = function() {
                     if(body["decodeToString"]) {
                         body = body.decodeToString('utf-8');
                     }
-                
-                    body = body.replace(/%%PackageName%%/g, packageName);
-    
-                    body = body.replace(/%%PackageChromeURLPrefix%%/g, "narwhalrunner://" +
-                            self.manifest.narwhalrunner.InternalName + "/" + packageName + "/");
-    
-                    body = body.replace(/%%PackagePrefix%%/g, "NRID_" + packageID + "_");
-                    
-                    body = body.replace(/%%PackageNarwhalizeURL%%/g, "chrome://" +
-                            self.manifest.narwhalrunner.InternalName +
-                            "-narwhalrunner/content/common/narwhalize.js");
-                            
+
                     body = body.replace(/%%QueryString%%/g, chromeEnv["QUERY_STRING"]);
-                            
-    /*
-                    body = body.replace(/%%PackageNarwhalizeURL%%/g, "narwhalrunner://" +
-                            self.manifest.narwhalrunner.InternalName +
-                            "/common/content/narwhalize.js");
-    */
+print(body);
+                    body = pkg.replaceTemplateVariables(self, body);
+print(body);
                 }
    
                 return {

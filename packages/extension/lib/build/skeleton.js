@@ -25,27 +25,6 @@ exports.main = function(args) { with(HARNESS.initialize(args, {type: "extension"
         vars: vars
     });
 
-    var templateVars = {
-        build: {
-            common: {
-                file: ""
-            }
-        }
-    }
-    
-    
-    // chrome.manifest
-    
-    fromPath = locatePath("chrome.manifest.tpl.txt");
-    toPath = targetBuildPath.join("chrome.manifest");
-    
-    templateVars.build.common.file = locatePath("chrome.manifest.tpl.txt", "common");
-    
-    copyWhile(fromPath, toPath, [
-        [replaceVariables, [vars]],
-        [runTemplate, [templateVars]],
-    ]);
-    
     
     // install.rdf    
     

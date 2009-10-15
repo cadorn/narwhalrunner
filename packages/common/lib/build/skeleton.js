@@ -30,6 +30,55 @@ exports.main = function(args, options) { with(HARNESS.initialize(args, options))
             }
         }
     }
+
+    // chrome.manifest
+    
+    fromPath = locatePath("chrome.manifest.tpl.txt");
+    toPath = targetBuildChromePath.join("chrome.manifest");
+    
+    templateVars.build.common.file = locatePath("chrome.manifest.tpl.txt", "common");
+    
+    copyWhile(fromPath, toPath, [
+        [replaceVariables, [vars]],
+        [runTemplate, [templateVars]],
+    ]);
+    
+    // chrome.manifest of all dependencies
+    
+    pkg.forEachDependency(function(dependency) {
+        var dependencyPackage = dependency.getPackage();
+        var manifestPath = dependencyPackage.getPath().join("chrome.manifest.tpl.txt");
+        if(manifestPath.exists()) {
+            
+            // TODO: identify packages directly via a package ID rather than via the catalog
+            switch(dependency.getLocator().getUrl() + ":" + dependencyPackage.getName()) {
+                case "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json:common":
+                case "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json:extension":
+                case "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json:application":
+                    // ignore chrome manifest files or these packagesas they are handled differently (see above)
+                    break;
+                default:
+                    fromPath = manifestPath;
+                    
+                    // write to temporary file
+                    toPath = targetBuildChromePath.join(".tmp_chrome.manifest~");
+                    
+                    copyWhile(fromPath, toPath, [
+                        [replaceVariables, [vars]]
+                    ]);
+                    
+                    // append to chrome.manifest file
+                    targetBuildChromePath.join("chrome.manifest").write(
+                        targetBuildChromePath.join("chrome.manifest").read() + "\n" +
+                        toPath.read()
+                    );
+                    toPath.remove();
+                    break;
+            }
+        }        
+    });
+    
+     
     
     // copy chrome directory for common and extension/application packages
     
