@@ -8,7 +8,7 @@
     // -----------------------------------
     
     var narwhal = {}
-    Components.utils.import("resource://%%InternalName%%-narwhalrunner/modules/app.jsm", narwhal);
+    Components.utils.import("__Program.AppModuleURL__", narwhal);
      
 
     // -----------------------------------
@@ -16,12 +16,12 @@
     // -----------------------------------
 
     var FILE = narwhal.require("file");
-    var CHROME = narwhal.require("chrome", "%%CommonPackageName%%");    
-    var APP = narwhal.require("app", "%%CommonPackageName%%");
+    var CHROME = narwhal.require("chrome", "__module[package]__");    
+    var APP = narwhal.require("app", "__module[package]__");
 
     CHROME.set(this);
     
-    APP.initializeApp(FILE.Path(narwhal.prefix)).start("%%Type%%", window, {});
+    APP.initializeApp("__Program.ProgramPackage.Id__").start("__Program.Type__", window, {});
     
 })();
 

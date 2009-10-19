@@ -9,6 +9,8 @@ var TUSK = require("narwhal/tusk/tusk");
 var TEMPLATE = require("template", "template");
 var STRUCT = require("struct");
 var MD5 = require("md5");
+var APP = require("../app");
+var PACKAGE = require("../package");
 
 
 var initialized = false;
@@ -28,6 +30,7 @@ var sea = TUSK.getActive().getSea(),
     targetBuildChromePath,
     fromPath,
     toPath,
+    app,
     pkg,
     pkgType;
 
@@ -52,9 +55,10 @@ exports.initialize = function(args, options) {
         if(options.type=="extension") {
             extensionPackage = platformPackage;
         }
-        pkg = sea.getPackage(packageName);
-        pkgType = options.type;        
-        packageID = STRUCT.bin2hex(MD5.hash(pkg.getManifest().manifest.narwhalrunner.InternalName + ":" + packageName));
+        pkg = PACKAGE.Package(sea.getPackage(packageName));
+        pkg.setAppInfo(pkg.getManifest().manifest.narwhalrunner);
+        pkgType = options.type;
+        packageID = pkg.getReferenceId();
 
         targetBuildPath.mkdirs();
 
@@ -77,13 +81,13 @@ exports.initialize = function(args, options) {
         toPath: toPath,
         pkg: pkg,
         copyWhile: exports.copyWhile,
+        copyTreeWhile: exports.copyTreeWhile,
         runTemplate: exports.runTemplate,
         replaceVariables: exports.replaceVariables,
         locatePath: exports.locatePath,
         packageID: packageID
     }
 }
-
 
 exports.copyWhile = function(fromPath, toPath, callbacks) {
     print("Copying '" + fromPath + "' to '" + toPath + "':");
@@ -98,6 +102,19 @@ exports.copyWhile = function(fromPath, toPath, callbacks) {
     toPath.write(data);
     print("  Done.");
 }
+
+exports.copyTreeWhile = function(source, target, callbacks, path) {
+    var sourcePath = (source = FILE.path(source)).join(path);
+    var targetPath = (target = FILE.path(target)).join(path);
+    if (sourcePath.isDirectory()) {
+        targetPath.mkdir();
+        sourcePath.listPaths().forEach(function(entry) {
+            exports.copyTreeWhile(source, target, callbacks, ((path)?path.join(entry.basename()):entry.basename()));
+        });
+    } else {
+        exports.copyWhile(sourcePath, targetPath, callbacks);
+    }
+};
 
 exports.runTemplate = function(callbacks, data, vars) {
     return new TEMPLATE.Template(data, {

@@ -8,12 +8,12 @@ var JSON = require('json');
 var STREAM = require('term').stream;
 var HARNESS = require("./harness");
 var MANIFEST = require("narwhal/tusk/manifest");
+var PACKAGE = require("../package");
 
 
 exports.main = function(args, options) { with(HARNESS.initialize(args, options)) {
         
     var vars = options.vars;
-    vars.PackageName = packageName;
     vars.CommonPackageName = commonPackageName;
     
     
@@ -42,7 +42,7 @@ exports.main = function(args, options) { with(HARNESS.initialize(args, options))
         [replaceVariables, [vars]],
         [runTemplate, [templateVars]],
     ]);
-    
+
     // chrome.manifest of all dependencies
     
     pkg.forEachDependency(function(dependency) {
@@ -62,9 +62,16 @@ exports.main = function(args, options) { with(HARNESS.initialize(args, options))
                     
                     // write to temporary file
                     toPath = targetBuildChromePath.join(".tmp_chrome.manifest~");
+
+                    // cast the dependent package to a common/package object
+                    dependencyPackage = PACKAGE.Package(dependencyPackage);
+                    dependencyPackage.setAppInfo(pkg.getManifest().manifest.narwhalrunner);
+                    
+                    var pkgVars = UTIL.copy(vars);
+                    UTIL.update(pkgVars, dependencyPackage.getTemplateVariables());
                     
                     copyWhile(fromPath, toPath, [
-                        [replaceVariables, [vars]]
+                        [replaceVariables, [pkgVars]]
                     ]);
                     
                     // append to chrome.manifest file
@@ -198,6 +205,49 @@ exports.main = function(args, options) { with(HARNESS.initialize(args, options))
             });
         }
     });
+    
+    
+    // copy chrome content & locale for all dependencies
+    
+    var packages = [];
+
+    pkg.forEachDependency(function(dependency) {
+        
+        var dependencyPackage = dependency.getPackage();
+        
+        // cast the dependent package to a common/package object
+        dependencyPackage = PACKAGE.Package(dependencyPackage);
+        dependencyPackage.setAppInfo(pkg.getManifest().manifest.narwhalrunner);
+
+        var pkgVars = UTIL.copy(vars);
+        UTIL.update(pkgVars, dependencyPackage.getTemplateVariables());
+        
+        // locales
+        var locales = dependencyPackage.getLocales();
+        if(locales) {
+            locales.forEach(function(locale) {
+                
+                fromPath = FILE.Path(locale[1]);
+                toPath = targetBuildPath.join("chrome", "locale", locale[0], dependencyPackage.getReferenceId());
+                
+                copyTreeWhile(fromPath, toPath, [
+                    [replaceVariables, [pkgVars]]
+                ]);
+            });
+        }
+
+        // content
+        var contentPath = dependencyPackage.getPath().join("chrome", "content");
+        if(contentPath.exists()) {
+
+            fromPath = contentPath;
+            toPath = targetBuildPath.join("chrome", "content", dependencyPackage.getReferenceId());
+
+            copyTreeWhile(fromPath, toPath, [
+                [replaceVariables, [pkgVars]]
+            ]);
+        }
+    });    
     
 }}
 

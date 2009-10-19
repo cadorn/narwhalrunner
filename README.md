@@ -144,6 +144,12 @@ As a deep-sea package:
     nr launch --dev --app firefox --package test-application
 
 
+Links
+=====
+
+  * [W3C: XML Binding Language (XBL) 2.0](http://www.w3.org/TR/xbl/)
+  * [MDC: XUL Tutorial](https://developer.mozilla.org/en/XUL_Tutorial)
+  * [MDC: XBL](https://developer.mozilla.org/en/XBL)
 
 License
 =======

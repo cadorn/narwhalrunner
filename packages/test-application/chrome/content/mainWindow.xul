@@ -5,15 +5,15 @@
         id="main" title="NarwhalRunner Test" width="600" height="300">
 
     <!-- Load a chrome JS file for the package -->
-    <script src="%%PackageChromeURLPrefix%%content/mainWindow.js" type="application/x-javascript"/>
+    <script src="%%Package.ChromeURLPrefix%%content/mainWindow.js" type="application/x-javascript"/>
 
     <!-- Load a narwhal module for the package -->
-    <script src="%%PackageNarwhalizeURL%%" type="application/x-javascript"/>
+    <script src="%%Package.NarwhalizeURL%%" type="application/x-javascript"/>
     <script type="application/x-javascript">
-        require("main-window", "%%PackageName%%").main({});
+        require("main-window", "%%Package.Name%%").main({});
     </script>
 
-    <label value="%%PackageChromeURLPrefix%%"/>
-    <label value="%%PackagePrefix%%"/>
+    <label value="%%Package.ChromeURLPrefix%%"/>
+    <label value="%%Package.Prefix%%"/>
 
 </window>

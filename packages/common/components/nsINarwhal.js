@@ -126,8 +126,7 @@ AppStartupBoot.prototype = {
     },
     boot: function() {
         try {
-//            bootstrapNarwhal(getResourceFile("resource://%%InternalName%%-packages/%%XULRunnerEnginePath%%/bootstrap.js"));
-            bootstrapNarwhal(getResourceFile("resource://narwhal/engines/xulrunner/bootstrap.js"));
+            bootstrapNarwhal(getResourceFile("__Program.PackagesBaseURL____module[packages][narwhal-xulrunner]__/bootstrap.js"));
         } finally {
             this.unregister();
         }
@@ -143,8 +142,9 @@ function bootstrapNarwhal(bootstrap) {
         try {
             if (!Env.exists(NARWHAL_HOME))
                 Env.set(NARWHAL_HOME, bootstrap.parent.parent.parent.path);
-            if (!Env.exists(ENGINE_HOME))
+//            if (!Env.exists(ENGINE_HOME))
                 Env.set(ENGINE_HOME, bootstrap.parent.path);
+/*
             if (!Env.exists(PATH)) {
                 var path = [];
                 var narwhalHome = Env.get(NARWHAL_HOME);
@@ -158,6 +158,8 @@ function bootstrapNarwhal(bootstrap) {
                 if (Env.exists(JS_PATH)) path.push(Env.get(JS_PATH))
                 Env.set(PATH, path.join(":"))
             }
+*/
+            
             var sandbox = Cu.Sandbox(Cc["@mozilla.org/systemprincipal;1"].createInstance(Ci.nsIPrincipal));
             sandbox.args = ARGUMENTS;
             Cu.evalInSandbox(readFile(bootstrap), sandbox, "1.8", bootstrap.path, 0);

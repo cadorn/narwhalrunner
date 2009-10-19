@@ -14,11 +14,9 @@ var SKELETON = require("build/skeleton", "common");
 exports.main = function(args) { with(HARNESS.initialize(args, {type: "extension"})) {
 
     var vars = pkg.getManifest().manifest.narwhalrunner;
-    
     vars.Type = "extension";
-    vars.PackageChromeURL = "narwhalrunner://" + vars.InternalName + "/" + packageName + "/";
-    vars.PackagePrefix = "NRID_" + packageID + "_";
-    
+    UTIL.update(vars, pkg.getTemplateVariables());
+
     
     SKELETON.main(args, {
         type: "extension",

@@ -11,11 +11,8 @@ exports.get = function() {
 }
 
 exports.registerProtocolHandler = function(handler) {
-
     var chrome_ext = Components.classes["@mozilla.org/network/protocol;1?name=narwhalrunner"].getService();
-
-    chrome_ext.wrappedJSObject.registerExtension(handler);
-    
+    chrome_ext.wrappedJSObject.registerExtension(handler);    
 }
 
 exports.getWindow = function() {
@@ -27,7 +24,5 @@ exports.getBrowser = function() {
 }
 
 exports.getConsoleService = function() {
-    
     return Components.classes["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);
-
 }

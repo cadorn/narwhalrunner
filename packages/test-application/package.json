@@ -19,6 +19,7 @@
         }
     },
     "narwhalrunner": {
+        "Type": "application",
         "InternalName": "narwhalrunner-test-application",
         "ID": "test-application@narwhalrunner.cadorn.github.com",
         "Name": "NarwhalRunner Test",

@@ -16,12 +16,12 @@ EXPORTED_SYMBOLS = ["system", "require", "print", "prefix"];
     // -----------------------------------
     // load narwhal    
     // -----------------------------------
-    
+
     var narwhal = Cc["@narwhaljs.org/xulrunner/global;1"].createInstance(Ci.nsINarwhal).system.global;
     var print = narwhal.print;
     var require = narwhal.require;
 
-    
+
     // -----------------------------------
     // create sandbox
     // -----------------------------------
@@ -33,12 +33,15 @@ EXPORTED_SYMBOLS = ["system", "require", "print", "prefix"];
     var Loader = LOADER.Loader;
     var Sandbox = SANDBOX.Sandbox;
     
-    
     var system = UTIL.copy(narwhal.system);
-    //system.engines = UTIL.copy(system.engines);
 
+    var paths = [
+        narwhal.system.prefixes[0] + "/lib",
+        narwhal.system.prefixes[1] + "/engines/default/lib",
+        narwhal.system.prefixes[1] + "/lib"
+    ]
     
-    var loader = Loader({"paths": UTIL.copy(require.paths)});
+    var loader = Loader({"paths": paths});
     var sandbox = Sandbox({
         "loader": loader,
         "system": system,
@@ -46,7 +49,7 @@ EXPORTED_SYMBOLS = ["system", "require", "print", "prefix"];
             "system": system
         }
     });
-    
+        
     sandbox.force("system").env["SEA"] = getPath('/');
     sandbox("global");
     
@@ -79,9 +82,9 @@ EXPORTED_SYMBOLS = ["system", "require", "print", "prefix"];
 
 
     function getPath(path) {
-        if("%%Type%%"=="extension") {
+        if("%%Program.Type%%"=="extension") {
             var em = Cc["@mozilla.org/extensions/manager;1"].getService(Ci.nsIExtensionManager);
-            return em.getInstallLocation("%%ID%%").getItemFile("%%ID%%", path).path;
+            return em.getInstallLocation("%%Program.ID%%").getItemFile("%%Program.ID%%", path).path;
         } else {
             var ResourceHandler = Cc['@mozilla.org/network/protocol;1?name=resource'].getService(Ci.nsIResProtocolHandler);
             var IOService = Cc['@mozilla.org/network/io-service;1'].getService(Ci.nsIIOService)

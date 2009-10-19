@@ -10,17 +10,19 @@ var BASE64 = require("base64");
 var PACKAGES = require("packages");
 
 var PACKAGE = require("./package");
+var BINDING = require("./binding");
+var CONTAINER = require("./container");
 
 
 
-var App = exports.App = function (path) {
+var App = exports.App = function (packageName) {
     
     if (!(this instanceof exports.App)) {
-        return new exports.App(path);
+        return new exports.App(packageName);
     }
-    
-    this.path = path;
-    
+
+    this.path = PACKAGES.catalog[packageName].directory;
+
     var manifestPath = this.path.join("package.json");
     if(!manifestPath.exists()) {
         throw "no manifest found at: " + manifestPath;
@@ -28,6 +30,11 @@ var App = exports.App = function (path) {
     this.manifest = JSON.decode(manifestPath.read({charset:"utf-8"}));
     
     this.registerProtocolHandler();
+    
+    this.bindings = {};
+    this.containers = {};
+    
+    this.status = false;
 }
 
 App.prototype.exists = function() {
@@ -42,8 +49,65 @@ App.prototype.getPackageName = function() {
     return this.manifest.name;
 }
 
+App.prototype.registerBinding = function(pkgId, object, name) {
+    if(!UTIL.has(this.bindings, pkgId)) {
+        this.bindings[pkgId] = {};
+    }
+    return this.bindings[pkgId][name] = BINDING.Binding(pkgId, object, name);
+}
+
+App.prototype.getBinding = function(pkgId, name) {
+    if(!UTIL.has(this.bindings, pkgId)) {
+        return false;
+    }
+    if(!UTIL.has(this.bindings[pkgId], name)) {
+        return false;
+    }
+    return this.bindings[pkgId][name];
+}
+
+App.prototype.registerContainer = function(pkgId, object, module, name) {
+    if(!UTIL.has(this.containers, pkgId)) {
+        this.containers[pkgId] = {};
+    }
+
+    if(UTIL.has(this.containers[pkgId], name)) {
+        var container = this.containers[pkgId][name];
+        if(container.getObject()===object) {
+            // the container has already been registered
+            container.reattach();
+            return container;
+        } else {
+            // a different container is registering in the same spot
+            container.destroy();
+        }
+    }
+
+    var containerModule = require(module, pkgId);
+    if(!containerModule) {
+        throw "Could not find module '" + module + "' in package: " + pkgId;
+    }
+    
+    return this.containers[pkgId][name] = containerModule.Container(pkgId, object, name);
+}
+
+App.prototype.getContainer = function(pkgId, name) {
+    if(!UTIL.has(this.containers, pkgId)) {
+        return false;
+    }
+    if(!UTIL.has(this.containers[pkgId], name)) {
+        return false;
+    }
+    return this.containers[pkgId][name];
+    
+}
+
 App.prototype.registerProtocolHandler = function() {
     var self = this;
+    
+    var appInfo = self.manifest.narwhalrunner;
+    appInfo["CommonPackage.ReferenceId"] = PACKAGE.Package(module["package"]).setAppInfo(appInfo).getReferenceId();
+    
     CHROME.registerProtocolHandler({
         internalAppName : self.getInternalName(),
         app: function(chromeEnv) {
@@ -64,8 +128,12 @@ App.prototype.registerProtocolHandler = function() {
                 }                
             }
             
-            var packageInfo = PACKAGES.catalog[packageName],
-                pkg = PACKAGE.Package(packageInfo.directory),
+            // if a locale URL is accessed we default to en-US for now            
+            if(parts[0]=="locale") {
+                parts.splice(1,0,"en-US");
+            }
+
+            var pkg = PACKAGE.Package(packageName),
                 filePath = pkg.getPath().join("chrome", parts.join("/"));
 
             if(!filePath.exists()) {
@@ -76,6 +144,8 @@ App.prototype.registerProtocolHandler = function() {
                     body: ["File Not Found", "</br>", "File not found: " + filePath]
                 }                
             }
+            
+            pkg.setAppInfo(appInfo);
 
             var app,
                 info = {};
@@ -89,7 +159,11 @@ App.prototype.registerProtocolHandler = function() {
 
                 case "htm":
                 case "html":
+                case "dtd":
                     if(!UTIL.has(info, "contentType")) info.contentType = "text/html";
+
+                case "xml":
+                    if(!UTIL.has(info, "contentType")) info.contentType = "text/xml";
 
                 case "css":
                     if(!UTIL.has(info, "contentType")) info.contentType = "text/css";
@@ -129,7 +203,7 @@ App.prototype.registerProtocolHandler = function() {
 
                     body = body.replace(/%%QueryString%%/g, chromeEnv["QUERY_STRING"]);
 
-                    body = pkg.replaceTemplateVariables(self, body);
+                    body = pkg.replaceTemplateVariables(body);
                 }
    
                 return {
@@ -152,6 +226,11 @@ App.prototype.registerProtocolHandler = function() {
 }
 
 App.prototype.start = function(type, loaderWindow, args) {
+    if(this.status) {
+        return;
+    }
+    this.status = "starting";
+
     var self = this;
     this.type = type;
     this.loaderWindow = loaderWindow;
@@ -166,6 +245,8 @@ App.prototype.start = function(type, loaderWindow, args) {
 
 App.prototype.started = function() {
 
+    this.status = "started";
+
     if(this.type=="application" && this.loaderWindow) {
         this.loaderWindow.close();
     }
@@ -179,8 +260,10 @@ App.prototype.started = function() {
 var app;
 
 exports.initializeApp = function(path) {
+    // singleton
     if(app) {
-        throw "App already initialized";
+//        throw "App already initialized";
+        return app;
     }
     app = App(path);
     return app;

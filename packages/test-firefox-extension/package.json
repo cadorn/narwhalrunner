@@ -19,6 +19,7 @@
         }
     },
     "narwhalrunner": {
+        "Type": "extension",
         "InternalName": "narwhalrunner-test-firefox-extension",
         "ID": "test-firefox-extension@narwhalrunner.cadorn.github.com",
         "Name": "NarwhalRunner Test",
