@@ -1,17 +1,16 @@
 {
+    "schema": "1.1",
     "name": "test-firefox-extension",
-    "dependencies": [
-        ["extension", {
+    "using": {
+        "extension": {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "extension",
-            "revision": "latest"
-        }],
-        ["common", {
+            "name": "extension"
+        },
+        "common": {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "common",
-            "revision": "latest"
-        }]
-    ],
+            "name": "common"
+        }
+    },
     "build": {
         "defaultTarget": "dev",
         "targets": {

@@ -1,17 +1,16 @@
 {
+    "schema": "1.1",
     "name": "test-application",
-    "dependencies": [
-        ["application", {
+    "using": {
+        "application": {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "application",
-            "revision": "latest"
-        }],
-        ["common", {
+            "name": "application"
+        },
+        "common": {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "common",
-            "revision": "latest"
-        }]
-    ],
+            "name": "common"
+        }
+    },
     "build": {
         "defaultTarget": "dev",
         "targets": {

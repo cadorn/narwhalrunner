@@ -1,20 +1,19 @@
 {
+    "schema": "1.1",
     "name": "extension",
-    "dependencies": [
-        ["common", {
+    "using": {
+        "common": {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "common",
-            "revision": "latest"
-        }]
-    ],
+            "name": "common"
+        }
+    },
     "build": {
-        "dependencies": [
-            ["common", {
+        "using": {
+            "common": {
                 "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-                "package": "common",
-                "revision": "latest"
-            }]
-        ],
+                "name": "common"
+            }
+        },
         "defaultTarget": "dev",
         "targets": {
             "dev": "build/dev"
