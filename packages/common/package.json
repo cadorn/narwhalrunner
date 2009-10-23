@@ -1,5 +1,6 @@
 {
     "schema": "1.1",
+    "uid": "http://pinf.org/cadorn.org/narwhalrunner/packages/common",
     "name": "common",
     "using": {
         "narwhal-xulrunner": {

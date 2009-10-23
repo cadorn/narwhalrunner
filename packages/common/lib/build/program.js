@@ -21,30 +21,16 @@ exports.Program = function(programPackage) {
     // determine common and platform packages
     var commonPackage,
         platformPackage;
+
     programPackage.forEachDependency(function(dependency) {
         var pkg = dependency.getPackage();
-
-print(" : dependency.getName(): "+dependency.getName());
-print(" : dependency.getName(): "+dependency.getLocator().getUrl());
-
-        // TODO: make this more generic via a unique package ID
-        if(dependency.getLocator().getUrl()=="http://github.com/cadorn/narwhalrunner/raw/master/catalog.json") {
-            if(["common", "application", "extension"].indexOf(pkg.getName())>=0) {
-
-print(" : pkg.getName(): "+pkg.getName() + " -- "+info["Type"]);
-                // determine the platform package
-                if(pkg.getName()==info["Type"]) {
-                    platformPackage = pkg;
-                } else
-                // determine the common package
-                if(pkg.getName()=="common") {
-                    commonPackage = pkg;
-                }
-            }
+        if(pkg.getUid()=="http://pinf.org/cadorn.org/narwhalrunner/packages/common") {
+            commonPackage = pkg;
+        } else
+        if(pkg.getUid()=="http://pinf.org/cadorn.org/narwhalrunner/packages/" + info["Type"]) {
+            platformPackage = pkg;
         }
     });
-
-print("platformPackage: "+platformPackage);
     
     platformPackage = PACKAGE.Package(platformPackage)
     commonPackage = PACKAGE.Package(commonPackage);
@@ -139,21 +125,15 @@ print("platformPackage: "+platformPackage);
             });
             
 
-print(" ::: pkg.getPath().valueOf(): "+pkg.getPath().valueOf() + " :: " +platformPackage.getPath().valueOf());
-
             // determine ID for some important narwhalrunner packages                        
             var pkgId = pkg.getId();
-            if(pkg.getPath().valueOf()==commonPackage.getPath().valueOf() ||
-               pkg.getPath().valueOf()==platformPackage.getPath().valueOf()) {
-
+            
+            if(pkg.toString()==commonPackage.toString() || pkg.toString()==platformPackage.toString()) {
                 pkgId = "__" + pkg.getName() + "__";
             }
-              
             
             // fetch chrome manifest
             fromPath = pkg.getChromeManifestPath();
-
-print(" ::: pkgId: "+pkgId + " :: " +fromPath);
 
             if(fromPath.exists()) {
                 chromeManifests[pkgId] = BUILD_UTIL.process([
@@ -167,11 +147,11 @@ print(" ::: pkgId: "+pkgId + " :: " +fromPath);
         
         // setup all vars for the program package
         vars = programPackage.getTemplateVariables();
-        
-        
+
+
         // write chrome.manifest
         toPath = Program.getChromeManifestPath();
-        var templateVars = { build: {} };
+        var templateVars = { "build": {"dependencies": []} };
         var rootTemplate;
         UTIL.every(chromeManifests, function(entry) {
             if(entry[0]=="__common__") {
@@ -183,17 +163,10 @@ print(" ::: pkgId: "+pkgId + " :: " +fromPath);
             if(entry[0]==programPackage.getName()) {
                 templateVars.build.program = entry[1];
             } else {
-                if(!UTIL.has(templateVars.build, "dependencies")) {
-                    templateVars.build.dependencies = [];
-                }
                 templateVars.build.dependencies.push(entry[1]);
             }
         });
         
-
-dump(templateVars);
-print(rootTemplate);
-
         
         templateVars.build.dependencies = templateVars.build.dependencies.join("\n");
         toPath.write(BUILD_UTIL.runTemplate([], rootTemplate, templateVars));

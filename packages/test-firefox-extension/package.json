@@ -1,5 +1,6 @@
 {
     "schema": "1.1",
+    "uid": "http://pinf.org/cadorn.org/narwhalrunner/packages/test-firefox-extension",
     "name": "test-firefox-extension",
     "using": {
         "extension": {

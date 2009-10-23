@@ -1,5 +1,6 @@
 {
     "schema": "1.1",
+    "uid": "http://pinf.org/cadorn.org/narwhalrunner",
     "name": "narwhalrunner",
     "license": "MIT",
     "description": "A toolkit for building XULRunner applications and extensions with Narwhal",

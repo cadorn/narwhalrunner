@@ -6,6 +6,7 @@ var FILE = require('file');
 var UTIL = require("util");
 var STREAM = require('term').stream;
 var TUSK = require("narwhal/tusk/tusk");
+
 var TEMPLATE = require("template", "template");
 var STRUCT = require("struct");
 var MD5 = require("md5");
