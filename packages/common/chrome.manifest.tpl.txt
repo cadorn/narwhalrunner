@@ -1,3 +1,3 @@
 
-resource narwhal         narwhalrunner/narwhal/
-
+resource narwhal            narwhal/
+resource narwhal-xulrunner  packages/__module[packages][narwhal-xulrunner]__/

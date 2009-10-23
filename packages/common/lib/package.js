@@ -54,6 +54,7 @@ exports.Package = function (packagePath) {
             "Package.LocaleBaseURL": "chrome://" + appInfo.InternalName + "/locale/" + id + "/",
 
             "Package.ContentBaseURL": "narwhalrunner://" + appInfo.InternalName + "/" + name + "/content/",
+            "Package.SkinBaseURL": "narwhalrunner://" + appInfo.InternalName + "/" + name + "/skin/",
 
             "Program.NarwhalURL": "chrome://" + appInfo.InternalName + "-overlay/content/" + appInfo["CommonPackage.ReferenceId"] + "/narwhal.js",
             "Program.NarwhalizeURL": "chrome://" + appInfo.InternalName + "-overlay/content/" + appInfo["CommonPackage.ReferenceId"] + "/narwhalize.js",

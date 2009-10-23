@@ -2,6 +2,7 @@
 function dump(obj) { print(require('test/jsdump').jsDump.parse(obj)) };
 
 
+var SYSTEM = require("system");
 var UTIL = require("util");
 var FILE = require("file");
 var JSON = require("json");
@@ -134,7 +135,6 @@ exports.Program = function(programPackage) {
             
             // fetch chrome manifest
             fromPath = pkg.getChromeManifestPath();
-
             if(fromPath.exists()) {
                 chromeManifests[pkgId] = BUILD_UTIL.process([
                     [BUILD_UTIL.replaceVariables, [vars, "%%"]],
@@ -171,7 +171,7 @@ exports.Program = function(programPackage) {
         templateVars.build.dependencies = templateVars.build.dependencies.join("\n");
         toPath.write(BUILD_UTIL.runTemplate([], rootTemplate, templateVars));
         print("Wrote chrome.manifest file to: " + toPath);
-
+        
 
         // write install.rdf
         fromPath = platformPackage.getInstallRdfPath();
@@ -191,10 +191,18 @@ exports.Program = function(programPackage) {
         
         
         // copy catalog.json
+/*        
         fromPath = sea.getPath().join("catalog.json");
         toPath = Program.getTargetPath().join("catalog.json");
         BUILD_UTIL.copyWhile(fromPath, toPath, []);
+*/
 
+        // copy catalog.local.json
+/*        
+        fromPath = sea.getPath().join("catalog.local.json");
+        toPath = Program.getTargetPath().join("catalog.local.json");
+        BUILD_UTIL.copyWhile(fromPath, toPath, []);
+*/
     }    
 
     Program.buildDynamic = function() {
@@ -233,10 +241,19 @@ exports.Program = function(programPackage) {
                 fromPath.symlink(toPath);
             }
             print("Linked '" + toPath + "' to '" + fromPath + "'");    
-
-
             
         }, "package", true);
+        
+        
+        // link narwhal
+        
+        fromPath = FILE.Path(SYSTEM.prefix);
+        toPath = Program.getTargetPath().join("narwhal");
+        if(!toPath.exists()) {
+            toPath.dirname().mkdirs();    
+            fromPath.symlink(toPath);
+        }
+        print("Linked '" + toPath + "' to '" + fromPath + "'");    
     }    
     
     
