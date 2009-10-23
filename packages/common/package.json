@@ -9,7 +9,7 @@
     "build": {
         "using": {
             "template": {
-                "catalog": "http://github.com/cadorn/narwhal/raw/tusk-catalog/catalog.json",
+                "catalog": "http://github.com/cadorn/narwhal/raw/experimental/catalogs/default.catalog.json",
                 "name": "template"
             }
         }
