@@ -43,6 +43,7 @@ exports.Package = function (packagePath) {
     
     Package.getTemplateVariables = function() {
         var name =  Package.getName();
+        var pkgId = Package.getId();
         var id = Package.getReferenceId();
         var vars = {
             "PP": "NRID_" + id + "_",
@@ -53,8 +54,8 @@ exports.Package = function (packagePath) {
             "Package.ModulesBaseURL": "resource://" + appInfo.InternalName + "-modules/" + id + "/",
             "Package.LocaleBaseURL": "chrome://" + appInfo.InternalName + "/locale/" + id + "/",
 
-            "Package.ContentBaseURL": "narwhalrunner://" + appInfo.InternalName + "/" + name + "/content/",
-            "Package.SkinBaseURL": "narwhalrunner://" + appInfo.InternalName + "/" + name + "/skin/",
+            "Package.ContentBaseURL": "narwhalrunner://" + appInfo.InternalName + "/" + id + "/content/",
+            "Package.SkinBaseURL": "narwhalrunner://" + appInfo.InternalName + "/" + id + "/skin/",
 
             "Program.NarwhalURL": "chrome://" + appInfo.InternalName + "-overlay/content/" + appInfo["CommonPackage.ReferenceId"] + "/narwhal.js",
             "Program.NarwhalizeURL": "chrome://" + appInfo.InternalName + "-overlay/content/" + appInfo["CommonPackage.ReferenceId"] + "/narwhalize.js",

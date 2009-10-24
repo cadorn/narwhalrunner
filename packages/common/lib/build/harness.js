@@ -7,7 +7,7 @@ var UTIL = require("util");
 var STREAM = require('term').stream;
 var TUSK = require("narwhal/tusk/tusk");
 
-var TEMPLATE = require("template", "template");
+//var TEMPLATE = require("template", "template");
 var STRUCT = require("struct");
 var MD5 = require("md5");
 var APP = require("../app");
@@ -118,6 +118,7 @@ exports.copyTreeWhile = function(source, target, callbacks, path) {
 };
 
 exports.runTemplate = function(callbacks, data, vars) {
+/*    
     return new TEMPLATE.Template(data, {
         formatters: {
             "includeFile": function(path) {
@@ -133,6 +134,7 @@ exports.runTemplate = function(callbacks, data, vars) {
             }
         }
     }).render(vars);
+*/
 }
 
 exports.replaceVariables = function(callbacks, data, vars) {

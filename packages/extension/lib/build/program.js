@@ -41,6 +41,10 @@ exports.Program = function (programPackage) {
         return Program.getTargetPath().join("packages");
     }
     
+    Program.getUsingPath = function() {
+        return Program.getTargetPath().join("using");
+    }
+    
     Program.getChromeManifestPath = function() {
         return Program.getTargetPath().join("chrome.manifest");
     }

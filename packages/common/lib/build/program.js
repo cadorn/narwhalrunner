@@ -210,7 +210,8 @@ exports.Program = function(programPackage) {
 //        var chromeContentPath = Program.getChromeContentPath();
 //        var chromeLocalePath = Program.getChromeLocalePath();
 
-        var packagesPath = Program.getPackagesPath();
+        var packagesPath = Program.getPackagesPath(),
+            usingPath = Program.getUsingPath();
         
         var fromPath,
             toPath;
@@ -218,6 +219,7 @@ exports.Program = function(programPackage) {
         // link program package
 
         fromPath = programPackage.getPath();
+
         toPath = packagesPath.join(programPackage.getId());
         if(!toPath.exists()) {
             toPath.dirname().mkdirs();    
@@ -235,7 +237,7 @@ exports.Program = function(programPackage) {
                         
             // link package
             fromPath = pkg.getPath();
-            toPath = packagesPath.join(pkg.getId());
+            toPath = usingPath.join(pkg.getId());
             if(!toPath.exists()) {
                 toPath.dirname().mkdirs();    
                 fromPath.symlink(toPath);
@@ -248,7 +250,7 @@ exports.Program = function(programPackage) {
         // link narwhal
         
         fromPath = FILE.Path(SYSTEM.prefix);
-        toPath = Program.getTargetPath().join("narwhal");
+        toPath = packagesPath.join("narwhal");
         if(!toPath.exists()) {
             toPath.dirname().mkdirs();    
             fromPath.symlink(toPath);

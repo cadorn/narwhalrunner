@@ -40,7 +40,7 @@ EXPORTED_SYMBOLS = ["system", "require", "print", "prefix"];
         narwhal.system.prefixes[1] + "/engines/default/lib",
         narwhal.system.prefixes[1] + "/lib"
     ]
-    
+        
     var loader = Loader({"paths": paths});
     var sandbox = Sandbox({
         "loader": loader,
@@ -63,23 +63,22 @@ EXPORTED_SYMBOLS = ["system", "require", "print", "prefix"];
     // load packages into sandbox
     // -----------------------------------
     
-    // Add our extension and user packages to the sandbox
-    
     var paths = [];
-    
-    // First locate user-installed packages
-//    paths.push(getFile('/user').path);
 
-    // Then application/extension packages
-    var prefix = getPath('/');
-    paths.push(prefix);
+    // application/extension packages
+    paths.push(getPath('/'));
 
-    // Finally all narwhal system packages
+    // all narwhal system packages
     paths.push(system.prefix);
-
+    
+    // load packages from paths
     require('packages').load(paths);
 
-
+    // fix loader paths that were trashed when loading packages
+    loader.paths.unshift(narwhal.system.prefixes[1] + "/lib");
+    loader.paths.unshift(narwhal.system.prefixes[1] + "/engines/default/lib");
+    loader.paths.unshift(narwhal.system.prefixes[0] + "/lib");
+    
 
     function getPath(path) {
         if("%%Program.Type%%"=="extension") {

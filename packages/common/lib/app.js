@@ -35,6 +35,17 @@ var App = exports.App = function (packageName) {
     this.containers = {};
     
     this.status = false;
+    
+    // keep the app package handy    
+    this.pkg = PACKAGE.Package(packageName).setAppInfo(this.manifest.narwhalrunner);
+    this.pkgVars = this.pkg.getTemplateVariables();
+ 
+    // populate package reference ID map to package ID
+    this.refIdMap = {};
+    var self = this;
+    UTIL.keys(PACKAGES.usingCatalog).forEach(function(id) {
+        self.refIdMap[PACKAGE.Package(id).setAppInfo(self.manifest.narwhalrunner).getReferenceId()] = id;
+    });
 }
 
 App.prototype.exists = function() {
@@ -47,6 +58,10 @@ App.prototype.getInternalName = function() {
 
 App.prototype.getPackageName = function() {
     return this.manifest.name;
+}
+
+App.prototype.getContentBaseUrl = function() {
+    return this.pkgVars["Package.ContentBaseURL"];
 }
 
 App.prototype.registerBinding = function(pkgId, object, name) {
@@ -106,6 +121,7 @@ App.prototype.registerProtocolHandler = function() {
     var self = this;
     
     var appInfo = self.manifest.narwhalrunner;
+    
     appInfo["CommonPackage.ReferenceId"] = PACKAGE.Package(module["package"]).setAppInfo(appInfo).getReferenceId();
     
     CHROME.registerProtocolHandler({
@@ -115,11 +131,13 @@ App.prototype.registerProtocolHandler = function() {
             print("Processing: " + chromeEnv["PATH_INFO"]);
             
             var parts = chromeEnv["PATH_INFO"].substr(1).split("/"),
-                packageName = parts.shift(),
+                packageRefId = parts.shift(),
                 baseName = parts[parts.length-1],
                 extension = baseName.split(".").pop();
+                
+            var packageName = self.refIdMap[packageRefId];
 
-            if(!UTIL.has(PACKAGES.catalog, packageName)) {
+            if(!UTIL.has(PACKAGES.usingCatalog, packageName)) {
                 print("error: Package not found: " + packageName);
                 return {
                     status: 500,
