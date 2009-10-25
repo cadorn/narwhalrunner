@@ -101,7 +101,7 @@ command = parser.command('launch', function(options) {
                 if(manifest.exists()) {
 
                     // build the package
-                    os.system("tusk package --package " + manifest.getName() + " build");
+                    os.system("tusk package --package " + manifest.manifest.dependencies[0] + " build");
                 }
             });
         }
