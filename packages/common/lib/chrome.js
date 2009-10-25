@@ -26,3 +26,8 @@ exports.getBrowser = function() {
 exports.getConsoleService = function() {
     return Components.classes["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);
 }
+
+exports.reloadPage = function()
+{
+    exports.getBrowser().selectedBrowser.reload();
+}

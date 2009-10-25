@@ -256,7 +256,12 @@ App.prototype.start = function(type, loaderWindow, args) {
     // Call the main.js module of the app once the loaderWindow is completely loaded
     this.onLoaderWindowLoad = function() {
         var main = require("main", self.manifest.name);
-        main.main(args);
+
+        try {
+            main.main(args);
+        } catch(e) {
+            print(e);
+        }
     }
     loaderWindow.addEventListener("load", this.onLoaderWindowLoad, false);
 }
@@ -268,7 +273,6 @@ App.prototype.started = function() {
     if(this.type=="application" && this.loaderWindow) {
         this.loaderWindow.close();
     }
-
 }
 
 
