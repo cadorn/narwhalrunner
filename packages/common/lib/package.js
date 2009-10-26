@@ -37,8 +37,16 @@ exports.Package = function (packagePath) {
     /**
      * Used to prefix CSS and XUL/HTML ID's
      */
+    // TODO: Move to super and rename to getIdHash() based on this.id only
     Package.getReferenceId = function() {
         return STRUCT.bin2hex(MD5.hash(appInfo.InternalName + ":" + Package.getId()));
+    }
+    Package.getPackagePrefix = function() {
+        return "NRID_" + Package.getReferenceId() + "_";
+    }
+    
+    Package.getContentBaseUrl = function() {
+        return "narwhalrunner://" + appInfo.InternalName + "/" + Package.getReferenceId() + "/content/";
     }
     
     Package.getTemplateVariables = function() {
@@ -46,7 +54,7 @@ exports.Package = function (packagePath) {
         var pkgId = Package.getId();
         var id = Package.getReferenceId();
         var vars = {
-            "PP": "NRID_" + id + "_",
+            "PP": Package.getPackagePrefix(),
             "Package.Name": name,
             "Package.ReferenceId": id,
 
@@ -54,7 +62,7 @@ exports.Package = function (packagePath) {
             "Package.ModulesBaseURL": "resource://" + appInfo.InternalName + "-modules/" + id + "/",
             "Package.LocaleBaseURL": "chrome://" + appInfo.InternalName + "/locale/" + id + "/",
 
-            "Package.ContentBaseURL": "narwhalrunner://" + appInfo.InternalName + "/" + id + "/content/",
+            "Package.ContentBaseURL": Package.getContentBaseUrl(),
             "Package.SkinBaseURL": "narwhalrunner://" + appInfo.InternalName + "/" + id + "/skin/",
 
             "Program.NarwhalURL": "chrome://" + appInfo.InternalName + "-overlay/content/" + appInfo["CommonPackage.ReferenceId"] + "/narwhal.js",

@@ -21,6 +21,10 @@ var App = exports.App = function (packageName) {
         return new exports.App(packageName);
     }
 
+    if(!UTIL.has(PACKAGES.catalog, packageName)) {
+        throw "App package not found: " + packageName;
+    }
+
     this.path = PACKAGES.catalog[packageName].directory;
 
     var manifestPath = this.path.join("package.json");
@@ -50,6 +54,14 @@ var App = exports.App = function (packageName) {
 
 App.prototype.exists = function() {
     return this.path.exists();
+}
+
+App.prototype.getAppPackage = function() {
+    return this.pkg;
+}
+
+App.prototype.getPackage = function(id) {
+    return PACKAGE.Package(id).setAppInfo(this.manifest.narwhalrunner);
 }
 
 App.prototype.getInternalName = function() {
