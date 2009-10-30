@@ -3,7 +3,7 @@
 var chrome;
 
 exports.set = function(obj) {
-    chrome = obj;    
+    chrome = obj;
 }
 
 exports.get = function() {
