@@ -71,7 +71,8 @@ exports.Program = function(programPackage) {
                 "preferences",
                 "modules",
                 "components",
-                "chromeLocale"
+                "chromeLocale",
+                "chromeSkin"
             ],
             fromPath,
             toPath,
@@ -79,19 +80,14 @@ exports.Program = function(programPackage) {
         
         var chromeManifests = {};
         
-
-        programPackage.forEachDependency(function(dependency) {
-            
-            // cast the dependent package to a common/package object
-            var pkg = PACKAGE.Package(dependency.getPackage());
-            pkg.setAppInfo(programPackage.getAppInfo());
+        
+        function buildPackage(pkg, pkgId) {
             
             var id = pkg.getReferenceId();
             vars = pkg.getTemplateVariables();
 
-            vars["module[package]"] = dependency.getId();
- 
-            
+            vars["module[package]"] = pkgId;
+
             // for the common package we need a special variable
             if(pkg.getPath().valueOf()==commonPackage.getPath().valueOf()) {
                 vars["module[packages][narwhal-xulrunner]"] = pkg.getPackage("narwhal-xulrunner").getId();
@@ -101,11 +97,11 @@ exports.Program = function(programPackage) {
             parts.forEach(function(part) {
                 fromPath = pkg["get" + part.substr(0,1).toUpperCase() + part.substr(1) + "Path"]();
                 if(fromPath.exists()) {
-                    if(part=="chromeLocale") {
-                        // locales need to be written into subdirectories
-                        fromPath.listPaths().forEach(function(localeDir) {
-                            toPath = Program.getChromeLocalePath().join(localeDir.basename(), id);
-                            BUILD_UTIL.copyTreeWhile(fromPath.join(localeDir.basename()), toPath, [
+                    if(part=="chromeLocale" || part=="chromeSkin") {
+                        // locales & skins need to be written into subdirectories
+                        fromPath.listPaths().forEach(function(sourceDir) {
+                            toPath = Program["get" + part.substr(0,1).toUpperCase() + part.substr(1) + "Path"]().join(sourceDir.basename(), id);
+                            BUILD_UTIL.copyTreeWhile(fromPath.join(sourceDir.basename()), toPath, [
                                 [BUILD_UTIL.replaceVariables, [vars, "%%"]],
                                 [BUILD_UTIL.replaceVariables, [vars, "__"]]
                             ]);
@@ -124,11 +120,8 @@ exports.Program = function(programPackage) {
                     }
                 }
             });
-            
 
             // determine ID for some important narwhalrunner packages                        
-            var pkgId = pkg.getId();
-            
             if(pkg.toString()==commonPackage.toString() || pkg.toString()==platformPackage.toString()) {
                 pkgId = "__" + pkg.getName() + "__";
             }
@@ -141,7 +134,22 @@ exports.Program = function(programPackage) {
                     [BUILD_UTIL.replaceVariables, [vars, "__"]]
                 ], fromPath.read());
             }
+        }
+
+
+        // build program package
+        buildPackage(programPackage, programPackage.getId());
+                
+        
+        // build all dependencies
+        programPackage.forEachDependency(function(dependency) {
+
+            // cast the dependent package to a common/package object
+            var pkg = PACKAGE.Package(dependency.getPackage());
+            pkg.setAppInfo(programPackage.getAppInfo());
             
+            buildPackage(pkg, dependency.getId());
+
         }, "package", true);
 
         

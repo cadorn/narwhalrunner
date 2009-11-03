@@ -65,7 +65,11 @@ App.prototype.getPackage = function(id) {
 }
 
 App.prototype.getInternalName = function() {
-    return this.manifest.narwhalrunner.InternalName;
+    return this.getInfo().InternalName;
+}
+
+App.prototype.getInfo = function() {
+    return this.manifest.narwhalrunner;
 }
 
 App.prototype.getPackageName = function() {
@@ -157,14 +161,21 @@ App.prototype.registerProtocolHandler = function() {
                     body: ["Internal Server Error", "</br>", "Package not found: " + packageName]
                 }                
             }
-            
-            // if a locale URL is accessed we default to en-US for now            
-            if(parts[0]=="locale") {
-                parts.splice(1,0,"en-US");
-            }
 
             var pkg = PACKAGE.Package(packageName),
-                filePath = pkg.getPath().join("chrome", parts.join("/"));
+                filePath = pkg.getPath();
+
+            if(parts[0]=="resources") {
+                // path is fine the way it is            
+            } else {
+                // if a locale URL is accessed we default to en-US for now            
+//                if(parts[0]=="locale") {
+//                    parts.splice(1,0,"en-US");
+//                }
+                filePath = filePath.join("chrome");
+            }
+            filePath = filePath.join(parts.join("/"));
+            
 
             if(!filePath.exists()) {
                 print("error: File not found: " + filePath);
@@ -294,6 +305,9 @@ App.prototype.started = function() {
 var app;
 
 exports.initializeApp = function(path) {
+
+print("narwhalrunner:initializeApp()");
+
     // singleton
     if(app) {
 //        throw "App already initialized";

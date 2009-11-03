@@ -25,6 +25,10 @@ exports.Program = function (programPackage) {
         return Program.getTargetPath().join("chrome", "locale");
     }
     
+    Program.getChromeSkinPath = function() {
+        return Program.getTargetPath().join("chrome", "skin");
+    }
+    
     Program.getPreferencesPath = function() {
         return Program.getTargetPath().join("defaults", "preferences");
     }

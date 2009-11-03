@@ -97,6 +97,16 @@ exports.dom.removeClass = function(node, name)
     }
 };
 
+exports.dom.getAncestorByClass = function(node, className)
+{
+    for (var parent = node; parent; parent = parent.parentNode)
+    {
+        if (exports.dom.hasClass(parent, className))
+            return parent;
+    }
+
+    return null;
+};
 
 /**
  * Prototypes

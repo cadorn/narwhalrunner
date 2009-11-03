@@ -61,9 +61,10 @@ exports.Package = function (packagePath) {
             "Package.OverlayBaseURL": "chrome://" + appInfo.InternalName + "-overlay/content/" + id + "/",
             "Package.ModulesBaseURL": "resource://" + appInfo.InternalName + "-modules/" + id + "/",
             "Package.LocaleBaseURL": "chrome://" + appInfo.InternalName + "/locale/" + id + "/",
+            "Package.SkinBaseURL": "chrome://" + appInfo.InternalName + "/skin/" + id + "/",
 
             "Package.ContentBaseURL": Package.getContentBaseUrl(),
-            "Package.SkinBaseURL": "narwhalrunner://" + appInfo.InternalName + "/" + id + "/skin/",
+            "Package.ResourcesBaseURL": "narwhalrunner://" + appInfo.InternalName + "/" + id + "/resources/",
 
             "Program.NarwhalURL": "chrome://" + appInfo.InternalName + "-overlay/content/" + appInfo["CommonPackage.ReferenceId"] + "/narwhal.js",
             "Program.NarwhalizeURL": "chrome://" + appInfo.InternalName + "-overlay/content/" + appInfo["CommonPackage.ReferenceId"] + "/narwhalize.js",
@@ -114,6 +115,10 @@ exports.Package = function (packagePath) {
 
     Package.getChromeLocalePath = function() {
         return Package.getPath().join("chrome", "locale");
+    }
+
+    Package.getChromeSkinPath = function() {
+        return Package.getPath().join("chrome", "skin");
     }
 
     Package.getPreferencesPath = function() {
