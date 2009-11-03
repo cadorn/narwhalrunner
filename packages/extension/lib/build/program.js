@@ -1,7 +1,4 @@
 
-function dump(obj) { print(require('test/jsdump').jsDump.parse(obj)) };
-
-
 var PROGRAM = require("build/program", "common");
 
 
