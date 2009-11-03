@@ -3,9 +3,11 @@ function dump(obj) { print(require('test/jsdump').jsDump.parse(obj)) };
 
 
 var SYSTEM = require("system");
+var OS = require("os");
 var UTIL = require("util");
 var FILE = require("file");
 var JSON = require("json");
+var ZIP = require("zip");
 var BUILD_UTIL = require("./util");
 var PACKAGE = require("../package");
 
@@ -17,6 +19,8 @@ exports.Program = function(programPackage) {
     // cast the programPackage to a common/package object
     programPackage = PACKAGE.Package(programPackage);
     var info = programPackage.getManifest().manifest.narwhalrunner;
+
+    var pinfVars = resolvePINFVars(programPackage.getManifest().manifest.pinf);
     
     
     // determine common and platform packages
@@ -54,6 +58,39 @@ exports.Program = function(programPackage) {
         return targetPath;
     }
     
+    
+    Program.dist = function() {
+        
+        // ensure there are no un-comitted changes
+        if(isVCSDirty()) {
+            throw "Dirty working directory. You need to commit all changes first.";
+        }
+    
+        Program.build();
+        
+        print("Bundling package '" + programPackage.getName() + "' from path: " + programPackage.getPath());
+
+        var vars = programPackage.getTemplateVariables();
+        UTIL.update(vars, pinfVars);
+        
+        var releaseVersion = vars["PINF.Version"] + "." + vars["PINF.Release"];
+        
+        var sourcePath = Program.getTargetPath(),
+            archivePath = sea.getBuildPath().join(programPackage.getName() + "-" + releaseVersion + ".xpi");
+
+        // create archive
+        command = "cd " + sourcePath + "; zip -r " + archivePath + " ./";
+        print(command);
+        result = OS.command(command);
+
+        // write update.rdf
+        var fromPath = platformPackage.getUpdateRdfPath();
+        var toPath = sea.getBuildPath().join(programPackage.getName() + "-" + releaseVersion + ".update.rdf");
+        BUILD_UTIL.copyWhile(fromPath, toPath, [
+            [BUILD_UTIL.replaceVariables, [vars]]
+        ]);
+    }    
+    
     Program.build = function() {
         
         print("Building package '" + programPackage.getName() + "' from path: " + programPackage.getPath());
@@ -85,6 +122,7 @@ exports.Program = function(programPackage) {
             
             var id = pkg.getReferenceId();
             vars = pkg.getTemplateVariables();
+            UTIL.update(vars, pinfVars);
 
             vars["module[package]"] = pkgId;
 
@@ -155,6 +193,7 @@ exports.Program = function(programPackage) {
         
         // setup all vars for the program package
         vars = programPackage.getTemplateVariables();
+        UTIL.update(vars, pinfVars);
 
 
         // write chrome.manifest
@@ -294,5 +333,52 @@ exports.Program = function(programPackage) {
     
     
     // PRIVATE
+    
+    function resolvePINFVars(info) {
+        
+        var vars = {};
+        
+        vars["PINF.Version"] = info.Version;
+        vars["PINF.Release"] = info.Release;
+        if(vars["PINF.Release"]=="{VCS.Revision}") {
+            vars["PINF.Release"] = getVCSRevision();
+        }
+        
+        UTIL.every(info.narwhalrunner, function(item) {
+            var value = item[1];
+            value = value.replace(/{PINF.Version}/g, vars["PINF.Version"]);
+            value = value.replace(/{PINF.Release}/g, vars["PINF.Release"]);
+            vars["PINF.narwhalrunner." +item[0]] = value; 
+        });
+        
+        return vars;
+    }
+    
+    function isVCSDirty() {
+        var command = "cd " + programPackage.getPath() + "; git status";
+        var process = OS.popen(command);
+        var result = process.communicate();
+        if(result.status!=1) {
+            throw "Error while getting VCS status using: " + command;
+        }
+        var match = result.stdout.read().match(/^# On branch (\S*)\nnothing to commit \(working directory clean\)\n$/);
+        if(!match) {
+            return true;
+        }
+        return false;
+    }
+    
+    function getVCSRevision() {
+        var command = "cd " + programPackage.getPath() + "; git log -1";
+        var result = OS.command(command);
+        if(!result) {
+            throw "Error while getting VCS revision using: " + command;
+        }
+        var match = result.match(/^commit (\S*)\n/);
+        if(!match) {
+            throw "Error while parsing VCS revision from: " + result;
+        }
+        return match[1];
+    }
     
 }

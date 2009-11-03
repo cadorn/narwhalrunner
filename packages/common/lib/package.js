@@ -141,6 +141,10 @@ exports.Package = function (packagePath) {
         return Package.getPath().join("install.rdf.tpl.xml");
     }
     
+    Package.getUpdateRdfPath = function() {
+        return Package.getPath().join("update.rdf.tpl.xml");
+    }
+    
     Package.getLocales = function() {
         var localePath = Package.getChromeLocalePath();
         if(!localePath.exists()) {

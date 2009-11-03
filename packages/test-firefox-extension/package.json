@@ -32,6 +32,8 @@
         "IconURL": "",
         "OptionsURL": "",
         "UpdateURL": "",
-        "UpdateKey": ""
+        "UpdateKey": "",
+        "UpdateLinkURL": "",
+        "UpdateInfoURL": ""
     }
 }

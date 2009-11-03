@@ -17,7 +17,8 @@
         },
         "defaultTarget": "dev",
         "targets": {
-            "dev": "build/dev"
+            "dev": "build/dev",
+            "dist": "build/dist"
         }
     }
 }
