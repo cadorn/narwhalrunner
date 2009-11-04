@@ -27,8 +27,10 @@
         </em:targetApplication>
 		
         <!-- NOTE: Do not move these tags above <em:targetApplication>. It will break the registration process! -->
-        <em:updateURL>%%PINF.narwhalruner.UpdateURL%%</em:updateURL>
-        <em:updateKey>%%PINF.narwhalruner.UpdateKey%%</em:updateKey>
-        
+        <em:updateURL>%%PINF.narwhalrunner.UpdateURL%%</em:updateURL>
+<!--
+    NOTE: Leaving this tag in while using a https updateLink (in update.rdf) will cause the update to fail
+        <em:updateKey>%%PINF.narwhalrunner.UpdateKey%%</em:updateKey>
+-->
     </RDF:Description>
 </RDF>

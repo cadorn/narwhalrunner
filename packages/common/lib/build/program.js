@@ -79,7 +79,8 @@ exports.Program = function(programPackage) {
             archivePath = sea.getBuildPath().join(programPackage.getName() + "-" + releaseVersion + ".xpi");
 
         // create archive
-        command = "cd " + sourcePath + "; zip -r " + archivePath + " ./";
+        if(archivePath.exists()) archivePath.remove();
+        command = "cd " + sourcePath + "; zip -r " + archivePath + " ./ -x \"*.DS_Store\" -x \"*.git/*\" -x \"packages/narwhal/engines/rhino/*\"";
         print(command);
         result = OS.command(command);
 
