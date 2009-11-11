@@ -34,6 +34,7 @@ Clone Christoph Dorn's [**tusk-catalog** narwhal branch](http://github.com/cador
  
 	// Switch to branch
 	git branch --track tusk-catalog origin/tusk-catalog
+	git checkout tusk-catalog
 	cd ..
 	
 	// Clone narwhal-xulrunner
