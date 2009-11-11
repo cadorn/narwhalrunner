@@ -47,6 +47,10 @@ Clone Christoph Dorn's [**tusk-catalog** narwhal branch](http://github.com/cador
 
 	// Activate narwhal to setup environment variables
 	narwhal/bin/activate
+	
+	// Create a directory for your seas and proceed below
+	mkdir seas
+	cd seas
 
 Setup a testing playground.
 
