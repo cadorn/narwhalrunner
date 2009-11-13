@@ -28,6 +28,10 @@
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
             "name": "devtools"
         },
+        "dev-sidebar": {
+            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
+            "name": "dev-sidebar"
+        },
         "test-firefox-extension": {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
             "name": "test-firefox-extension"

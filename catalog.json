@@ -21,6 +21,10 @@
             "location": "http://github.com/cadorn/narwhalrunner/zipball/master/",
             "path": "packages/devtools"
         },
+        "dev-sidebar": {
+            "location": "http://github.com/cadorn/narwhalrunner/zipball/master/",
+            "path": "packages/dev-sidebar"
+        },
         "test-firefox-extension": {
             "location": "http://github.com/cadorn/narwhalrunner/zipball/master/",
             "path": "packages/test-firefox-extension"
