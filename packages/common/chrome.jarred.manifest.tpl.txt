@@ -1,0 +1,3 @@
+
+resource narwhal            packages/narwhal/
+resource narwhal-xulrunner  using/__module[packages][narwhal-xulrunner]__/

@@ -64,6 +64,8 @@ exports.Package = function (packagePath) {
             "Package.SkinBaseURL": "chrome://" + appInfo.InternalName + "/skin/" + id + "/",
 
             "Package.ContentBaseURL": Package.getContentBaseUrl(),
+            "Package.AccessibleContentBaseURL": "narwhalrunner-accessible://" + appInfo.InternalName + "/" + Package.getReferenceId() + "/content-accessible/",
+            
             "Package.ResourcesBaseURL": "narwhalrunner://" + appInfo.InternalName + "/" + id + "/resources/",
 
             "Program.NarwhalURL": "chrome://" + appInfo.InternalName + "-overlay/content/" + appInfo["CommonPackage.ReferenceId"] + "/narwhal.js",
@@ -137,6 +139,13 @@ exports.Package = function (packagePath) {
         return Package.getPath().join("chrome.manifest.tpl.txt");
     }
     
+    Package.getChromeJarredManifestPath = function() {
+        var path = Package.getPath().join("chrome.jarred.manifest.tpl.txt");
+        // fall back to flat chrome manifest file if we do not have a jarred one
+        if(!path.exists()) return Package.getChromeManifestPath();
+        return path;
+    }
+    
     Package.getInstallRdfPath = function() {
         return Package.getPath().join("install.rdf.tpl.xml");
     }
@@ -164,3 +173,29 @@ exports.Package = function (packagePath) {
     
 }
 
+
+
+exports.resolvePackageInfoVariables = function(packageDatum, pinfVars) {
+    
+    pinfVars = pinfVars || {};
+    
+    UTIL.every(packageDatum.pinf, function(item1) {
+        if(item1[0]=="narwhalrunner") {
+            UTIL.every(packageDatum.pinf[item1[0]], function(item2) {
+                packageDatum.pinf[item1[0]][item2[0]] = pinfVars["PINF.narwhalrunner."+item2[0]] = replaceVariables(item2[1], pinfVars);
+            });           
+        } else {
+            packageDatum.pinf[item1[0]] = pinfVars["PINF."+item1[0]] = replaceVariables(item1[1], pinfVars);
+        }
+    });
+    UTIL.every(packageDatum.narwhalrunner, function(item1) {
+        packageDatum.narwhalrunner[item1[0]] = replaceVariables(item1[1], pinfVars);
+    });
+}
+
+function replaceVariables(data, vars) {
+    UTIL.keys(vars).forEach(function(name) {
+        data = data.replace(new RegExp("{" + name + "}", "g"), vars[name]);
+    });
+    return data;
+}

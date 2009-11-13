@@ -33,6 +33,8 @@ var App = exports.App = function (packageName) {
     }
     this.manifest = JSON.decode(manifestPath.read({charset:"utf-8"}));
     
+    PACKAGE.resolvePackageInfoVariables(this.manifest);
+    
     this.registerProtocolHandler();
     
     this.bindings = {};

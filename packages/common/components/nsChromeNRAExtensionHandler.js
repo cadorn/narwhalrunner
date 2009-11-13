@@ -74,10 +74,10 @@
  */
 
 // Custom protocol related
-const kSCHEME = "narwhalrunner";
-const kPROTOCOL_CID = Components.ID("{DA473A57-6AC8-4706-9B06-DA454C12028F}");
+const kSCHEME = "narwhalrunner-accessible";
+const kPROTOCOL_CID = Components.ID("{F804711E-B2F0-46C9-BCA9-6B4DB648167A}");
 const kPROTOCOL_CONTRACTID = "@mozilla.org/network/protocol;1?name=" + kSCHEME;
-const kPROTOCOL_NAME = "Chrome Extension Protocol for NarwhalRunner";
+const kPROTOCOL_NAME = "Chrome Extension Protocol for NarwhalRunner (Accessible)";
 
 // Dummy chrome URL used to obtain a valid chrome channel
 // This one was chosen at random and should be able to be substituted

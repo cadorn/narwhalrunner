@@ -50,6 +50,10 @@ exports.Program = function (programPackage) {
         return Program.getTargetPath().join("chrome.manifest");
     }
 
+    Program.getChromeJarredManifestPath = function() {
+        return Program.getTargetPath().join("chrome.jarred.manifest");
+    }
+
     Program.getInstallRdfPath = function() {
         return Program.getTargetPath().join("install.rdf");
     }

@@ -18,10 +18,13 @@ exports.Program = function(programPackage) {
 
     // cast the programPackage to a common/package object
     programPackage = PACKAGE.Package(programPackage);
-    var info = programPackage.getManifest().manifest.narwhalrunner;
-
-    var pinfVars = resolvePINFVars(programPackage.getManifest().manifest.pinf);
+    var packageDatum = programPackage.getManifest().manifest;
     
+    // resolve PINF vars
+    var pinfVars = {};
+    PACKAGE.resolvePackageInfoVariables(packageDatum, pinfVars);
+    var info = packageDatum.narwhalrunner;
+   
     
     // determine common and platform packages
     var commonPackage,
@@ -36,11 +39,11 @@ exports.Program = function(programPackage) {
             platformPackage = pkg;
         }
     });
-    
+        
     platformPackage = PACKAGE.Package(platformPackage)
     commonPackage = PACKAGE.Package(commonPackage);
-    info["CommonPackage.ReferenceId"] = commonPackage.setAppInfo(info).getReferenceId();    
-    info["ProgramPackage.Id"] = programPackage.getId();    
+    info["CommonPackage.ReferenceId"] = commonPackage.setAppInfo(info).getReferenceId();
+    info["ProgramPackage.Id"] = programPackage.getId();
     programPackage.setAppInfo(info);
     platformPackage.setAppInfo(info);
     commonPackage.setAppInfo(info);
@@ -60,11 +63,6 @@ exports.Program = function(programPackage) {
     
     
     Program.dist = function() {
-        
-        // ensure there are no un-comitted changes
-        if(isVCSDirty()) {
-            throw "Dirty working directory. You need to commit all changes first.";
-        }
     
         Program.build();
         
@@ -73,16 +71,34 @@ exports.Program = function(programPackage) {
         var vars = programPackage.getTemplateVariables();
         UTIL.update(vars, pinfVars);
         
-        var releaseVersion = vars["PINF.Version"] + "." + vars["PINF.Release"];
+        var releaseVersion = vars["Program.Version"];
         
         var sourcePath = Program.getTargetPath(),
-            archivePath = sea.getBuildPath().join(programPackage.getName() + "-" + releaseVersion + ".xpi");
+            archivePath = sea.getBuildPath().join(programPackage.getName() + "-" + releaseVersion + ".xpi"),
+            stagingPath = sea.getBuildPath().join(programPackage.getName() + "-" + releaseVersion);
+
+        // copy files we want from build dir to staging dir
+        if(stagingPath.exists()) stagingPath.rmtree();
+        var command = "rsync -r --copy-links --exclude \"- .DS_Store\" --exclude \"- .git/\" --exclude \"- /packages/narwhal/engines/rhino/\" " + sourcePath + "/* " + stagingPath;
+        print(command);
+        OS.command(command);
+        
+        // package jars
+        packageJar(stagingPath.join("chrome", "overlay"));
+//        packageJar(stagingPath.join("packages"));
+//        packageJar(stagingPath.join("using"));
+
+        // use jarred manifest instead
+        stagingPath.join("chrome.manifest").remove();
+        stagingPath.join("chrome.jarred.manifest").rename("chrome.manifest");
+        
 
         // create archive
         if(archivePath.exists()) archivePath.remove();
-        command = "cd " + sourcePath + "; zip -r " + archivePath + " ./ -x \"*.DS_Store\" -x \"*.git/*\" -x \"packages/narwhal/engines/rhino/*\"";
+        command = "cd " + stagingPath + "; zip -r " + archivePath + " ./";
         print(command);
         result = OS.command(command);
+
 
         // write update.rdf
         var fromPath = platformPackage.getUpdateRdfPath();
@@ -116,7 +132,7 @@ exports.Program = function(programPackage) {
             toPath,
             vars;
         
-        var chromeManifests = {};
+        var chromeManifests = {"Manifest": {}, "JarredManifest": {}};
         
         
         function buildPackage(pkg, pkgId) {
@@ -166,13 +182,15 @@ exports.Program = function(programPackage) {
             }
             
             // fetch chrome manifest
-            fromPath = pkg.getChromeManifestPath();
-            if(fromPath.exists()) {
-                chromeManifests[pkgId] = BUILD_UTIL.process([
-                    [BUILD_UTIL.replaceVariables, [vars, "%%"]],
-                    [BUILD_UTIL.replaceVariables, [vars, "__"]]
-                ], fromPath.read());
-            }
+            ["Manifest", "JarredManifest"].forEach(function(manifestType) {
+                fromPath = pkg["getChrome" + manifestType + "Path"]();
+                if(fromPath.exists()) {
+                    chromeManifests[manifestType][pkgId] = BUILD_UTIL.process([
+                        [BUILD_UTIL.replaceVariables, [vars, "%%"]],
+                        [BUILD_UTIL.replaceVariables, [vars, "__"]]
+                    ], fromPath.read());
+                }
+            });
         }
 
 
@@ -197,28 +215,28 @@ exports.Program = function(programPackage) {
         UTIL.update(vars, pinfVars);
 
 
-        // write chrome.manifest
-        toPath = Program.getChromeManifestPath();
-        var templateVars = { "build": {"dependencies": []} };
-        var rootTemplate;
-        UTIL.every(chromeManifests, function(entry) {
-            if(entry[0]=="__common__") {
-                templateVars.build.common = entry[1];
-            } else
-            if(entry[0]=="__" + vars["Program.Type"] + "__") {
-                rootTemplate = entry[1];
-            } else
-            if(entry[0]==programPackage.getName()) {
-                templateVars.build.program = entry[1];
-            } else {
-                templateVars.build.dependencies.push(entry[1]);
-            }
-        });
-        
-        
-        templateVars.build.dependencies = templateVars.build.dependencies.join("\n");
-        toPath.write(BUILD_UTIL.runTemplate([], rootTemplate, templateVars));
-        print("Wrote chrome.manifest file to: " + toPath);
+        // write chrome manifest files
+        ["Manifest", "JarredManifest"].forEach(function(manifestType) {
+            toPath = Program["getChrome" + manifestType + "Path"]();
+            var templateVars = { "build": {"dependencies": []} };
+            var rootTemplate;
+            UTIL.every(chromeManifests[manifestType], function(entry) {
+                if(entry[0]=="__common__") {
+                    templateVars.build.common = entry[1];
+                } else
+                if(entry[0]=="__" + vars["Program.Type"] + "__") {
+                    rootTemplate = entry[1];
+                } else
+                if(entry[0]==programPackage.getName()) {
+                    templateVars.build.program = entry[1];
+                } else {
+                    templateVars.build.dependencies.push(entry[1]);
+                }
+            });
+            templateVars.build.dependencies = templateVars.build.dependencies.join("\n");
+            toPath.write(BUILD_UTIL.runTemplate([], rootTemplate, templateVars));
+            print("Wrote " + manifestType + " file to: " + toPath);
+        })
         
 
         // write install.rdf
@@ -335,51 +353,14 @@ exports.Program = function(programPackage) {
     
     // PRIVATE
     
-    function resolvePINFVars(info) {
-        
-        var vars = {};
-        
-        vars["PINF.Version"] = info.Version;
-        vars["PINF.Release"] = info.Release;
-        if(vars["PINF.Release"]=="{VCS.Revision}") {
-            vars["PINF.Release"] = getVCSRevision();
+    function packageJar(path) {
+        if(!path.exists()) {
+            throw "Directory not found! Cannot package jar for path: " + path;
         }
-        
-        UTIL.every(info.narwhalrunner, function(item) {
-            var value = item[1];
-            value = value.replace(/{PINF.Version}/g, vars["PINF.Version"]);
-            value = value.replace(/{PINF.Release}/g, vars["PINF.Release"]);
-            vars["PINF.narwhalrunner." +item[0]] = value; 
-        });
-        
-        return vars;
-    }
-    
-    function isVCSDirty() {
-        var command = "cd " + programPackage.getPath() + "; git status";
-        var process = OS.popen(command);
-        var result = process.communicate();
-        if(result.status!=1) {
-            throw "Error while getting VCS status using: " + command;
-        }
-        var match = result.stdout.read().match(/^# On branch (\S*)\nnothing to commit \(working directory clean\)\n$/);
-        if(!match) {
-            return true;
-        }
-        return false;
-    }
-    
-    function getVCSRevision() {
-        var command = "cd " + programPackage.getPath() + "; git log -1";
+        var command = "cd " + path + "; zip -r " + path.valueOf() + ".jar ./";
+        print(command);
         var result = OS.command(command);
-        if(!result) {
-            throw "Error while getting VCS revision using: " + command;
-        }
-        var match = result.match(/^commit (\S*)\n/);
-        if(!match) {
-            throw "Error while parsing VCS revision from: " + result;
-        }
-        return match[1];
+        print(result);
+        path.rmtree();
     }
-    
 }
