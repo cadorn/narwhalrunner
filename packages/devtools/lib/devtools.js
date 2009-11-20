@@ -30,7 +30,6 @@ var tusk = TUSK.Tusk().activate(),
     profileSeaKey = STRUCT.bin2hex(MD5.hash(profilesPath.valueOf())),
     command;
 
-
 command = parser.command('launch', function(options) {
     
     var app = options.app,
@@ -143,11 +142,11 @@ command = parser.command('add-bin', function(options) {
         app,
         version;
 
-    if(parts = result.match(/Mozilla Firefox ([\d.]*), Copyright \(c\) 1998 - \d{4} mozilla.org/)) {
+    if(parts = result.match(/Mozilla Firefox ([\d.ab]*), Copyright \(c\) 1998 - \d{4} mozilla.org/)) {
         app = "firefox";
         version = parts[1];
     } else
-    if(parts = result.match(/Mozilla XULRunner ([\d.]*) - \d*/)) {
+    if(parts = result.match(/Mozilla XULRunner ([\d.ab]*) - \d*/)) {
         app = "xulrunner";
         version = parts[1];
     } else {
