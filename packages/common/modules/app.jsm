@@ -55,7 +55,7 @@ EXPORTED_SYMBOLS = ["system", "require", "print", "prefix"];
     
     // everything goes through the sandbox from now on
     require = function(id, pkg) {
-        return sandbox(id, null, false, false, pkg);
+        return sandbox(id, null, pkg);
     }
 
 
