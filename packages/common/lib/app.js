@@ -7,7 +7,12 @@ var JSON = require("json");
 var UTIL = require("util");
 var FILE = require("file");
 var BASE64 = require("base64");
+var MD5 = require("md5");
+var STRUCT = require("struct");
+var MD5 = require("md5");
+var STRUCT = require("struct");
 var PACKAGES = require("packages");
+var SEA = require("narwhal/tusk/sea");
 
 var PACKAGE = require("./package");
 var BINDING = require("./binding");
@@ -39,8 +44,14 @@ var App = exports.App = function (packageName) {
     
     this.bindings = {};
     this.containers = {};
-    
+    this.resourceURLs = {
+        path: {},
+        key: {}
+    };
+
     this.status = false;
+
+    this.sea = SEA.Sea(PACKAGES.catalog[this.manifest.narwhalrunner.ID].directory);
     
     // keep the app package handy    
     this.pkg = PACKAGE.Package(packageName).setAppInfo(this.manifest.narwhalrunner);
@@ -60,6 +71,10 @@ App.prototype.exists = function() {
 
 App.prototype.getAppPackage = function() {
     return this.pkg;
+}
+
+App.prototype.getSea = function() {
+    return this.sea;
 }
 
 App.prototype.getPackage = function(id) {
@@ -135,6 +150,15 @@ App.prototype.getContainer = function(pkgId, name) {
     
 }
 
+App.prototype.getResourceUrlForPackage = function(pkg) {
+    var path = pkg.getPath().valueOf();
+    var id = STRUCT.bin2hex(MD5.hash(path));
+    if(!UTIL.has(this.refIdMap, id)) {
+        this.refIdMap[id] = PACKAGE.Package(pkg).setAppInfo(this.manifest.narwhalrunner);
+    }    
+    return "narwhalrunner://" + this.manifest.narwhalrunner.InternalName + "/" + id + "/resources/";
+}
+
 App.prototype.registerProtocolHandler = function() {
     var self = this;
     
@@ -154,18 +178,22 @@ App.prototype.registerProtocolHandler = function() {
                 extension = baseName.split(".").pop();
                 
             var packageName = self.refIdMap[packageRefId];
-
-            if(!UTIL.has(PACKAGES.usingCatalog, packageName)) {
-                print("error: Package not found: " + packageName);
-                return {
-                    status: 500,
-                    headers: {"Content-Type":"text/plain"},
-                    body: ["Internal Server Error", "</br>", "Package not found: " + packageName]
-                }                
+            
+            var pkg;
+            if(!packageName || typeof packageName == "string") {
+                if(!UTIL.has(PACKAGES.usingCatalog, packageName)) {
+                    print("error: Package not found: " + packageName);
+                    return {
+                        status: 500,
+                        headers: {"Content-Type":"text/plain"},
+                        body: ["Internal Server Error", "</br>", "Package not found: " + packageName]
+                    }                
+                }
+                pkg = PACKAGE.Package(packageName);
+            } else {
+                pkg = packageName;
             }
-
-            var pkg = PACKAGE.Package(packageName),
-                filePath = pkg.getPath();
+            filePath = pkg.getPath();
 
             if(parts[0]=="resources") {
                 // path is fine the way it is            

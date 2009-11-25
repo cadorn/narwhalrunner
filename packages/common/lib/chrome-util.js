@@ -1,4 +1,5 @@
 
+var FILE = require("file");
 var CHROME = require("./chrome");
 
 exports.getWindow = function() {
@@ -28,7 +29,12 @@ exports.openNewTab = function(url, postText) {
     gBrowser.selectedTab = gBrowser.addTab(url, null, null, postData);
 };
 
-
+exports.getProfilePath = function() {
+    var file = Cc["@mozilla.org/file/directory_service;1"].
+                    getService(Ci.nsIProperties).
+                    get("ProfD", Components.interfaces.nsIFile);
+    return FILE.Path(file.path);    
+}
 
 
 function getInputStreamFromString(dataString) {
