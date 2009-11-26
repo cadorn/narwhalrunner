@@ -30,6 +30,7 @@
         "Copyright": "Copyright (c) 2009 Christoph Dorn",
         "Description": "A NarwhalRunner application for testing",
         "HomepageURL": "http://github.com/cadorn/narwhalrunner",
-        "IconURL": ""
+        "IconURL": "",
+        "SeaPath": "chrome"
     }
 }

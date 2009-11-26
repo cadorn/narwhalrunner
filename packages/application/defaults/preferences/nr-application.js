@@ -1,2 +1,2 @@
 
-pref("toolkit.defaultChromeURI", "chrome://%%InternalName%%-narwhalrunner/content/application/loader.xul");
+pref("toolkit.defaultChromeURI", "__Package.OverlayBaseURL__loader.xul");

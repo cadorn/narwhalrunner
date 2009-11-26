@@ -50,7 +50,7 @@ EXPORTED_SYMBOLS = ["system", "require", "print", "prefix"];
         }
     });
         
-    sandbox.force("system").env["SEA"] = getPath('/');
+    sandbox.force("system").env["SEA"] = getPath('/%%Program.SeaPath%%');
     sandbox("global");
     
     // everything goes through the sandbox from now on
@@ -66,7 +66,7 @@ EXPORTED_SYMBOLS = ["system", "require", "print", "prefix"];
     var paths = [];
 
     // application/extension packages
-    paths.push(getPath('/'));
+    paths.push(getPath('/%%Program.SeaPath%%'));
 
     // all narwhal system packages
     paths.push(system.prefix);

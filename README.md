@@ -147,13 +147,17 @@ As a deep-sea package:
 Links
 =====
 
-  * [Online Book: Rapid Application Development with Mozilla!](http://mb.eschew.org/)
-  * [W3C: XML Binding Language (XBL) 2.0](http://www.w3.org/TR/xbl/)
-  * [MDC: XUL Tutorial](https://developer.mozilla.org/en/XUL_Tutorial)
-  * [MDC: XBL](https://developer.mozilla.org/en/XBL)
-  * [MSDN: Naming Files, Paths, and Namespaces](http://msdn.microsoft.com/en-us/library/aa365247%28VS.85%29.aspx)
-  * [MDC: Extension Versioning, Update and Compatibility](https://developer.mozilla.org/en/Extension_Versioning,_Update_and_Compatibility)
-  * [MDC: Toolkit version format](https://developer.mozilla.org/en/Toolkit_version_format)
+  * Tips
+    * [Faster JS with TraceMonkey](http://ejohn.org/blog/tracemonkey/)
+  * Reference
+    * [Online Book: Rapid Application Development with Mozilla!](http://mb.eschew.org/)
+    * [W3C: XML Binding Language (XBL) 2.0](http://www.w3.org/TR/xbl/)
+    * [MDC: XUL Tutorial](https://developer.mozilla.org/en/XUL_Tutorial)
+    * [MDC: XBL](https://developer.mozilla.org/en/XBL)
+    * [MSDN: Naming Files, Paths, and Namespaces](http://msdn.microsoft.com/en-us/library/aa365247%28VS.85%29.aspx)
+    * [MDC: Extension Versioning, Update and Compatibility](https://developer.mozilla.org/en/Extension_Versioning,_Update_and_Compatibility)
+    * [MDC: Toolkit version format](https://developer.mozilla.org/en/Toolkit_version_format)
+
 
 License
 =======

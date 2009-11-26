@@ -32,6 +32,8 @@ exports.copyWhile = function(fromPath, toPath, callbacks) {
         case "html":
         case "rdf":
         case "dtd":
+        case "ini":
+        case "txt":
             var data = fromPath.read();
             callbacks.forEach(function(callback) {
                 var args = UTIL.copy(callback[1]);
@@ -42,6 +44,7 @@ exports.copyWhile = function(fromPath, toPath, callbacks) {
             toPath.write(data);
             break;
         default:
+            print("Skip copyWhile callbacks as file is not ASCII");
             fromPath.copy(toPath);
             break;
     }

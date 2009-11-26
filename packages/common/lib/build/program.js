@@ -57,6 +57,8 @@ exports.Program = function(programPackage) {
     
     // PUBLIC
     
+    Program.platformPackage = platformPackage;
+    
     Program.getTargetPath = function() {
         return targetPath;
     }
@@ -135,7 +137,7 @@ exports.Program = function(programPackage) {
         var chromeManifests = {"Manifest": {}, "JarredManifest": {}};
         
         
-        function buildPackage(pkg, pkgId) {
+        function buildPackage(pkg, pkgId, sinks) {
             
             var id = pkg.getReferenceId();
             vars = pkg.getTemplateVariables();
@@ -160,6 +162,15 @@ exports.Program = function(programPackage) {
                                 [BUILD_UTIL.replaceVariables, [vars, "%%"]],
                                 [BUILD_UTIL.replaceVariables, [vars, "__"]]
                             ]);
+                        });
+                    } else
+                    if(part=="preferences") {
+                        // all preferences need to go into one prefs.js file
+                        fromPath.listPaths().forEach(function(entry) {
+                            sinks.preferences.push(BUILD_UTIL.process([
+                                [BUILD_UTIL.replaceVariables, [vars, "%%"]],
+                                [BUILD_UTIL.replaceVariables, [vars, "__"]]
+                            ], entry.read()));
                         });
                     } else {
                         if(part=="components") {
@@ -199,16 +210,27 @@ exports.Program = function(programPackage) {
                 
         
         // build all dependencies
+        var sinks = {
+            "preferences": []
+        }
         programPackage.forEachDependency(function(dependency) {
 
             // cast the dependent package to a common/package object
             var pkg = PACKAGE.Package(dependency.getPackage());
             pkg.setAppInfo(programPackage.getAppInfo());
             
-            buildPackage(pkg, dependency.getId());
+            buildPackage(pkg, dependency.getId(), sinks);
 
         }, "package", true);
-
+        
+        
+        // dump all sinks
+        if(sinks.preferences.length>0) {
+            toPath = Program.getPreferencesPath();
+            toPath.dirname().mkdirs();
+            toPath.write(sinks.preferences.join("\n"));
+            print("Wrote preferences file to: " + toPath);
+        }
         
         // setup all vars for the program package
         vars = programPackage.getTemplateVariables();
@@ -216,7 +238,8 @@ exports.Program = function(programPackage) {
 
 
         // write chrome manifest files
-        ["Manifest", "JarredManifest"].forEach(function(manifestType) {
+        // ["Manifest", "JarredManifest"]   // don't write jarred manifests unless we need to
+        ["Manifest"].forEach(function(manifestType) {
             toPath = Program["getChrome" + manifestType + "Path"]();
             var templateVars = { "build": {"dependencies": []} };
             var rootTemplate;
@@ -239,16 +262,9 @@ exports.Program = function(programPackage) {
         })
         
 
-        // write install.rdf
-        fromPath = platformPackage.getInstallRdfPath();
-        toPath = Program.getInstallRdfPath();
-        BUILD_UTIL.copyWhile(fromPath, toPath, [
-            [BUILD_UTIL.replaceVariables, [vars]]
-        ]);
-
 
         // write package.json
-        toPath = Program.getTargetPath().join("package.json");
+        toPath = Program.getPackageJsonPath();
         toPath.write(JSON.encode({
             "name": vars["Program.ID"],
             "dependencies": [programPackage.getName()]
@@ -269,7 +285,18 @@ exports.Program = function(programPackage) {
         toPath = Program.getTargetPath().join("catalog.local.json");
         BUILD_UTIL.copyWhile(fromPath, toPath, []);
 */
+
+        Program.buildStaticPlatform({
+            "fromPath": fromPath,
+            "toPath": toPath,
+            "platformPackage": platformPackage,
+            "vars": vars
+        });
     }    
+
+    Program.buildStaticPlatform = function() {
+        
+    }
 
     Program.buildDynamic = function() {
         
@@ -321,9 +348,14 @@ exports.Program = function(programPackage) {
             toPath.dirname().mkdirs();    
             fromPath.symlink(toPath);
         }
-        print("Linked '" + toPath + "' to '" + fromPath + "'");    
+        print("Linked '" + toPath + "' to '" + fromPath + "'");
+        
+        Program.buildDynamicPlatform();    
     }    
-    
+
+    Program.buildDynamicPlatform = function() {
+        // to be subclassed
+    }
     
     Program.triggerComponentReload = function() {
         var devtoolsManifest = sea.path.join("devtools.local.json");

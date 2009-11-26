@@ -95,6 +95,11 @@ exports.Package = function (packagePath) {
         UTIL.every(appInfo, function(item) {
             vars["Program." + item[0]] = item[1];
         });
+        
+        // Some defaults
+        if(!UTIL.has(vars, "Program.SeaPath")) {
+            vars["Program.SeaPath"] = "";
+        }
         return vars;
     }
 
@@ -148,6 +153,10 @@ exports.Package = function (packagePath) {
     
     Package.getInstallRdfPath = function() {
         return Package.getPath().join("install.rdf.tpl.xml");
+    }
+
+    Package.getApplicationIniPath = function() {
+        return Package.getPath().join("application.ini.tpl.txt");
     }
     
     Package.getUpdateRdfPath = function() {

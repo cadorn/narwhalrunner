@@ -9,7 +9,7 @@ exports.main = function(args) {
 
     CHROME.getConsoleService().logStringMessage("hello world from MAIN for test app!");
 
-    CHROME.getWindow().open("narwhalrunner://"+APP.getApp().getInternalName()+"/"+APP.getApp().getPackageName()+"/content/mainWindow.xul",
+    CHROME.getWindow().open(APP.getApp().getContentBaseUrl()+"test.xul",
                             "main",
                             "chrome,left=200,top=200");
         
@@ -17,3 +17,4 @@ exports.main = function(args) {
     APP.getApp().started();
 
 }
+

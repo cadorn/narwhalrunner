@@ -1,5 +1,6 @@
 
 var PROGRAM = require("build/program", "common");
+var BUILD_UTIL = require("build/util", "common");
 
 
 exports.Program = function (programPackage) {
@@ -9,6 +10,18 @@ exports.Program = function (programPackage) {
     var Program = PROGRAM.Program(programPackage);
     
     // PUBLIC
+    
+
+    Program.buildStaticPlatform = function(scope) {
+        with(scope) {
+            // write install.rdf
+            fromPath = platformPackage.getInstallRdfPath();
+            toPath = Program.getInstallRdfPath();
+            BUILD_UTIL.copyWhile(fromPath, toPath, [
+                [BUILD_UTIL.replaceVariables, [vars]]
+            ]);
+        }
+    }    
     
     Program.getChromeOverlayPath = function() {
         return Program.getTargetPath().join("chrome", "overlay");
@@ -27,7 +40,7 @@ exports.Program = function (programPackage) {
     }
     
     Program.getPreferencesPath = function() {
-        return Program.getTargetPath().join("defaults", "preferences");
+        return Program.getTargetPath().join("defaults", "preferences", "prefs.js");
     }
     
     Program.getModulesPath = function() {
@@ -52,6 +65,10 @@ exports.Program = function (programPackage) {
 
     Program.getChromeJarredManifestPath = function() {
         return Program.getTargetPath().join("chrome.jarred.manifest");
+    }
+
+    Program.getPackageJsonPath = function() {
+        return Program.getTargetPath().join("package.json");
     }
 
     Program.getInstallRdfPath = function() {
