@@ -36,7 +36,7 @@ exports.Container = function (pkgId, object, name) {
     }
     
     Container.getBinding = function(name) {
-        return APP.getApp().getBinding(pkgId, name);
+        return APP.getChrome().getBinding(pkgId, name);
     }
 
     Container.onLoad = function() {

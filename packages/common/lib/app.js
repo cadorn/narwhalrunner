@@ -2,7 +2,7 @@
 function dump(obj) { print(require('test/jsdump').jsDump.parse(obj)) };
 
 
-var CHROME = require("./chrome");
+var OBSERVABLE = require("observable", "observable");
 var JSON = require("json");
 var UTIL = require("util");
 var FILE = require("file");
@@ -18,6 +18,7 @@ var PACKAGE = require("./package");
 var BINDING = require("./binding");
 var CONTAINER = require("./container");
 
+var CHROME = require("./chrome");
 
 
 var App = exports.App = function (packageName) {
@@ -42,8 +43,6 @@ var App = exports.App = function (packageName) {
     
     this.registerProtocolHandler();
     
-    this.bindings = {};
-    this.containers = {};
     this.resourceURLs = {
         path: {},
         key: {}
@@ -64,6 +63,7 @@ var App = exports.App = function (packageName) {
         self.refIdMap[PACKAGE.Package(id).setAppInfo(self.manifest.narwhalrunner).getReferenceId()] = id;
     });
 }
+OBSERVABLE.mixin(App.prototype);
 
 App.prototype.exists = function() {
     return this.path.exists();
@@ -97,59 +97,6 @@ App.prototype.getContentBaseUrl = function() {
     return this.pkgVars["Package.ContentBaseURL"];
 }
 
-App.prototype.registerBinding = function(pkgId, object, name) {
-    if(!UTIL.has(this.bindings, pkgId)) {
-        this.bindings[pkgId] = {};
-    }
-    return this.bindings[pkgId][name] = BINDING.Binding(pkgId, object, name);
-}
-
-App.prototype.getBinding = function(pkgId, name) {
-    if(!UTIL.has(this.bindings, pkgId)) {
-        return false;
-    }
-    if(!UTIL.has(this.bindings[pkgId], name)) {
-        return false;
-    }
-    return this.bindings[pkgId][name];
-}
-
-App.prototype.registerContainer = function(pkgId, object, module, name) {
-    if(!UTIL.has(this.containers, pkgId)) {
-        this.containers[pkgId] = {};
-    }
-
-    if(UTIL.has(this.containers[pkgId], name)) {
-        var container = this.containers[pkgId][name];
-        if(container.getObject()===object) {
-            // the container has already been registered
-            container.reattach();
-            return container;
-        } else {
-            // a different container is registering in the same spot
-            container.destroy();
-        }
-    }
-
-    var containerModule = require(module, pkgId);
-    if(!containerModule) {
-        throw "Could not find module '" + module + "' in package: " + pkgId;
-    }
-    
-    return this.containers[pkgId][name] = containerModule.Container(pkgId, object, name);
-}
-
-App.prototype.getContainer = function(pkgId, name) {
-    if(!UTIL.has(this.containers, pkgId)) {
-        return false;
-    }
-    if(!UTIL.has(this.containers[pkgId], name)) {
-        return false;
-    }
-    return this.containers[pkgId][name];
-    
-}
-
 App.prototype.getResourceUrlForPackage = function(pkg) {
     var path = pkg.getPath().valueOf();
     var id = STRUCT.bin2hex(MD5.hash(path));
@@ -166,7 +113,7 @@ App.prototype.registerProtocolHandler = function() {
     
     appInfo["CommonPackage.ReferenceId"] = PACKAGE.Package(module["package"]).setAppInfo(appInfo).getReferenceId();
     
-    CHROME.registerProtocolHandler({
+    var protocolHandler = {
         internalAppName : self.getInternalName(),
         app: function(chromeEnv) {
 
@@ -293,30 +240,42 @@ App.prototype.registerProtocolHandler = function() {
             
             return result;
         }
-    });
+    };
+
+    Cc["@mozilla.org/network/protocol;1?name=narwhalrunner"].
+        getService().
+            wrappedJSObject.registerExtension(protocolHandler);
+    
+    Cc["@mozilla.org/network/protocol;1?name=narwhalrunner-accessible"].
+        getService().
+            wrappedJSObject.registerExtension(protocolHandler);
 }
 
 App.prototype.start = function(type, loaderWindow, args) {
-    if(this.status) {
+    var self = this;
+
+    if(self.status) {
+        // app can only initialize once
         return;
     }
-    this.status = "starting";
 
-    var self = this;
-    this.type = type;
-    this.loaderWindow = loaderWindow;
-    
+    self.status = "starting";
+    self.type = type;
+    self.loaderWindow = loaderWindow;
+
     // Call the main.js module of the app once the loaderWindow is completely loaded
-    this.onLoaderWindowLoad = function() {
-        var main = require("main", self.manifest.name);
+    self.onLoaderWindowLoad = function() {
+        self.programModule = require("main", self.manifest.name);
 
         try {
-            main.main(args);
+            self.programModule.main(args);
         } catch(e) {
-            print(e);
+            system.log.error(e);
         }
+
+        self.onNewChrome(self.getChrome());
     }
-    loaderWindow.addEventListener("load", this.onLoaderWindowLoad, false);
+    loaderWindow.addEventListener("load", self.onLoaderWindowLoad, false);
 }
 
 App.prototype.started = function() {
@@ -328,22 +287,64 @@ App.prototype.started = function() {
     }
 }
 
+App.prototype.onNewChrome = function(chrome) {
+    try {
+        app.publish("newChrome", chrome);
+
+        if(this.programModule.chrome) {
+            this.programModule.chrome(chrome);
+        }
+    } catch(e) {
+        system.log.error(e);
+    }
+}
+
+
+// Chrome management
+
+var activeChrome = null;
+var chromes = [];           // all known chromes
+
+App.prototype.getChrome = function() {
+    return exports.getChrome();
+}
+
+exports.getChrome = function() {
+    return activeChrome;
+}
+
+CHROME.Chrome.prototype.subscribeTo("new", function(chrome) {
+    // when a new chrome is initialized we assume it is a browser window and that it
+    // has or will get the focus
+    activeChrome = chrome;
+    chromes.push(chrome);
+});
+
+CHROME.Chrome.prototype.subscribeTo("load", function(chrome) {
+    // if the app is initialized we call chrome() on the program module
+    // this is the case when the second browser window is opened
+    // for the first window chrome() is called after main() on the program module
+    var app = exports.getApp();
+    if(app && app.programModule) {
+        app.onNewChrome(chrome);
+    }
+});
+
+CHROME.Chrome.prototype.subscribeTo("focus", function(chrome) {
+    activeChrome = chrome;
+});
 
 
 
+
+
+// App singleton management
 
 var app;
 
-exports.initializeApp = function(path) {
-
-print("narwhalrunner:initializeApp()");
-
-    // singleton
-    if(app) {
-//        throw "App already initialized";
-        return app;
-    }
-    app = App(path);
+exports.initializeApp = function(path, chrome) {
+    // only initialize the app once no matter how many windows are open
+    if(!app) app = App(path);
     return app;
 }
 

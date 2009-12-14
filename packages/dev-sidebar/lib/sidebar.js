@@ -36,7 +36,7 @@ exports.Sidebar = function () {
     // PRIVATE
     
     function buildUI() {
-        var ui = APP.getApp().getContainer(module["package"], "Sidebar");
+        var ui = APP.getChrome().getContainer(module["package"], "Sidebar");
         if(ui) {
             ui.buildUI();
         }

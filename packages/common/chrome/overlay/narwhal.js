@@ -15,13 +15,11 @@
     // initialize narwhalrunner utilities
     // -----------------------------------
 
-    var FILE = narwhal.require("file");
     var CHROME = narwhal.require("chrome", "__module[package]__");    
     var APP = narwhal.require("app", "__module[package]__");
-
-    CHROME.set(this);
     
-    APP.initializeApp("__Program.ProgramPackage.Id__").start("__Program.Type__", window, {});
+    var chrome = CHROME.Chrome(this);
+    
+    APP.initializeApp("__Program.ProgramPackage.Id__", chrome).start("__Program.Type__", window, {});
     
 })();
-

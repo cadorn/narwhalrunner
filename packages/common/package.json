@@ -5,6 +5,9 @@
     "using": {
         "narwhal-xulrunner": {
             "location": "http://github.com/cadorn/narwhal-xulrunner/zipball/master/"
+        },
+        "observable": {
+            "location": "http://github.com/nrstott/observable-js/zipball/master/"
         }
     },
     "build": {

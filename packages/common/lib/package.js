@@ -79,7 +79,7 @@ exports.Package = function (packagePath) {
             "    var narwhal = {};" +
             "    Components.utils.import('" + vars["Program.AppModuleURL"] + "', narwhal);" +
             "    return function(object, name) {" +
-            "        return narwhal.require('app', '" + module["package"] + "').getApp().registerBinding('" + Package.getId() + "', object, name);" +
+            "        return narwhal.require('app', '" + module["package"] + "').getChrome().registerBinding('" + Package.getId() + "', object, name);" +
             "    };" +
             "}())";
         
@@ -88,7 +88,7 @@ exports.Package = function (packagePath) {
             "    var narwhal = {};" +
             "    Components.utils.import('" + vars["Program.AppModuleURL"] + "', narwhal);" +
             "    return function(object, module, name) {" +
-            "        return narwhal.require('app', '" + module["package"] + "').getApp().registerContainer('" + Package.getId() + "', object, module, name);" +
+            "        return narwhal.require('app', '" + module["package"] + "').getChrome().registerContainer('" + Package.getId() + "', object, module, name);" +
             "    };" +
             "}())";
         

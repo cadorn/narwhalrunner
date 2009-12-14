@@ -9,22 +9,24 @@
 EXPORTED_SYMBOLS = ["system", "require", "print", "prefix"];
 
 
-    const Cc = Components.classes;
-    const Ci = Components.interfaces;
-    
-    
-    // -----------------------------------
-    // load narwhal    
-    // -----------------------------------
-
-    var narwhal = Cc["@narwhaljs.org/xulrunner/global;1"].createInstance(Ci.nsINarwhal).system.global;
-    var print = narwhal.print;
-    var require = narwhal.require;
+//const Cc = Components.classes;
+//const Ci = Components.interfaces;
 
 
-    // -----------------------------------
-    // create sandbox
-    // -----------------------------------
+// -----------------------------------
+// load narwhal    
+// -----------------------------------
+
+var narwhal = Cc["@narwhaljs.org/xulrunner/global;1"].createInstance(Ci.nsINarwhal).system.global;
+var print = narwhal.print;
+var require = narwhal.require;
+
+
+// -----------------------------------
+// create sandbox
+// -----------------------------------
+
+try {
 
     var UTIL = require("util");
     var FILE = require("file");
@@ -91,4 +93,6 @@ EXPORTED_SYMBOLS = ["system", "require", "print", "prefix"];
             return FileService.getFileFromURLSpec(ResourceHandler.resolveURI(IOService.newURI("resource:"+path, null, null))).path;
         }
     }
- 
+} catch(e) {
+    narwhal.system.log.error(e);
+}
