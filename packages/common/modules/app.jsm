@@ -9,8 +9,8 @@
 EXPORTED_SYMBOLS = ["system", "require", "print", "prefix"];
 
 
-//const Cc = Components.classes;
-//const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Ci = Components.interfaces;
 
 
 // -----------------------------------
@@ -81,18 +81,19 @@ try {
     loader.paths.unshift(narwhal.system.prefixes[1] + "/engines/default/lib");
     loader.paths.unshift(narwhal.system.prefixes[0] + "/lib");
     
-
-    function getPath(path) {
-        if("%%Program.Type%%"=="extension") {
-            var em = Cc["@mozilla.org/extensions/manager;1"].getService(Ci.nsIExtensionManager);
-            return em.getInstallLocation("%%Program.ID%%").getItemFile("%%Program.ID%%", path).path;
-        } else {
-            var ResourceHandler = Cc['@mozilla.org/network/protocol;1?name=resource'].getService(Ci.nsIResProtocolHandler);
-            var IOService = Cc['@mozilla.org/network/io-service;1'].getService(Ci.nsIIOService)
-            var FileService = IOService.getProtocolHandler("file").QueryInterface(Ci.nsIFileProtocolHandler);
-            return FileService.getFileFromURLSpec(ResourceHandler.resolveURI(IOService.newURI("resource:"+path, null, null))).path;
-        }
-    }
 } catch(e) {
     narwhal.system.log.error(e);
+}
+
+
+function getPath(path) {
+    if("%%Program.Type%%"=="extension") {
+        var em = Cc["@mozilla.org/extensions/manager;1"].getService(Ci.nsIExtensionManager);
+        return em.getInstallLocation("%%Program.ID%%").getItemFile("%%Program.ID%%", path).path;
+    } else {
+        var ResourceHandler = Cc['@mozilla.org/network/protocol;1?name=resource'].getService(Ci.nsIResProtocolHandler);
+        var IOService = Cc['@mozilla.org/network/io-service;1'].getService(Ci.nsIIOService)
+        var FileService = IOService.getProtocolHandler("file").QueryInterface(Ci.nsIFileProtocolHandler);
+        return FileService.getFileFromURLSpec(ResourceHandler.resolveURI(IOService.newURI("resource:"+path, null, null))).path;
+    }
 }
