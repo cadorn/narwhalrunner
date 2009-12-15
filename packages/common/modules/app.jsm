@@ -8,10 +8,8 @@
 
 EXPORTED_SYMBOLS = ["system", "require", "print", "prefix"];
 
-
 const Cc = Components.classes;
 const Ci = Components.interfaces;
-
 
 // -----------------------------------
 // load narwhal    
@@ -30,29 +28,32 @@ try {
 
     var UTIL = require("util");
     var FILE = require("file");
-    var SANDBOX = require("sandbox");
-    var LOADER = require("loader");
-    var Loader = LOADER.Loader;
-    var Sandbox = SANDBOX.Sandbox;
+    var PACKAGES = require("packages");
+    var Sandbox = require("sandbox").Sandbox;
+    var Loader = require("loader").Loader;
     
-    var system = UTIL.copy(narwhal.system);
+    // start with the program root path and locate all resources from there
+    var programRootPath = getPath('/%%Program.SeaPath%%');
 
-    var paths = [
-        narwhal.system.prefixes[0] + "/lib",
-        narwhal.system.prefixes[1] + "/engines/default/lib",
-        narwhal.system.prefixes[1] + "/lib"
-    ]
-        
-    var loader = Loader({"paths": paths});
+    var system = UTIL.copy(narwhal.system);
+    var loader = Loader({
+        // construct own loader paths to ensure predictable environment
+        "paths": [
+            PACKAGES.usingCatalog["narwhal-xulrunner"].libPath,
+            FILE.join(PACKAGES.usingCatalog["narwhal"].directory, "engines", "default", "lib"),
+            PACKAGES.usingCatalog["narwhal"].libPath
+        ]
+    });
     var sandbox = Sandbox({
         "loader": loader,
         "system": system,
         "modules": {
             "system": system
-        }
+        },
+        "debug": false
     });
-        
-    sandbox.force("system").env["SEA"] = getPath('/%%Program.SeaPath%%');
+
+    sandbox.force("system").env["SEA"] = programRootPath;
     sandbox("global");
     
     // everything goes through the sandbox from now on
@@ -60,31 +61,18 @@ try {
         return sandbox(id, null, pkg);
     }
 
-
     // -----------------------------------
     // load packages into sandbox
     // -----------------------------------
     
-    var paths = [];
-
-    // application/extension packages
-    paths.push(getPath('/%%Program.SeaPath%%'));
-
-    // all narwhal system packages
-    paths.push(system.prefix);
-    
     // load packages from paths
-    require('packages').load(paths);
-
-    // fix loader paths that were trashed when loading packages
-    loader.paths.unshift(narwhal.system.prefixes[1] + "/lib");
-    loader.paths.unshift(narwhal.system.prefixes[1] + "/engines/default/lib");
-    loader.paths.unshift(narwhal.system.prefixes[0] + "/lib");
+    require('packages').load([
+        programRootPath    // application/extension packages
+    ]);
     
 } catch(e) {
     narwhal.system.log.error(e);
 }
-
 
 function getPath(path) {
     if("%%Program.Type%%"=="extension") {

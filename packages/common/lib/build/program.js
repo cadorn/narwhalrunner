@@ -267,7 +267,10 @@ exports.Program = function(programPackage) {
         toPath = Program.getPackageJsonPath();
         toPath.write(JSON.encode({
             "name": vars["Program.ID"],
-            "dependencies": [programPackage.getName()]
+            "dependencies": [
+                "github.com/cadorn/narwhal-xulrunner/zipball/master",
+                programPackage.getName()
+            ]
         }, null, 4));
         print("Wrote package.json file to: " + toPath);
         
