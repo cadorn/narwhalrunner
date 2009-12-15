@@ -140,7 +140,7 @@ App.prototype.registerProtocolHandler = function() {
             } else {
                 pkg = packageName;
             }
-            filePath = pkg.getPath();
+            var filePath = pkg.getPath();
 
             if(parts[0]=="resources") {
                 // path is fine the way it is            
