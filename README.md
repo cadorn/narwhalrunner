@@ -149,6 +149,7 @@ Links
 
   * Tips
     * [Faster JS with TraceMonkey](http://ejohn.org/blog/tracemonkey/)
+    * [Five wrong reasons to use eval() in an extension](http://adblockplus.org/blog/five-wrong-reasons-to-use-eval-in-an-extension)
   * Reference
     * [Online Book: Rapid Application Development with Mozilla!](http://mb.eschew.org/)
     * [W3C: XML Binding Language (XBL) 2.0](http://www.w3.org/TR/xbl/)
