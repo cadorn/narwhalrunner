@@ -66,7 +66,7 @@ exports.Program = function(programPackage) {
     
     Program.dist = function() {
     
-        Program.build();
+        Program.build({"chrome.manifest.type": "JarredManifest"});
         
         print("Bundling package '" + programPackage.getName() + "' from path: " + programPackage.getPath());
 
@@ -84,14 +84,13 @@ exports.Program = function(programPackage) {
         var command = "rsync -r --copy-links --exclude \"- .DS_Store\" --exclude \"- .git/\" --exclude \"- /packages/narwhal/engines/rhino/\" " + sourcePath + "/* " + stagingPath;
         print(command);
         OS.command(command);
-        
+
         // package jars
         packageJar(stagingPath.join("chrome", "overlay"));
-//        packageJar(stagingPath.join("packages"));
-//        packageJar(stagingPath.join("using"));
+        packageJar(stagingPath.join("packages"));
+        packageJar(stagingPath.join("using"));
 
-        // use jarred manifest instead
-        stagingPath.join("chrome.manifest").remove();
+        // use jarred manifest
         stagingPath.join("chrome.jarred.manifest").rename("chrome.manifest");
         
 
@@ -110,17 +109,20 @@ exports.Program = function(programPackage) {
         ]);
     }    
     
-    Program.build = function() {
+    Program.build = function(options) {
         
         print("Building package '" + programPackage.getName() + "' from path: " + programPackage.getPath());
         
-        Program.buildStatic();
+        Program.buildStatic(options);
         Program.buildDynamic();
         
         Program.triggerComponentReload();
     }    
     
-    Program.buildStatic = function() {
+    Program.buildStatic = function(options) {
+        
+        options = options || {};
+        if(!options["chrome.manifest.type"]) options["chrome.manifest.type"] = "Manifest";
         
         var parts = [
                 "chromeOverlay",
@@ -238,8 +240,7 @@ exports.Program = function(programPackage) {
 
 
         // write chrome manifest files
-        // ["Manifest", "JarredManifest"]   // don't write jarred manifests unless we need to
-        ["Manifest"].forEach(function(manifestType) {
+        [options["chrome.manifest.type"]].forEach(function(manifestType) {
             toPath = Program["getChrome" + manifestType + "Path"]();
             var templateVars = { "build": {"dependencies": []} };
             var rootTemplate;

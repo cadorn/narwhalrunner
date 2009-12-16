@@ -30,11 +30,27 @@ try {
     var FILE = require("file");
     var PACKAGES = require("packages");
     var Sandbox = require("sandbox").Sandbox;
-    var Loader = require("loader").Loader;
-    
+    var LOADER = require("loader");
+    LOADER.reassignFileModule(FILE);
+    var Loader = LOADER.Loader;
+    var JAR_LOADER = require("jar-loader");
+        
     // start with the program root path and locate all resources from there
-    var programRootPath = getPath('/%%Program.SeaPath%%');
+    var programRootPath = FILE.Path(getPath('/%%Program.SeaPath%%'));
 
+    if(programRootPath.join("using.jar").exists()) {
+        JAR_LOADER.registerJar(
+            programRootPath.join("using").valueOf(),
+            programRootPath.join("using.jar").valueOf()
+        );
+    }
+    if(programRootPath.join("packages.jar").exists()) {
+        JAR_LOADER.registerJar(
+            programRootPath.join("packages").valueOf(),
+            programRootPath.join("packages.jar").valueOf()
+        );
+    }
+    
     var system = UTIL.copy(narwhal.system);
     var loader = Loader({
         // construct own loader paths to ensure predictable environment
@@ -48,12 +64,13 @@ try {
         "loader": loader,
         "system": system,
         "modules": {
-            "system": system
+            "system": system,
+            "jar-loader": JAR_LOADER        // prevents module from being re-loaded in the sandbox
         },
         "debug": false
     });
 
-    sandbox.force("system").env["SEA"] = programRootPath;
+    sandbox.force("system").env["SEA"] = programRootPath.valueOf();
     sandbox("global");
     
     // everything goes through the sandbox from now on
@@ -64,10 +81,10 @@ try {
     // -----------------------------------
     // load packages into sandbox
     // -----------------------------------
-    
+
     // load packages from paths
     require('packages').load([
-        programRootPath    // application/extension packages
+        programRootPath.valueOf()    // application/extension packages
     ]);
     
 } catch(e) {
