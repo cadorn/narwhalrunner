@@ -10,6 +10,7 @@ var JSON = require("json");
 var ZIP = require("zip");
 var BUILD_UTIL = require("./util");
 var PACKAGE = require("../package");
+var ARGS = require('args');
 
 
 exports.Program = function(programPackage) {
@@ -64,9 +65,20 @@ exports.Program = function(programPackage) {
     }
     
     
-    Program.dist = function() {
-    
-        Program.build({"chrome.manifest.type": "JarredManifest"});
+    Program.dist = function(args) {
+
+        var parser = new ARGS.Parser();
+        parser.option('--source')
+            .bool();
+        var options = parser.parse(args);
+
+        args = args || {};
+
+        if(options.source) {
+            Program.build();
+        } else {
+            Program.build({"chrome.manifest.type": "JarredManifest"});
+        }
         
         print("Bundling package '" + programPackage.getName() + "' from path: " + programPackage.getPath());
 
@@ -85,14 +97,18 @@ exports.Program = function(programPackage) {
         print(command);
         OS.command(command);
 
-        // package jars
-        packageJar(stagingPath.join("chrome", "overlay"));
-        packageJar(stagingPath.join("packages"));
-        packageJar(stagingPath.join("using"));
 
-        // use jarred manifest
-        stagingPath.join("chrome.jarred.manifest").rename("chrome.manifest");
-        
+        if(options.source) {
+            print("Skipping jarring to generate source distribution");
+        } else {
+            // package jars
+            packageJar(stagingPath.join("chrome", "overlay"));
+            packageJar(stagingPath.join("packages"));
+            packageJar(stagingPath.join("using"));
+    
+            // use jarred manifest
+            stagingPath.join("chrome.jarred.manifest").rename("chrome.manifest");
+        }        
 
         // create archive
         if(archivePath.exists()) archivePath.remove();
@@ -112,6 +128,15 @@ exports.Program = function(programPackage) {
     Program.build = function(options) {
         
         print("Building package '" + programPackage.getName() + "' from path: " + programPackage.getPath());
+        
+        var targetPath = Program.getTargetPath();
+        if(targetPath.exists()) {
+            print("Removing existing program at: " + targetPath);
+            // NOTE: We use exec here to ensure symlinks are not followed as the FILE.rmtree() implementation is not solid yet
+            var command = "rm -Rf " + targetPath;
+            print(command);
+            OS.command(command);
+        }
         
         Program.buildStatic(options);
         Program.buildDynamic();
@@ -237,7 +262,6 @@ exports.Program = function(programPackage) {
         // setup all vars for the program package
         vars = programPackage.getTemplateVariables();
         UTIL.update(vars, pinfVars);
-
 
         // write chrome manifest files
         [options["chrome.manifest.type"]].forEach(function(manifestType) {
