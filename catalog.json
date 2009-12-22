@@ -32,6 +32,10 @@
         "test-application": {
             "location": "http://github.com/cadorn/narwhalrunner/zipball/master/",
             "path": "packages/test-application"
+        },
+        "extra": {
+            "location": "http://github.com/cadorn/narwhalrunner/zipball/master/",
+            "path": "packages/extra"
         }
     }
 }

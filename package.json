@@ -39,6 +39,10 @@
         "test-application": {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
             "name": "test-application"
+        },
+        "extra": {
+            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
+            "name": "extra"
         }
     }
 }
