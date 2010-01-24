@@ -158,6 +158,8 @@ Links
     * [MSDN: Naming Files, Paths, and Namespaces](http://msdn.microsoft.com/en-us/library/aa365247%28VS.85%29.aspx)
     * [MDC: Extension Versioning, Update and Compatibility](https://developer.mozilla.org/en/Extension_Versioning,_Update_and_Compatibility)
     * [MDC: Toolkit version format](https://developer.mozilla.org/en/Toolkit_version_format)
+    * [MDC: Multiple Item Package](https://developer.mozilla.org/en/Multiple_Item_Packaging)
+    * [MDC: Extension Dependencies](https://wiki.mozilla.org/Extension_Dependencies)
     * [Semantic Versioning](http://semver.org/)
 
 
