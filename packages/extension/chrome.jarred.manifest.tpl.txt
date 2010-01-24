@@ -1,0 +1,14 @@
+
+content  __Program.InternalName__-overlay  jar:chrome/overlay.jar!/
+resource __Program.InternalName__-modules  modules/
+skin     __Program.InternalName__  classic/1.0  chrome/skin/classic/
+locale   __Program.InternalName__  en-US   chrome/locale/en-US/
+resource __Program.InternalName__-packages jar:packages.jar!/
+
+{build.common|include}
+
+overlay  chrome://browser/content/browser.xul         __Package.OverlayBaseURL__browser.xul
+
+{build.dependencies|include}
+
+{build.program|include}

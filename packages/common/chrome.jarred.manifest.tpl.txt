@@ -1,0 +1,3 @@
+
+resource narwhal            jar:packages.jar!/narwhal/
+resource narwhal-xulrunner  jar:using.jar!/__module[packages][narwhal-xulrunner]__/

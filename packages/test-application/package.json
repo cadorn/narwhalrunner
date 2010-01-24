@@ -1,17 +1,18 @@
 {
+    "schema": "1.1",
+    "type": "using",
+    "uid": "http://pinf.org/cadorn.org/narwhalrunner/packages/test-application",
     "name": "test-application",
-    "dependencies": [
-        ["application", {
+    "using": {
+        "application": {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "application",
-            "revision": "latest"
-        }],
-        ["common", {
+            "name": "application"
+        },
+        "common": {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "common",
-            "revision": "latest"
-        }]
-    ],
+            "name": "common"
+        }
+    },
     "build": {
         "defaultTarget": "dev",
         "targets": {
@@ -19,6 +20,7 @@
         }
     },
     "narwhalrunner": {
+        "Type": "application",
         "InternalName": "narwhalrunner-test-application",
         "ID": "test-application@narwhalrunner.cadorn.github.com",
         "Name": "NarwhalRunner Test",
@@ -29,6 +31,7 @@
         "Copyright": "Copyright (c) 2009 Christoph Dorn",
         "Description": "A NarwhalRunner application for testing",
         "HomepageURL": "http://github.com/cadorn/narwhalrunner",
-        "IconURL": ""
+        "IconURL": "",
+        "SeaPath": "chrome"
     }
 }

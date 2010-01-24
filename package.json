@@ -1,4 +1,6 @@
 {
+    "schema": "1.1",
+    "uid": "http://pinf.org/cadorn.org/narwhalrunner",
     "name": "narwhalrunner",
     "license": "MIT",
     "description": "A toolkit for building XULRunner applications and extensions with Narwhal",
@@ -9,49 +11,38 @@
         "narwhal"
     ],
     "author": "Christoph Dorn (http://www.christophdorn.com/)",
-    "dependencies": [
-        "narwhal",
-        ["common", {
+    "using": {
+        "common": {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "common",
-            "revision": "latest"
-        }],
-        ["application", {
+            "name": "common"
+        },
+        "application": {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "application",
-            "revision": "latest"
-        }],
-        ["extension", {
+            "name": "application"
+        },
+        "extension": {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "extension",
-            "revision": "latest"
-        }],
-        ["devtools", {
+            "name": "extension"
+        },
+        "devtools": {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "devtools",
-            "revision": "latest"
-        }],
-        ["test-firefox-extension", {
+            "name": "devtools"
+        },
+        "dev-sidebar": {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "test-firefox-extension",
-            "revision": "latest"
-        }],
-        ["test-application", {
+            "name": "dev-sidebar"
+        },
+        "test-firefox-extension": {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "test-application",
-            "revision": "latest"
-        }]
-    ],
-    "origin": [
-        ["source", {
-            "locate": "git://github.com/cadorn/narwhalrunner.git",
-            "package": "narwhalrunner",
-            "revision": "master"
-        }],
-        ["latest", {
-            "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
-            "package": "narwhalrunner",
-            "revision": "master"
-        }]
-    ]
+            "name": "test-firefox-extension"
+        },
+        "test-application": {
+            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
+            "name": "test-application"
+        },
+        "extra": {
+            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
+            "name": "extra"
+        }
+    }
 }

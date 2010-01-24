@@ -161,6 +161,22 @@ As a deep-sea package:
     nr launch --dev --app firefox --package test-application
 
 
+Links
+=====
+
+  * Tips
+    * [Faster JS with TraceMonkey](http://ejohn.org/blog/tracemonkey/)
+    * [Five wrong reasons to use eval() in an extension](http://adblockplus.org/blog/five-wrong-reasons-to-use-eval-in-an-extension)
+  * Reference
+    * [Online Book: Rapid Application Development with Mozilla!](http://mb.eschew.org/)
+    * [W3C: XML Binding Language (XBL) 2.0](http://www.w3.org/TR/xbl/)
+    * [MDC: XUL Tutorial](https://developer.mozilla.org/en/XUL_Tutorial)
+    * [MDC: XBL](https://developer.mozilla.org/en/XBL)
+    * [MSDN: Naming Files, Paths, and Namespaces](http://msdn.microsoft.com/en-us/library/aa365247%28VS.85%29.aspx)
+    * [MDC: Extension Versioning, Update and Compatibility](https://developer.mozilla.org/en/Extension_Versioning,_Update_and_Compatibility)
+    * [MDC: Toolkit version format](https://developer.mozilla.org/en/Toolkit_version_format)
+    * [Semantic Versioning](http://semver.org/)
+
 
 License
 =======

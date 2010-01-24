@@ -2,26 +2,26 @@
 ;
 ; This field specifies your organization's name.  This field is recommended,
 ; but optional.
-Vendor=%%Vendor%%
+Vendor=%%Program.Vendor%%
 ;
 ; This field specifies your application's name.  This field is required.
-Name=%%Name%%
+Name=%%Program.Name%%
 ;
 ; This field specifies your application's version.  This field is optional.
-Version=%%Version%%%%Release%%
+Version=%%Program.Version%%
 ;
 ; This field specifies your application's build ID (timestamp).  This field is
 ; required.
-BuildID=%%BuildID%%
+BuildID=%%Program.BuildID%%
 ;
 ; This field specifies a compact copyright notice for your application.  This
 ; field is optional.
-Copyright=%%Copyright%%
+Copyright=%%Program.Copyright%%
 ;
 ; This ID is just an example.  Every XUL app ought to have it's own unique ID.
 ; You can use the microsoft "guidgen" or "uuidgen" tools, or go on
 ; irc.mozilla.org and /msg botbot uuid.  This field is optional.
-ID=%%ID%%
+ID=%%Program.ID%%
 
 [Gecko]
 ;

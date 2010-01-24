@@ -75,7 +75,7 @@
 
 // Custom protocol related
 const kSCHEME = "narwhalrunner";
-const kPROTOCOL_CID = Components.ID("{7E973EAE-A566-4E0D-A309-98F84A96DE40}");
+const kPROTOCOL_CID = Components.ID("{DA473A57-6AC8-4706-9B06-DA454C12028F}");
 const kPROTOCOL_CONTRACTID = "@mozilla.org/network/protocol;1?name=" + kSCHEME;
 const kPROTOCOL_NAME = "Chrome Extension Protocol for NarwhalRunner";
 

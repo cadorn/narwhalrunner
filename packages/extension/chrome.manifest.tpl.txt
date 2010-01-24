@@ -1,10 +1,14 @@
 
-content  %%InternalName%%          chrome/content/
-skin     %%InternalName%%  global  chrome/skin/global/
-locale   %%InternalName%%  en-US   chrome/locale/en-US/
-resource %%InternalName%%-packages packages/
+content  __Program.InternalName__-overlay  chrome/overlay/
+resource __Program.InternalName__-modules  modules/
+skin     __Program.InternalName__  classic/1.0  chrome/skin/classic/
+locale   __Program.InternalName__  en-US   chrome/locale/en-US/
+resource __Program.InternalName__-packages packages/
 
+{build.common|include}
 
-{build.common.file|includeFile}
+overlay  chrome://browser/content/browser.xul         __Package.OverlayBaseURL__browser.xul
 
-overlay  chrome://browser/content/browser.xul         chrome://%%InternalName%%-narwhalrunner/content/extension/browserOverlay.xul
+{build.dependencies|include}
+
+{build.program|include}

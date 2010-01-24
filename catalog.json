@@ -1,87 +1,41 @@
 {
-    "name": "com.github.cadorn.narwhalrunner",
-    "type": "sea",
-    "origin": {
-        "locate": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json"
-    },
+    "schema": "1.1",
+    "location": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
     "packages": {
-        "common": [
-            ["source", {
-                "locate": "file://./packages/common",
-                "package": "common",
-                "revision": "latest"
-            }],
-            ["latest", {
-                "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
-                "path": "packages/common",
-                "package": "common",
-                "revision": "master"
-            }]
-        ],
-        "application": [
-            ["source", {
-                "locate": "file://./packages/application",
-                "package": "application",
-                "revision": "latest"
-            }],
-            ["latest", {
-                "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
-                "path": "packages/application",
-                "package": "application",
-                "revision": "master"
-            }]
-        ],
-        "extension": [
-            ["source", {
-                "locate": "file://./packages/extension",
-                "package": "extension",
-                "revision": "latest"
-            }],
-            ["latest", {
-                "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
-                "path": "packages/extension",
-                "package": "extension",
-                "revision": "master"
-            }]
-        ],
-        "devtools": [
-            ["source", {
-                "locate": "file://./packages/devtools",
-                "package": "devtools",
-                "revision": "latest"
-            }],
-            ["latest", {
-                "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
-                "path": "packages/devtools",
-                "package": "devtools",
-                "revision": "master"
-            }]
-        ],
-        "test-firefox-extension": [
-            ["source", {
-                "locate": "file://./packages/test-firefox-extension",
-                "package": "test-firefox-extension",
-                "revision": "latest"
-            }],
-            ["latest", {
-                "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
-                "path": "packages/test-firefox-extension",
-                "package": "test-firefox-extension",
-                "revision": "master"
-            }]
-        ],
-        "test-application": [
-            ["source", {
-                "locate": "file://./packages/test-application",
-                "package": "test-application",
-                "revision": "latest"
-            }],
-            ["latest", {
-                "locate": "http://github.com/cadorn/narwhalrunner/zipball/master/",
-                "path": "packages/test-application",
-                "package": "test-application",
-                "revision": "master"
-            }]
-        ]
+        "narwhalrunner": {
+            "location": "http://github.com/cadorn/narwhalrunner/zipball/master/"
+        },
+        "common": {
+            "location": "http://github.com/cadorn/narwhalrunner/zipball/master/",
+            "path": "packages/common"
+        },
+        "application": {
+            "location": "http://github.com/cadorn/narwhalrunner/zipball/master/",
+            "path": "packages/application"
+        },
+        "extension": {
+            "location": "http://github.com/cadorn/narwhalrunner/zipball/master/",
+            "path": "packages/extension"
+        },
+        "devtools": {
+            "location": "http://github.com/cadorn/narwhalrunner/zipball/master/",
+            "path": "packages/devtools"
+        },
+        "dev-sidebar": {
+            "location": "http://github.com/cadorn/narwhalrunner/zipball/master/",
+            "path": "packages/dev-sidebar"
+        },
+        "test-firefox-extension": {
+            "location": "http://github.com/cadorn/narwhalrunner/zipball/master/",
+            "path": "packages/test-firefox-extension"
+        },
+        "test-application": {
+            "location": "http://github.com/cadorn/narwhalrunner/zipball/master/",
+            "path": "packages/test-application"
+        },
+        "extra": {
+            "location": "http://github.com/cadorn/narwhalrunner/zipball/master/",
+            "path": "packages/extra"
+        }
     }
 }

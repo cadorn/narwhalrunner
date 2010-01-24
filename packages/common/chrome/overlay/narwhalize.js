@@ -8,7 +8,7 @@
     // -----------------------------------
     
     var narwhal = {}
-    Components.utils.import("resource://%%InternalName%%-narwhalrunner/modules/app.jsm", narwhal);
+    Components.utils.import("__Program.AppModuleURL__", narwhal);
     
     this.require = narwhal.require;
     

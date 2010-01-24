@@ -94,7 +94,7 @@ Config.prototype.addBinary = function(app, version, path) {
         this.config.binaries = [];
     }
     
-    this.config.binaries.push([app, path, version]);
+    this.config.binaries.push([app, ""+path, version]);
     
     this.save();
     

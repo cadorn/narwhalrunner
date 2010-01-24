@@ -1,24 +1,27 @@
 {
+    "schema": "1.1",
+    "type": "using",
+    "uid": "http://pinf.org/cadorn.org/narwhalrunner/packages/test-firefox-extension",
     "name": "test-firefox-extension",
-    "dependencies": [
-        ["extension", {
+    "using": {
+        "extension": {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "extension",
-            "revision": "latest"
-        }],
-        ["common", {
+            "name": "extension"
+        },
+        "common": {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "common",
-            "revision": "latest"
-        }]
-    ],
+            "name": "common"
+        }
+    },
     "build": {
         "defaultTarget": "dev",
         "targets": {
             "dev": "extension:build/dev",
+            "dist": "extension:build/dist",
         }
     },
     "narwhalrunner": {
+        "Type": "extension",
         "InternalName": "narwhalrunner-test-firefox-extension",
         "ID": "test-firefox-extension@narwhalrunner.cadorn.github.com",
         "Name": "NarwhalRunner Test",
@@ -31,6 +34,8 @@
         "IconURL": "",
         "OptionsURL": "",
         "UpdateURL": "",
-        "UpdateKey": ""
+        "UpdateKey": "",
+        "UpdateLinkURL": "",
+        "UpdateInfoURL": ""
     }
 }

@@ -6,29 +6,31 @@
     
     <RDF:Description about="urn:mozilla:install-manifest">
 
-        <em:id>%%ID%%</em:id>
-        <em:name>%%Name%%</em:name>
-        <em:version>%%Version%%%%Release%%</em:version>
+        <em:id>%%Program.ID%%</em:id>
+        <em:name>%%Program.Name%%</em:name>
+        <em:version>%%Program.Version%%</em:version>
         <em:type>2</em:type>
     
-        <em:creator>%%Creator%%</em:creator>
-        <em:description>%%Description%%</em:description>
+        <em:creator>%%Program.Creator%%</em:creator>
+        <em:description>%%Program.Description%%</em:description>
 
-        <em:homepageURL>%%HomepageURL%%</em:homepageURL>
-        <em:iconURL>%%IconURL%%</em:iconURL>
-        <em:optionsURL>%%OptionsURL%%</em:optionsURL>
+        <em:homepageURL>%%Program.HomepageURL%%</em:homepageURL>
+        <em:iconURL>%%Program.IconURL%%</em:iconURL>
+        <em:optionsURL>%%Program.OptionsURL%%</em:optionsURL>
 
         <em:targetApplication>
             <RDF:Description>
                 <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-                <em:maxVersion>3.5.*</em:maxVersion>
+                <em:maxVersion>3.6.*</em:maxVersion>
                 <em:minVersion>3.0</em:minVersion>
             </RDF:Description>
         </em:targetApplication>
 		
         <!-- NOTE: Do not move these tags above <em:targetApplication>. It will break the registration process! -->
-        <em:updateURL>%%UpdateURL%%</em:updateURL>
-        <em:updateKey>%%UpdateKey%%</em:updateKey>
-        
+        <em:updateURL>%%Program.UpdateURL%%</em:updateURL>
+<!--
+    NOTE: Leaving this tag in while using a https updateLink (in update.rdf) will cause the update to fail
+        <em:updateKey>%%Program.UpdateKey%%</em:updateKey>
+-->
     </RDF:Description>
 </RDF>

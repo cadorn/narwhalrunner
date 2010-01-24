@@ -1,6 +1,12 @@
 
-content  %%InternalName%%         file:content/
-skin     %%InternalName%%  global file:skin/global/
-locale   %%InternalName%%  en-US  file:locale/en-US/
+content  __Program.InternalName__-overlay  file:overlay/
+resource __Program.InternalName__-modules  file:modules/
+skin     __Program.InternalName__  classic/1.0  file:skin/classic/
+locale   __Program.InternalName__  en-US   file:locale/en-US/
+resource __Program.InternalName__-packages jar:packages.jar!/
 
-{build.common.file|includeFile}
+{build.common|include}
+
+{build.dependencies|include}
+
+{build.program|include}
