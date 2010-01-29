@@ -1,5 +1,11 @@
 {
-    "schema": "1.1",
-    "uid": "http://pinf.org/cadorn.org/narwhalrunner/packages/devtools",
-    "name": "devtools"
+    "uid": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/devtools/",
+    "name": "devtools",
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git://github.com/cadorn/narwhalrunner.git",
+            "path": "packages/devtools"
+        }
+    ]
 }

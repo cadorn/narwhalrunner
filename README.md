@@ -24,6 +24,9 @@ You are on:
 Instructions
 ------------
 
+**NOTE: These instructions are outdated! New info will be available soon.**
+
+
 Clone Christoph Dorn's [**tusk-catalog** narwhal branch](http://github.com/cadorn/narwhal/tree/tusk-catalog) and the [narwhal-xulrunner](http://github.com/cadorn/narwhal-xulrunner) engine.
 
 	mkdir tutorial
@@ -185,7 +188,7 @@ License
 
 [MIT License](http://www.opensource.org/licenses/mit-license.php)
 
-Copyright (c) 2009 Christoph Dorn
+Copyright (c) 2009-2010 Christoph Dorn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -1,7 +1,5 @@
 {
-    "schema": "1.1",
-    "type": "using",
-    "uid": "http://pinf.org/cadorn.org/narwhalrunner/packages/test-firefox-extension",
+    "uid": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/test-firefox-extension/",
     "name": "test-firefox-extension",
     "using": {
         "extension": {
@@ -17,7 +15,7 @@
         "defaultTarget": "dev",
         "targets": {
             "dev": "extension:build/dev",
-            "dist": "extension:build/dist",
+            "dist": "extension:build/dist"
         }
     },
     "narwhalrunner": {
@@ -37,5 +35,12 @@
         "UpdateKey": "",
         "UpdateLinkURL": "",
         "UpdateInfoURL": ""
-    }
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git://github.com/cadorn/narwhalrunner.git",
+            "path": "packages/test-firefox-extension"
+        }
+    ]
 }

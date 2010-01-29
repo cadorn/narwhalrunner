@@ -1,9 +1,17 @@
 {
+    "uid": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/dev-sidebar/",
     "name": "dev-sidebar",
     "using": {
         "nr-common": {
             "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
             "name": "common"
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git://github.com/cadorn/narwhalrunner.git",
+            "path": "packages/dev-sidebar"
+        }
+    ]
 }

@@ -1,6 +1,5 @@
 {
-    "schema": "1.1",
-    "uid": "http://pinf.org/cadorn.org/narwhalrunner/packages/application",
+    "uid": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/application/",
     "name": "application",
     "using": {
         "common": {
@@ -19,5 +18,12 @@
         "targets": {
             "dev": "build/dev"
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git://github.com/cadorn/narwhalrunner.git",
+            "path": "packages/application"
+        }
+    ]
 }

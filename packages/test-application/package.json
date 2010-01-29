@@ -1,7 +1,5 @@
 {
-    "schema": "1.1",
-    "type": "using",
-    "uid": "http://pinf.org/cadorn.org/narwhalrunner/packages/test-application",
+    "uid": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/test-application/",
     "name": "test-application",
     "using": {
         "application": {
@@ -16,7 +14,7 @@
     "build": {
         "defaultTarget": "dev",
         "targets": {
-            "dev": "application:build/dev",
+            "dev": "application:build/dev"
         }
     },
     "narwhalrunner": {
@@ -33,5 +31,12 @@
         "HomepageURL": "http://github.com/cadorn/narwhalrunner",
         "IconURL": "",
         "SeaPath": "chrome"
-    }
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git://github.com/cadorn/narwhalrunner.git",
+            "path": "packages/test-application"
+        }
+    ]
 }

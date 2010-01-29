@@ -1,6 +1,5 @@
 {
-    "schema": "1.1",
-    "uid": "http://pinf.org/cadorn.org/narwhalrunner/packages/common",
+    "uid": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/common/",
     "name": "common",
     "using": {
         "observable": {
@@ -14,5 +13,12 @@
                 "name": "template"
             }
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git://github.com/cadorn/narwhalrunner.git",
+            "path": "packages/common"
+        }
+    ]
 }
