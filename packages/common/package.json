@@ -2,13 +2,7 @@
     "schema": "1.1",
     "uid": "http://pinf.org/cadorn.org/narwhalrunner/packages/common",
     "name": "common",
-    "dependencies": [
-        "github.com/cadorn/narwhal-xulrunner/zipball/master"
-    ],
     "using": {
-        "narwhal-xulrunner": {
-            "location": "http://github.com/cadorn/narwhal-xulrunner/zipball/master/"
-        },
         "observable": {
             "location": "http://github.com/nrstott/observable-js/zipball/master/"
         }

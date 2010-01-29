@@ -171,11 +171,6 @@ exports.Program = function(programPackage) {
             UTIL.update(vars, pinfVars);
 
             vars["module[package]"] = pkgId;
-
-            // for the common package we need a special variable
-            if(pkg.getPath().valueOf()==commonPackage.getPath().valueOf()) {
-                vars["module[packages][narwhal-xulrunner]"] = pkg.getPackage("narwhal-xulrunner").getId();
-            }
             
             // copy files that cannot be dynamically loaded
             parts.forEach(function(part) {
@@ -291,11 +286,11 @@ exports.Program = function(programPackage) {
         // write package.json
         toPath = Program.getPackageJsonPath();
         toPath.write(JSON.encode({
-            "name": vars["Program.ID"],
-            "dependencies": [
-                "github.com/cadorn/narwhal-xulrunner/zipball/master",
-                programPackage.getName()
-            ]
+            "name": vars["Program.ID"]
+//            "dependencies": [
+//                "github.com/cadorn/narwhal-xulrunner/zipball/master",
+//                programPackage.getName()
+//            ]
         }, null, 4));
         print("Wrote package.json file to: " + toPath);
         
@@ -366,18 +361,7 @@ exports.Program = function(programPackage) {
             print("Linked '" + toPath + "' to '" + fromPath + "'");    
             
         }, "package", true);
-        
-        
-        // link narwhal
-        
-        fromPath = FILE.Path(SYSTEM.prefix);
-        toPath = packagesPath.join("narwhal");
-        if(!toPath.exists()) {
-            toPath.dirname().mkdirs();    
-            fromPath.symlink(toPath);
-        }
-        print("Linked '" + toPath + "' to '" + fromPath + "'");
-        
+
         Program.buildDynamicPlatform();    
     }    
 

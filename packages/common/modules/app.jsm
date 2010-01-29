@@ -55,11 +55,16 @@ try {
     var loader = Loader({
         // construct own loader paths to ensure predictable environment
         "paths": [
-            PACKAGES.usingCatalog["narwhal-xulrunner"].libPath,
-            FILE.join(PACKAGES.usingCatalog["narwhal"].directory, "engines", "default", "lib"),
-            PACKAGES.usingCatalog["narwhal"].libPath
+            "resource://narwhal-xulrunner/lib",
+            "resource://narwhal/engines/default/lib",
+            "resource://narwhal/lib"
+            
+//            PACKAGES.usingCatalog["narwhal-xulrunner"].libPath,
+//            FILE.join(PACKAGES.usingCatalog["narwhal"].directory, "engines", "default", "lib"),
+//            PACKAGES.usingCatalog["narwhal"].libPath
         ]
     });
+    
     var sandbox = Sandbox({
         "loader": loader,
         "system": system,

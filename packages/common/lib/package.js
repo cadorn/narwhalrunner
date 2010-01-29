@@ -76,19 +76,21 @@ exports.Package = function (packagePath) {
 
         vars["Package.RegisterBindingMacro"] = 
             "(function() {" +
-            "    var narwhal = {};" +
-            "    Components.utils.import('" + vars["Program.AppModuleURL"] + "', narwhal);" +
+            "    var sandbox = {};" +
+            "    Components.utils.import('resource://narwhal-xulrunner/sandbox.js', sandbox);" +
+            "    var program = sandbox.get({'type': '" + appInfo["Type"]  + "', 'id': '" + appInfo["ID"]  + "'});" +
             "    return function(object, name) {" +
-            "        return narwhal.require('app', '" + module["package"] + "').getChrome().registerBinding('" + Package.getId() + "', object, name);" +
+            "        return program.require('app', '" + module["package"] + "').getChrome().registerBinding('" + Package.getId() + "', object, name);" +
             "    };" +
             "}())";
         
         vars["Package.RegisterContainerMacro"] = 
             "(function() {" +
-            "    var narwhal = {};" +
-            "    Components.utils.import('" + vars["Program.AppModuleURL"] + "', narwhal);" +
+            "    var sandbox = {};" +
+            "    Components.utils.import('resource://narwhal-xulrunner/sandbox.js', sandbox);" +
+            "    var program = sandbox.get({'type': '" + appInfo["Type"]  + "', 'id': '" + appInfo["ID"]  + "'});" +
             "    return function(object, module, name) {" +
-            "        return narwhal.require('app', '" + module["package"] + "').getChrome().registerContainer('" + Package.getId() + "', object, module, name);" +
+            "        return program.require('app', '" + module["package"] + "').getChrome().registerContainer('" + Package.getId() + "', object, module, name);" +
             "    };" +
             "}())";
         

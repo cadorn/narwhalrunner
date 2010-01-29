@@ -6,17 +6,22 @@
     // -----------------------------------
     // initialize global narwhal for app
     // -----------------------------------
-    
-    var narwhal = {}
-    Components.utils.import("__Program.AppModuleURL__", narwhal);
+
+    var sandbox = {};
+    Components.utils.import('resource://narwhal-xulrunner/sandbox.js', sandbox);
+
+    var program = sandbox.get({
+        "type": "__Program.Type__",
+        "id": "__Program.ID__"
+    });
      
 
     // -----------------------------------
     // initialize narwhalrunner utilities
     // -----------------------------------
 
-    var CHROME = narwhal.require("chrome", "__module[package]__");    
-    var APP = narwhal.require("app", "__module[package]__");
+    var CHROME = program.require("chrome", "__module[package]__");    
+    var APP = program.require("app", "__module[package]__");
     
     var chrome = CHROME.Chrome(this);
     

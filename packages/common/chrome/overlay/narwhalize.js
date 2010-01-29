@@ -7,9 +7,14 @@
     // fetch global narwhal for app
     // -----------------------------------
     
-    var narwhal = {}
-    Components.utils.import("__Program.AppModuleURL__", narwhal);
+    var sandbox = {};
+    Components.utils.import('resource://narwhal-xulrunner/sandbox.js', sandbox);
+
+    var program = sandbox.get({
+        "type": "__Program.Type__",
+        "id": "__Program.ID__"
+    });
     
-    this.require = narwhal.require;
+    this.require = program.require;
     
 })();
