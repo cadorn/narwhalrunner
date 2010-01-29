@@ -12,18 +12,6 @@ Setup
 Assumptions
 -----------
 
-You must be using Christoph Dorn's **tusk-catalog** branch.
- 
-    // Fresh clone
-    git clone git://github.com/cadorn/narwhal.git
-     
-    // Switch to branch
-    git checkout tusk-catalog
-
-You have the [narwhal-xulrunner](http://github.com/cadorn/narwhal-xulrunner) engine installed:
- 
-    TODO: tusk package install ...
-
 You have [firefox 3.5+](http://www.mozilla.com/en-US/firefox/) installed.
 
 You are on:
@@ -35,6 +23,35 @@ You are on:
 
 Instructions
 ------------
+
+Clone Christoph Dorn's [**tusk-catalog** narwhal branch](http://github.com/cadorn/narwhal/tree/tusk-catalog) and the [narwhal-xulrunner](http://github.com/cadorn/narwhal-xulrunner) engine.
+
+	mkdir tutorial
+
+	// Clone narwhal
+	git clone git://github.com/cadorn/narwhal.git
+	cd narwhal
+ 
+	// Switch to branch
+	git branch --track tusk-catalog origin/tusk-catalog
+	git checkout tusk-catalog
+	cd ..
+	
+	// Clone narwhal-xulrunner
+	git clone git://github.com/cadorn/narwhal-xulrunner.git
+	cd ..
+	
+	// Link the engine into narwhal
+	cd narwhal/engines
+	ln -s ../../narwhal-xulrunner xulrunner
+	cd ../../
+
+	// Activate narwhal to setup environment variables
+	narwhal/bin/activate
+	
+	// Create a directory for your seas and proceed below
+	mkdir seas
+	cd seas
 
 Setup a testing playground.
 
