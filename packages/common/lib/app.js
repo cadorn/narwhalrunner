@@ -12,7 +12,6 @@ var STRUCT = require("struct");
 var MD5 = require("md5");
 var STRUCT = require("struct");
 var PACKAGES = require("packages");
-var SEA = require("narwhal/tusk/sea");
 
 var PACKAGE = require("./package");
 var BINDING = require("./binding");
@@ -27,11 +26,12 @@ var App = exports.App = function (packageName) {
         return new exports.App(packageName);
     }
 
-    if(!UTIL.has(PACKAGES.catalog, packageName)) {
+    if(!UTIL.has(PACKAGES.uidCatalog, packageName)) {
         throw "App package not found: " + packageName;
     }
 
-    this.path = PACKAGES.catalog[packageName].directory;
+    this.path = PACKAGES.usingCatalog[PACKAGES.uidCatalog[packageName].id].directory;
+
 
     var manifestPath = this.path.join("package.json");
     if(!manifestPath.exists()) {
@@ -49,18 +49,19 @@ var App = exports.App = function (packageName) {
     };
 
     this.status = false;
-
-    this.sea = SEA.Sea(PACKAGES.catalog[this.manifest.narwhalrunner.ID].directory);
     
     // keep the app package handy    
-    this.pkg = PACKAGE.Package(packageName).setAppInfo(this.manifest.narwhalrunner);
+    this.pkg = PACKAGE.Package(this.path).setAppInfo(this.manifest.narwhalrunner);
     this.pkgVars = this.pkg.getTemplateVariables();
- 
+
     // populate package reference ID map to package ID
     this.refIdMap = {};
     var self = this;
     UTIL.keys(PACKAGES.usingCatalog).forEach(function(id) {
-        self.refIdMap[PACKAGE.Package(id).setAppInfo(self.manifest.narwhalrunner).getReferenceId()] = id;
+        var pkg = PACKAGE.Package(PACKAGES.usingCatalog[id].directory);
+        if(pkg.hasUid()) {
+           self.refIdMap[pkg.setAppInfo(self.manifest.narwhalrunner).getReferenceId()] = id;
+       }
     });
 }
 OBSERVABLE.mixin(App.prototype);
@@ -73,12 +74,8 @@ App.prototype.getAppPackage = function() {
     return this.pkg;
 }
 
-App.prototype.getSea = function() {
-    return this.sea;
-}
-
 App.prototype.getPackage = function(id) {
-    return PACKAGE.Package(id).setAppInfo(this.manifest.narwhalrunner);
+    return PACKAGE.Package(PACKAGES.usingCatalog[id].directory).setAppInfo(this.manifest.narwhalrunner);
 }
 
 App.prototype.getInternalName = function() {
@@ -111,134 +108,139 @@ App.prototype.registerProtocolHandler = function() {
     
     var appInfo = self.manifest.narwhalrunner;
     
-    appInfo["CommonPackage.ReferenceId"] = PACKAGE.Package(module["package"]).setAppInfo(appInfo).getReferenceId();
+    appInfo["CommonPackage.ReferenceId"] = PACKAGE.Package(PACKAGES.usingCatalog[module["package"]].directory).setAppInfo(appInfo).getReferenceId();
     
     var protocolHandler = {
         internalAppName : self.getInternalName(),
         app: function(chromeEnv) {
 
-            print("Processing: " + chromeEnv["PATH_INFO"]);
-            
-            var parts = chromeEnv["PATH_INFO"].substr(1).split("/"),
-                packageRefId = parts.shift(),
-                baseName = parts[parts.length-1],
-                extension = baseName.split(".").pop();
+            try {
+    
+                print("Processing: " + chromeEnv["PATH_INFO"]);
                 
-            var packageName = self.refIdMap[packageRefId];
-            
-            var pkg;
-            if(!packageName || typeof packageName == "string") {
-                if(!UTIL.has(PACKAGES.usingCatalog, packageName)) {
-                    print("error: Package not found: " + packageName);
+                var parts = chromeEnv["PATH_INFO"].substr(1).split("/"),
+                    packageRefId = parts.shift(),
+                    baseName = parts[parts.length-1],
+                    extension = baseName.split(".").pop();
+                    
+                var packageName = self.refIdMap[packageRefId];
+                
+                var pkg;
+                if(!packageName || typeof packageName == "string") {
+                    if(!UTIL.has(PACKAGES.usingCatalog, packageName)) {
+                        print("error: Package not found: " + packageName);
+                        return {
+                            status: 500,
+                            headers: {"Content-Type":"text/plain"},
+                            body: ["Internal Server Error", "</br>", "Package not found: " + packageName]
+                        }                
+                    }
+                    pkg = PACKAGE.Package(PACKAGES.usingCatalog[packageName].directory);
+                } else {
+                    pkg = packageName;
+                }
+                var filePath = pkg.getPath();
+    
+                if(parts[0]=="resources") {
+                    // path is fine the way it is            
+                } else {
+                    // if a locale URL is accessed we default to en-US for now            
+    //                if(parts[0]=="locale") {
+    //                    parts.splice(1,0,"en-US");
+    //                }
+                    filePath = filePath.join("chrome");
+                }
+                filePath = filePath.join(parts.join("/"));
+                
+    
+                if(!filePath.exists()) {
+                    print("error: File not found: " + filePath);
                     return {
-                        status: 500,
+                        status: 404,
                         headers: {"Content-Type":"text/plain"},
-                        body: ["Internal Server Error", "</br>", "Package not found: " + packageName]
+                        body: ["File Not Found", "</br>", "File not found: " + filePath]
                     }                
                 }
-                pkg = PACKAGE.Package(packageName);
-            } else {
-                pkg = packageName;
-            }
-            var filePath = pkg.getPath();
-
-            if(parts[0]=="resources") {
-                // path is fine the way it is            
-            } else {
-                // if a locale URL is accessed we default to en-US for now            
-//                if(parts[0]=="locale") {
-//                    parts.splice(1,0,"en-US");
-//                }
-                filePath = filePath.join("chrome");
-            }
-            filePath = filePath.join(parts.join("/"));
-            
-
-            if(!filePath.exists()) {
-                print("error: File not found: " + filePath);
-                return {
-                    status: 404,
-                    headers: {"Content-Type":"text/plain"},
-                    body: ["File Not Found", "</br>", "File not found: " + filePath]
-                }                
-            }
-            
-            pkg.setAppInfo(appInfo);
-
-            var app,
-                info = {};
                 
-            switch(extension) {
-                
-                // ASCII
-
-                case "xul":
-                    if(!UTIL.has(info, "contentType")) info.contentType = "application/vnd.mozilla.xul+xml";
-
-                case "htm":
-                case "html":
-                case "dtd":
-                    if(!UTIL.has(info, "contentType")) info.contentType = "text/html";
-
-                case "xml":
-                    if(!UTIL.has(info, "contentType")) info.contentType = "text/xml";
-
-                case "css":
-                    if(!UTIL.has(info, "contentType")) info.contentType = "text/css";
-
-                case "js":
-                    if(!UTIL.has(info, "contentType")) info.contentType = "application/vnd.mozilla.xul+xml";
-
-
-                if(!UTIL.has(info, "binary")) info.binary = false;
-
-                // Binary
-
-                case "png":
-                    if(!UTIL.has(info, "contentType")) info.contentType = "image/png";
-                
-
-                default:
-
-                if(!UTIL.has(info, "binary")) info.binary = true;
-                if(!UTIL.has(info, "contentType")) info.contentType = "application/binary";
-            }
-
-            app = function(env) {
-
-                print("Serving: " + filePath);
-                
-                var body;
-                
-                if(info.binary) {
-                    body = filePath.read("b");
-                } else {
-                    body = filePath.read();
-
-                    if(body["decodeToString"]) {
-                        body = body.decodeToString('utf-8');
+                pkg.setAppInfo(appInfo);
+    
+                var app,
+                    info = {};
+                    
+                switch(extension) {
+                    
+                    // ASCII
+    
+                    case "xul":
+                        if(!UTIL.has(info, "contentType")) info.contentType = "application/vnd.mozilla.xul+xml";
+    
+                    case "htm":
+                    case "html":
+                    case "dtd":
+                        if(!UTIL.has(info, "contentType")) info.contentType = "text/html";
+    
+                    case "xml":
+                        if(!UTIL.has(info, "contentType")) info.contentType = "text/xml";
+    
+                    case "css":
+                        if(!UTIL.has(info, "contentType")) info.contentType = "text/css";
+    
+                    case "js":
+                        if(!UTIL.has(info, "contentType")) info.contentType = "application/vnd.mozilla.xul+xml";
+    
+    
+                    if(!UTIL.has(info, "binary")) info.binary = false;
+    
+                    // Binary
+    
+                    case "png":
+                        if(!UTIL.has(info, "contentType")) info.contentType = "image/png";
+                    
+    
+                    default:
+    
+                    if(!UTIL.has(info, "binary")) info.binary = true;
+                    if(!UTIL.has(info, "contentType")) info.contentType = "application/binary";
+                }
+    
+                app = function(env) {
+    
+                    print("Serving: " + filePath);
+                    
+                    var body;
+                    
+                    if(info.binary) {
+                        body = filePath.read("b");
+                    } else {
+                        body = filePath.read();
+    
+                        if(body["decodeToString"]) {
+                            body = body.decodeToString('utf-8');
+                        }
+    
+                        body = body.replace(/%%QueryString%%/g, chromeEnv["QUERY_STRING"]);
+    
+                        body = pkg.replaceTemplateVariables(body);
                     }
-
-                    body = body.replace(/%%QueryString%%/g, chromeEnv["QUERY_STRING"]);
-
-                    body = pkg.replaceTemplateVariables(body);
+       
+                    return {
+                        status: 200,
+                        headers: {"Content-Type": info.contentType},
+                        body: [body]
+                    }
+                }   
+                
+                var result = app(chromeEnv);
+                
+                // base64 encode the body
+                for( var i=0 ; i<result.body.length ; i++ ) {
+                    result.body[i] = BASE64.encode(result.body[i]);
                 }
-   
-                return {
-                    status: 200,
-                    headers: {"Content-Type": info.contentType},
-                    body: [body]
-                }
-            }   
-            
-            var result = app(chromeEnv);
-            
-            // base64 encode the body
-            for( var i=0 ; i<result.body.length ; i++ ) {
-                result.body[i] = BASE64.encode(result.body[i]);
+                
+                return result;
+            } catch(e) {
+                system.log.error(e);
             }
-            
-            return result;
         }
     };
 

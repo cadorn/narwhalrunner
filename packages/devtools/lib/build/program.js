@@ -9,49 +9,66 @@ var FILE = require("file");
 var JSON = require("json");
 var ZIP = require("zip");
 var BUILD_UTIL = require("./util");
-var PACKAGE = require("../package");
+var PACKAGE = require("package", "common");
 var ARGS = require('args');
+var PACKAGES = require("packages");
 
 
-exports.Program = function(programPackage) {
+// TODO: Refactor for clarity and simplicity
+
+exports.Program = function(program, buildOptions) {
+
 
     // PRIVATE
+    
+    var rawPackageStore = {
+        "get": function(locator) {
+            return PACKAGE.Package(buildOptions.path.join("raw", "using", locator.getFsPath()));
+        }
+    }
+    
 
     // cast the programPackage to a common/package object
-    programPackage = PACKAGE.Package(programPackage);
-    var packageDatum = programPackage.getManifest().manifest;
+    programPackage = PACKAGE.Package(program);
+    var packageDatum = programPackage.getDescriptor().getCompletedSpec();
     
     // resolve PINF vars
-    var pinfVars = {};
-    PACKAGE.resolvePackageInfoVariables(packageDatum, pinfVars);
+//    var pinfVars = {};
+//    PACKAGE.resolvePackageInfoVariables(packageDatum, pinfVars);
     var info = packageDatum.narwhalrunner;
-   
-    
-    // determine common and platform packages
-    var commonPackage,
-        platformPackage;
 
-    programPackage.forEachDependency(function(dependency) {
-        var pkg = dependency.getPackage();
-        if(pkg.getUid()=="http://pinf.org/cadorn.org/narwhalrunner/packages/common") {
-            commonPackage = pkg;
-        } else
-        if(pkg.getUid()=="http://pinf.org/cadorn.org/narwhalrunner/packages/" + info["Type"]) {
-            platformPackage = pkg;
-        }
-    });
-        
-    platformPackage = PACKAGE.Package(platformPackage)
-    commonPackage = PACKAGE.Package(commonPackage);
+
+    var version = program.getVersion();
+    if(!version) {
+        // if no version is supplied we date stamp the archive
+        var time = new Date()
+        version = [
+            "0.0.0" + program.getLocator().getRevision(),
+            (""+time.getFullYear()).substr(2,2),
+            UTIL.padBegin(time.getMonth()+1, 2),
+            UTIL.padBegin(time.getDate(), 2),
+            UTIL.padBegin(time.getHours(), 2),
+            UTIL.padBegin(time.getMinutes(), 2)
+        ].join("");
+    }
+
+    info["Version"] = version;
+
+
+    // determine common and platform packages
+    var commonPackage = PACKAGE.Package(PACKAGES.usingCatalog[module["using"].common].directory),
+        platformPackage = PACKAGE.Package(PACKAGES.usingCatalog[module["using"][info["Type"]]].directory);
+
+
     info["CommonPackage.ReferenceId"] = commonPackage.setAppInfo(info).getReferenceId();
-    info["ProgramPackage.Id"] = programPackage.getId();
+    info["ProgramPackage.Id"] = programPackage.getUid();
     programPackage.setAppInfo(info);
     platformPackage.setAppInfo(info);
     commonPackage.setAppInfo(info);
 
 
-    var sea = programPackage.getSea();
-    var targetPath = sea.getBuildPath().join(programPackage.getName());
+    var buildPath = buildOptions.path;
+    var targetPath = buildPath.join("extension");
 
 
     var Program = {};
@@ -88,8 +105,8 @@ exports.Program = function(programPackage) {
         var releaseVersion = vars["Program.Version"];
         
         var sourcePath = Program.getTargetPath(),
-            archivePath = sea.getBuildPath().join(programPackage.getName() + "-" + releaseVersion + ".xpi"),
-            stagingPath = sea.getBuildPath().join(programPackage.getName() + "-" + releaseVersion);
+            archivePath = buildPath.join(programPackage.getName() + "-" + releaseVersion + ".xpi"),
+            stagingPath = buildPath.join(programPackage.getName() + "-" + releaseVersion);
 
         // copy files we want from build dir to staging dir
         if(stagingPath.exists()) stagingPath.rmtree();
@@ -119,7 +136,7 @@ exports.Program = function(programPackage) {
 
         // write update.rdf
         var fromPath = platformPackage.getUpdateRdfPath();
-        var toPath = sea.getBuildPath().join(programPackage.getName() + "-" + releaseVersion + ".update.rdf");
+        var toPath = buildPath.join(programPackage.getName() + "-" + releaseVersion + ".update.rdf");
         BUILD_UTIL.copyWhile(fromPath, toPath, [
             [BUILD_UTIL.replaceVariables, [vars]]
         ]);
@@ -130,15 +147,9 @@ exports.Program = function(programPackage) {
         print("Building package '" + programPackage.getName() + "' from path: " + programPackage.getPath());
         
         var targetPath = Program.getTargetPath();
-        if(targetPath.exists()) {
-            print("Removing existing program at: " + targetPath);
-            // NOTE: We use exec here to ensure symlinks are not followed as the FILE.rmtree() implementation is not solid yet
-            var command = "rm -Rf " + targetPath;
-            print(command);
-            OS.command(command);
-        }
         
         Program.buildStatic(options);
+
         Program.buildDynamic();
         
         Program.triggerComponentReload();
@@ -164,11 +175,16 @@ exports.Program = function(programPackage) {
         var chromeManifests = {"Manifest": {}, "JarredManifest": {}};
         
         
-        function buildPackage(pkg, pkgId, sinks) {
+        function buildPackage(pkg, sinks) {
+
+            // ignore packages without uid as they are not likely to contain anything we need to worry about
+            if(!pkg.hasUid()) return;
             
             var id = pkg.getReferenceId();
             vars = pkg.getTemplateVariables();
-            UTIL.update(vars, pinfVars);
+//            UTIL.update(vars, pinfVars);
+
+            var pkgId = pkg.getUid();
 
             vars["module[package]"] = pkgId;
             
@@ -210,7 +226,7 @@ exports.Program = function(programPackage) {
             });
 
             // determine ID for some important narwhalrunner packages                        
-            if(pkg.toString()==commonPackage.toString() || pkg.toString()==platformPackage.toString()) {
+            if(pkg.getUid()==commonPackage.getUid() || pkg.getUid()==platformPackage.getUid()) {
                 pkgId = "__" + pkg.getName() + "__";
             }
             
@@ -228,23 +244,30 @@ exports.Program = function(programPackage) {
 
 
         // build program package
-        buildPackage(programPackage, programPackage.getId());
-                
+        buildPackage(programPackage);
+
+
         
         // build all dependencies
         var sinks = {
             "preferences": []
         }
-        programPackage.forEachDependency(function(dependency) {
-
-            // cast the dependent package to a common/package object
-            var pkg = PACKAGE.Package(dependency.getPackage());
+        var visited = {};
+        programPackage.getDescriptor().traverseEveryUsing(function(parentPackage, name, locator, stacks) {
+            var pkg = rawPackageStore.get(locator);
+            if(visited[pkg.getPath().valueOf()]) {
+                return;
+            }
+            visited[pkg.getPath().valueOf()] = true;
             pkg.setAppInfo(programPackage.getAppInfo());
             
-            buildPackage(pkg, dependency.getId(), sinks);
+            buildPackage(pkg, sinks);
 
-        }, "package", true);
-        
+            return locator;
+        }, {
+            "packageStore": rawPackageStore,
+            "package": programPackage
+        });
         
         // dump all sinks
         if(sinks.preferences.length>0) {
@@ -253,10 +276,13 @@ exports.Program = function(programPackage) {
             toPath.write(sinks.preferences.join("\n"));
             print("Wrote preferences file to: " + toPath);
         }
+
+  
         
         // setup all vars for the program package
         vars = programPackage.getTemplateVariables();
-        UTIL.update(vars, pinfVars);
+//        UTIL.update(vars, pinfVars);
+
 
         // write chrome manifest files
         [options["chrome.manifest.type"]].forEach(function(manifestType) {
@@ -280,34 +306,16 @@ exports.Program = function(programPackage) {
             toPath.write(BUILD_UTIL.runTemplate([], rootTemplate, templateVars));
             print("Wrote " + manifestType + " file to: " + toPath);
         })
-        
-
 
         // write package.json
         toPath = Program.getPackageJsonPath();
+
         toPath.write(JSON.encode({
             "name": vars["Program.ID"]
-//            "dependencies": [
-//                "github.com/cadorn/narwhal-xulrunner/zipball/master",
-//                programPackage.getName()
-//            ]
         }, null, 4));
         print("Wrote package.json file to: " + toPath);
         
         
-        // copy catalog.json
-/*        
-        fromPath = sea.getPath().join("catalog.json");
-        toPath = Program.getTargetPath().join("catalog.json");
-        BUILD_UTIL.copyWhile(fromPath, toPath, []);
-*/
-
-        // copy catalog.local.json
-/*        
-        fromPath = sea.getPath().join("catalog.local.json");
-        toPath = Program.getTargetPath().join("catalog.local.json");
-        BUILD_UTIL.copyWhile(fromPath, toPath, []);
-*/
 
         Program.buildStaticPlatform({
             "fromPath": fromPath,
@@ -333,10 +341,8 @@ exports.Program = function(programPackage) {
             toPath;
 
         // link program package
-
         fromPath = programPackage.getPath();
-
-        toPath = packagesPath.join(programPackage.getId());
+        toPath = packagesPath.join(programPackage.getName());
         if(!toPath.exists()) {
             toPath.dirname().mkdirs();    
             fromPath.symlink(toPath);
@@ -344,23 +350,15 @@ exports.Program = function(programPackage) {
         print("Linked '" + toPath + "' to '" + fromPath + "'");    
 
 
-        programPackage.forEachDependency(function(dependency) {
-            
-            // cast the dependent package to a common/package object
-            var pkg = PACKAGE.Package(dependency.getPackage());
-            pkg.setAppInfo(programPackage.getAppInfo());
-            
-                        
-            // link package
-            fromPath = pkg.getPath();
-            toPath = usingPath.join(pkg.getId());
-            if(!toPath.exists()) {
-                toPath.dirname().mkdirs();    
-                fromPath.symlink(toPath);
-            }
-            print("Linked '" + toPath + "' to '" + fromPath + "'");    
-            
-        }, "package", true);
+        // link using packages
+        fromPath = buildPath.join("raw", "using");
+        toPath = usingPath;
+        if(!toPath.exists()) {
+            toPath.dirname().mkdirs();    
+            fromPath.symlink(toPath);
+        }
+        print("Linked '" + toPath + "' to '" + fromPath + "'");    
+        
 
         Program.buildDynamicPlatform();    
     }    
@@ -370,6 +368,7 @@ exports.Program = function(programPackage) {
     }
     
     Program.triggerComponentReload = function() {
+/*        
         var devtoolsManifest = sea.path.join("devtools.local.json");
         if(devtoolsManifest.exists()) {
             devtoolsManifest = JSON.parse(devtoolsManifest.read());
@@ -389,7 +388,8 @@ exports.Program = function(programPackage) {
                     }
                 });
             }
-        }    
+        }
+*/        
     }
 
     return Program;

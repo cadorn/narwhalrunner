@@ -1,13 +1,17 @@
 
-var PROGRAM = require("build/program", "common");
-var BUILD_UTIL = require("build/util", "common");
+
+function dump(obj) { print(require('test/jsdump').jsDump.parse(obj)) };
 
 
-exports.Program = function (programPackage) {
+var PROGRAM = require("../program");
+var BUILD_UTIL = require("../util");
+
+
+exports.Program = function (program, options) {
 
     // PRIVATE
     
-    var Program = PROGRAM.Program(programPackage);
+    var Program = PROGRAM.Program(program, options);
     
     // PUBLIC
     
@@ -20,6 +24,12 @@ exports.Program = function (programPackage) {
             BUILD_UTIL.copyWhile(fromPath, toPath, [
                 [BUILD_UTIL.replaceVariables, [vars]]
             ]);
+            
+            if(!options.remoteProgram) {
+                var contents = toPath.read();
+                contents = contents.replace(/<em:updateURL>(.*?)<\/em:updateURL>/g, "");
+                toPath.write(contents);
+            }
         }
     }    
     

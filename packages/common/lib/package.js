@@ -5,7 +5,7 @@ function dump(obj) { print(require('test/jsdump').jsDump.parse(obj)) };
 var UTIL = require("util");
 var STRUCT = require("struct");
 var MD5 = require("md5");
-var PACKAGE = require("narwhal/tusk/package");
+var PACKAGE = require("package", "pinf-common");
 
 
 exports.Package = function (packagePath) {
@@ -20,6 +20,8 @@ exports.Package = function (packagePath) {
     } else {
         Package = PACKAGE.Package(packagePath);
     }
+
+
     
     var appInfo;
     
@@ -39,7 +41,7 @@ exports.Package = function (packagePath) {
      */
     // TODO: Move to super and rename to getIdHash() based on this.id only
     Package.getReferenceId = function() {
-        return STRUCT.bin2hex(MD5.hash(appInfo.InternalName + ":" + Package.getId()));
+        return STRUCT.bin2hex(MD5.hash(appInfo.InternalName + ":" + Package.getUid()));
     }
     Package.getPackagePrefix = function() {
         return "NRID_" + Package.getReferenceId() + "_";
@@ -51,7 +53,6 @@ exports.Package = function (packagePath) {
     
     Package.getTemplateVariables = function() {
         var name =  Package.getName();
-        var pkgId = Package.getId();
         var id = Package.getReferenceId();
         var vars = {
             "PP": Package.getPackagePrefix(),
@@ -80,7 +81,7 @@ exports.Package = function (packagePath) {
             "    Components.utils.import('resource://narwhal-xulrunner/sandbox.js', sandbox);" +
             "    var program = sandbox.get({'type': '" + appInfo["Type"]  + "', 'id': '" + appInfo["ID"]  + "'});" +
             "    return function(object, name) {" +
-            "        return program.require('app', '" + module["package"] + "').getChrome().registerBinding('" + Package.getId() + "', object, name);" +
+            "        return program.require('app', '" + module["package"] + "').getChrome().registerBinding('" + Package.getUid() + "', object, name);" +
             "    };" +
             "}())";
         
@@ -90,7 +91,7 @@ exports.Package = function (packagePath) {
             "    Components.utils.import('resource://narwhal-xulrunner/sandbox.js', sandbox);" +
             "    var program = sandbox.get({'type': '" + appInfo["Type"]  + "', 'id': '" + appInfo["ID"]  + "'});" +
             "    return function(object, module, name) {" +
-            "        return program.require('app', '" + module["package"] + "').getChrome().registerContainer('" + Package.getId() + "', object, module, name);" +
+            "        return program.require('app', '" + module["package"] + "').getChrome().registerContainer('" + Package.getUid() + "', object, module, name);" +
             "    };" +
             "}())";
         
@@ -187,7 +188,6 @@ exports.Package = function (packagePath) {
 
 
 exports.resolvePackageInfoVariables = function(packageDatum, pinfVars) {
-    
     pinfVars = pinfVars || {};
     
     UTIL.every(packageDatum.pinf, function(item1) {

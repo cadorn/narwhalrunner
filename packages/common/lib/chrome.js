@@ -1,9 +1,14 @@
 
+
+
+function dump(obj) { print(require('test/jsdump').jsDump.parse(obj)) };
+
+
 var FILE = require("file");
 var UTIL = require("util");
 var OBSERVABLE = require("observable", "observable");
 var BINDING = require("./binding");
-
+var PACKAGES = require("packages");
 
 var chromeIndex = 0;
 
@@ -40,6 +45,9 @@ Chrome.prototype.registerBinding = function(pkgId, object, name) {
 }
 
 Chrome.prototype.getBinding = function(pkgId, name) {
+
+    pkgId = PACKAGES.usingCatalog[pkgId].uid;
+
     if(!UTIL.has(this.bindings, pkgId)) {
         return false;
     }

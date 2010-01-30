@@ -3,8 +3,9 @@
     "name": "dev-sidebar",
     "using": {
         "nr-common": {
-            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "name": "common"
+            "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
+            "name": "common",
+            "revision": "master"
         }
     },
     "repositories": [

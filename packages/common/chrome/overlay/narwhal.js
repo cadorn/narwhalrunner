@@ -25,6 +25,12 @@
     
     var chrome = CHROME.Chrome(this);
     
-    APP.initializeApp("__Program.ProgramPackage.Id__", chrome).start("__Program.Type__", window, {});
+    try {
+
+        APP.initializeApp("__Program.ProgramPackage.Id__", chrome).start("__Program.Type__", window, {});
     
+    } catch(e) {
+        program.system.log.error(e);
+    }
+
 })();

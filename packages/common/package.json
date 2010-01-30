@@ -4,14 +4,11 @@
     "using": {
         "observable": {
             "location": "http://github.com/nrstott/observable-js/zipball/master/"
-        }
-    },
-    "build": {
-        "using": {
-            "template": {
-                "catalog": "http://github.com/cadorn/narwhal/raw/experimental/catalogs/default.catalog.json",
-                "name": "template"
-            }
+        },
+        "pinf-common": {
+            "catalog": "http://registry.pinf.org/cadorn.org/github/pinf/packages/catalog.json",
+            "name": "common",
+            "revision": "master"
         }
     },
     "repositories": [

@@ -16,5 +16,6 @@
     });
     
     this.require = program.require;
+    this.system = program.system;
     
 })();

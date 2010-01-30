@@ -2,14 +2,14 @@
     "name": "%%PackageName%%",
     "dependencies": [
         ["nr-app", {
-            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "application",
-            "revision": "latest"
+            "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
+            "name": "application",
+            "revision": "master"
         }],
         ["nr-common", {
-            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "package": "common",
-            "revision": "latest"
+            "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
+            "name": "common",
+            "revision": "master"
         }]
     ],
     "build": {

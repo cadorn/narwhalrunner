@@ -3,12 +3,14 @@
     "name": "test-firefox-extension",
     "using": {
         "extension": {
-            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "name": "extension"
+            "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
+            "name": "extension",
+            "revision": "master"
         },
         "common": {
-            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "name": "common"
+            "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
+            "name": "common",
+            "revision": "master"
         }
     },
     "build": {

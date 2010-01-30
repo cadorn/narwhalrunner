@@ -3,12 +3,14 @@
     "name": "test-application",
     "using": {
         "application": {
-            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "name": "application"
+            "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
+            "name": "application",
+            "revision": "master"
         },
         "common": {
-            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "name": "common"
+            "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
+            "name": "common",
+            "revision": "master"
         }
     },
     "build": {

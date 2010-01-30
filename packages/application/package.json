@@ -3,20 +3,9 @@
     "name": "application",
     "using": {
         "common": {
-            "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-            "name": "common"
-        }
-    },
-    "build": {
-        "using": {
-            "common": {
-                "catalog": "http://github.com/cadorn/narwhalrunner/raw/master/catalog.json",
-                "name": "common"
-            }
-        },
-        "defaultTarget": "dev",
-        "targets": {
-            "dev": "build/dev"
+            "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
+            "name": "common",
+            "revision": "master"
         }
     },
     "repositories": [
