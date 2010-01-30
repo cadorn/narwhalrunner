@@ -12,18 +12,22 @@ var BUILD_UTIL = require("./util");
 var PACKAGE = require("package", "common");
 var ARGS = require('args');
 var PACKAGES = require("packages");
+var LOCATOR = require("package/locator", "http://registry.pinf.org/cadorn.org/github/pinf/packages/common/");
 
 
 // TODO: Refactor for clarity and simplicity
 
 exports.Program = function(program, buildOptions) {
 
-
     // PRIVATE
     
     var rawPackageStore = {
         "get": function(locator) {
-            return PACKAGE.Package(buildOptions.path.join("raw", "using", locator.getFsPath()));
+            if(locator.getForceRemote()) {
+                var pkg = buildOptions.builder.getPackageForLocator(locator);
+                return PACKAGE.Package(pkg.getPath());
+            }
+            return PACKAGE.Package(buildOptions.path.join("raw", "using", locator.getFsPath()), locator);
         }
     }
     
@@ -56,7 +60,7 @@ exports.Program = function(program, buildOptions) {
 
 
     // determine common and platform packages
-    var commonPackage = PACKAGE.Package(PACKAGES.usingCatalog[module["using"].common].directory),
+    var commonPackage = rawPackageStore.get(buildOptions.uidLocators["http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/common/"]),
         platformPackage = PACKAGE.Package(PACKAGES.usingCatalog[module["using"][info["Type"]]].directory);
 
 
@@ -80,18 +84,11 @@ exports.Program = function(program, buildOptions) {
     Program.getTargetPath = function() {
         return targetPath;
     }
-    
-    
-    Program.dist = function(args) {
 
-        var parser = new ARGS.Parser();
-        parser.option('--source')
-            .bool();
-        var options = parser.parse(args);
 
-        args = args || {};
+    Program.dist = function(distOptions) {
 
-        if(options.source) {
+        if(distOptions.nojar) {
             Program.build();
         } else {
             Program.build({"chrome.manifest.type": "JarredManifest"});
@@ -100,22 +97,36 @@ exports.Program = function(program, buildOptions) {
         print("Bundling package '" + programPackage.getName() + "' from path: " + programPackage.getPath());
 
         var vars = programPackage.getTemplateVariables();
-        UTIL.update(vars, pinfVars);
+//        UTIL.update(vars, pinfVars);
+
         
         var releaseVersion = vars["Program.Version"];
+
         
         var sourcePath = Program.getTargetPath(),
-            archivePath = buildPath.join(programPackage.getName() + "-" + releaseVersion + ".xpi"),
+            archivePath = buildPath.join(programPackage.getName() + ".xpi"),
             stagingPath = buildPath.join(programPackage.getName() + "-" + releaseVersion);
+
+
+
+// HACK: This is temporary until the program package is a "using" package as well        
+        OS.command("rm -Rf " + sourcePath.join("packages", programPackage.getName(), "packages"));
+        var fromPath = buildOptions.path.join("raw", "package.json"),
+            toPath = sourcePath.join("packages", programPackage.getName(), "package.json");
+        toPath.remove();
+        fromPath.copy(toPath);
+        
+
+
 
         // copy files we want from build dir to staging dir
         if(stagingPath.exists()) stagingPath.rmtree();
-        var command = "rsync -r --copy-links --exclude \"- .DS_Store\" --exclude \"- .git/\" --exclude \"- /packages/narwhal/engines/rhino/\" " + sourcePath + "/* " + stagingPath;
+        var command = "rsync -r --copy-links --exclude \"- .DS_Store\" --exclude \"- .git/\" " + sourcePath + "/* " + stagingPath;
         print(command);
         OS.command(command);
 
 
-        if(options.source) {
+        if(distOptions.nojar) {
             print("Skipping jarring to generate source distribution");
         } else {
             // package jars
@@ -128,18 +139,21 @@ exports.Program = function(program, buildOptions) {
         }        
 
         // create archive
+/*        
         if(archivePath.exists()) archivePath.remove();
         command = "cd " + stagingPath + "; zip -r " + archivePath + " ./";
         print(command);
         result = OS.command(command);
-
+*/
 
         // write update.rdf
+/*        
         var fromPath = platformPackage.getUpdateRdfPath();
         var toPath = buildPath.join(programPackage.getName() + "-" + releaseVersion + ".update.rdf");
         BUILD_UTIL.copyWhile(fromPath, toPath, [
             [BUILD_UTIL.replaceVariables, [vars]]
         ]);
+*/
     }    
     
     Program.build = function(options) {
@@ -181,7 +195,7 @@ exports.Program = function(program, buildOptions) {
             if(!pkg.hasUid()) return;
             
             var id = pkg.getReferenceId();
-            vars = pkg.getTemplateVariables();
+            vars = pkg.getTemplateVariables(commonPackage);
 //            UTIL.update(vars, pinfVars);
 
             var pkgId = pkg.getUid();
@@ -254,11 +268,29 @@ exports.Program = function(program, buildOptions) {
         }
         var visited = {};
         programPackage.getDescriptor().traverseEveryUsing(function(parentPackage, name, locator, stacks) {
+            var key = ["packages", "using"].concat(stacks.names).concat([name, "@"]);
+
+            if(buildOptions.remoteProgram) {
+                // overwite locator with the one from the program config
+                locator = LOCATOR.PackageLocator(program.spec.get(key).locator);
+            }
+
+            if(buildOptions.remoteDependencies) {
+                locator.setForceRemote(true);
+            }
+
             var pkg = rawPackageStore.get(locator);
+
+            // linked packages do not contain 'version' properties
+            if(pkg.getVersion()) {
+                locator.pinAtVersion(pkg.getVersion());
+            }
+
             if(visited[pkg.getPath().valueOf()]) {
-                return;
+                return locator;
             }
             visited[pkg.getPath().valueOf()] = true;
+
             pkg.setAppInfo(programPackage.getAppInfo());
             
             buildPackage(pkg, sinks);

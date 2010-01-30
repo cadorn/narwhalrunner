@@ -45,8 +45,9 @@ Chrome.prototype.registerBinding = function(pkgId, object, name) {
 }
 
 Chrome.prototype.getBinding = function(pkgId, name) {
-
-    pkgId = PACKAGES.usingCatalog[pkgId].uid;
+    if(PACKAGES.usingCatalog[pkgId]) {
+        pkgId = PACKAGES.usingCatalog[pkgId].uid;
+    }
 
     if(!UTIL.has(this.bindings, pkgId)) {
         return false;

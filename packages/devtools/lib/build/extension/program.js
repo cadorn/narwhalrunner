@@ -25,11 +25,11 @@ exports.Program = function (program, options) {
                 [BUILD_UTIL.replaceVariables, [vars]]
             ]);
             
-            if(!options.remoteProgram) {
+//            if(!options.remoteProgram) {
                 var contents = toPath.read();
                 contents = contents.replace(/<em:updateURL>(.*?)<\/em:updateURL>/g, "");
                 toPath.write(contents);
-            }
+//            }
         }
     }    
     

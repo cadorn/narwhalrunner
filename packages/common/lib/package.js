@@ -8,7 +8,7 @@ var MD5 = require("md5");
 var PACKAGE = require("package", "pinf-common");
 
 
-exports.Package = function (packagePath) {
+exports.Package = function (packagePath, locator) {
 
     // PRIVATE
 
@@ -18,7 +18,7 @@ exports.Package = function (packagePath) {
         Package = packagePath;
         packagePath = Package.getPath();
     } else {
-        Package = PACKAGE.Package(packagePath);
+        Package = PACKAGE.Package(packagePath, locator);
     }
 
 
@@ -51,7 +51,7 @@ exports.Package = function (packagePath) {
         return "narwhalrunner://" + appInfo.InternalName + "/" + Package.getReferenceId() + "/content/";
     }
     
-    Package.getTemplateVariables = function() {
+    Package.getTemplateVariables = function(commonPackage) {
         var name =  Package.getName();
         var id = Package.getReferenceId();
         var vars = {
@@ -75,13 +75,14 @@ exports.Package = function (packagePath) {
             "Program.AppModuleURL": "resource://" + appInfo.InternalName + "-modules/" + appInfo["CommonPackage.ReferenceId"] + "/app.jsm"
         };
 
+        if(commonPackage) {
         vars["Package.RegisterBindingMacro"] = 
             "(function() {" +
             "    var sandbox = {};" +
             "    Components.utils.import('resource://narwhal-xulrunner/sandbox.js', sandbox);" +
             "    var program = sandbox.get({'type': '" + appInfo["Type"]  + "', 'id': '" + appInfo["ID"]  + "'});" +
             "    return function(object, name) {" +
-            "        return program.require('app', '" + module["package"] + "').getChrome().registerBinding('" + Package.getUid() + "', object, name);" +
+            "        return program.require('app', '" + commonPackage.getTopLevelId() + "').getChrome().registerBinding('" + Package.getUid() + "', object, name);" +
             "    };" +
             "}())";
         
@@ -91,9 +92,10 @@ exports.Package = function (packagePath) {
             "    Components.utils.import('resource://narwhal-xulrunner/sandbox.js', sandbox);" +
             "    var program = sandbox.get({'type': '" + appInfo["Type"]  + "', 'id': '" + appInfo["ID"]  + "'});" +
             "    return function(object, module, name) {" +
-            "        return program.require('app', '" + module["package"] + "').getChrome().registerContainer('" + Package.getUid() + "', object, module, name);" +
+            "        return program.require('app', '" + commonPackage.getTopLevelId() + "').getChrome().registerContainer('" + Package.getUid() + "', object, module, name);" +
             "    };" +
             "}())";
+        }
         
         UTIL.every(appInfo, function(item) {
             vars["Program." + item[0]] = item[1];
