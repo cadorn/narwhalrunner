@@ -27,7 +27,7 @@
         </em:targetApplication>
 		
         <!-- NOTE: Do not move these tags above <em:targetApplication>. It will break the registration process! -->
-        <em:updateURL>%%Program.UpdateURL%%</em:updateURL>
+        <em:updateURL>%%UPDATEURL%%</em:updateURL>
 <!--
     NOTE: Leaving this tag in while using a https updateLink (in update.rdf) will cause the update to fail
         <em:updateKey>%%Program.UpdateKey%%</em:updateKey>

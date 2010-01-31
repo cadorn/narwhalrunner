@@ -19,17 +19,24 @@ exports.Program = function (program, options) {
     Program.buildStaticPlatform = function(scope) {
         with(scope) {
             // write install.rdf
-            fromPath = platformPackage.getInstallRdfPath();
-            toPath = Program.getInstallRdfPath();
+            var fromPath = platformPackage.getInstallRdfPath();
+            var toPath = Program.getInstallRdfPath();
             BUILD_UTIL.copyWhile(fromPath, toPath, [
                 [BUILD_UTIL.replaceVariables, [vars]]
             ]);
             
-//            if(!options.remoteProgram) {
+            if(!options.remoteProgram) {
                 var contents = toPath.read();
                 contents = contents.replace(/<em:updateURL>(.*?)<\/em:updateURL>/g, "");
                 toPath.write(contents);
-//            }
+            } else {
+                // write update.rdf
+                fromPath = platformPackage.getUpdateRdfPath();
+                toPath = Program.getUpdateRdfPath();
+                BUILD_UTIL.copyWhile(fromPath, toPath, [
+                    [BUILD_UTIL.replaceVariables, [vars]]
+                ]);
+            }
         }
     }    
     
@@ -83,6 +90,10 @@ exports.Program = function (program, options) {
 
     Program.getInstallRdfPath = function() {
         return Program.getTargetPath().join("install.rdf");
+    }
+    
+    Program.getUpdateRdfPath = function() {
+        return Program.getTargetPath().join("update.rdf");
     }
     
     return Program;

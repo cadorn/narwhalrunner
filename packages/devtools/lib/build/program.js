@@ -43,7 +43,7 @@ exports.Program = function(program, buildOptions) {
 
 
     var version = program.getVersion();
-    if(!version) {
+//    if(!version) {
         // if no version is supplied we date stamp the archive
         var time = new Date()
         version = [
@@ -54,7 +54,7 @@ exports.Program = function(program, buildOptions) {
             UTIL.padBegin(time.getHours(), 2),
             UTIL.padBegin(time.getMinutes(), 2)
         ].join("");
-    }
+//    }
 
     info["Version"] = version;
 
@@ -69,6 +69,7 @@ exports.Program = function(program, buildOptions) {
     programPackage.setAppInfo(info);
     platformPackage.setAppInfo(info);
     commonPackage.setAppInfo(info);
+
 
 
     var buildPath = buildOptions.path;
@@ -105,7 +106,7 @@ exports.Program = function(program, buildOptions) {
         
         var sourcePath = Program.getTargetPath(),
             archivePath = buildPath.join(programPackage.getName() + ".xpi"),
-            stagingPath = buildPath.join(programPackage.getName() + "-" + releaseVersion);
+            stagingPath = buildPath.join(programPackage.getName());
 
 
 
@@ -343,7 +344,8 @@ exports.Program = function(program, buildOptions) {
         toPath = Program.getPackageJsonPath();
 
         toPath.write(JSON.encode({
-            "name": vars["Program.ID"]
+            "name": vars["Program.ID"],
+            "version": version
         }, null, 4));
         print("Wrote package.json file to: " + toPath);
         
