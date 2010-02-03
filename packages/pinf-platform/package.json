@@ -1,0 +1,23 @@
+{
+    "uid": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/pinf-platform/",
+    "name": "pinf-platform",
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git://github.com:cadorn/platforms.git",
+            "path": "packages/narwhalrunner"
+        }
+    ],
+    "using": {
+        "devtools": {
+            "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
+            "name": "devtools",
+            "revision": "master"
+        }
+    },
+    "pinf": {
+        "builder": {
+            "module": "builder"
+        }
+    }
+}

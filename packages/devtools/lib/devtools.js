@@ -115,6 +115,9 @@ command = parser.command('launch', function(options) {
         cmd.push("-jsconsole");
     }
     cmd.push("-no-remote");
+    if(options.chromebug) {
+        cmd.push("--chromebug");
+    }
     cmd = cmd.join(" ");
     
     print("Running: " + cmd);
@@ -123,12 +126,13 @@ command = parser.command('launch', function(options) {
     
 });
 command.help('Launch a binary');
-command.option('--app', 'app').set().help("The binary name");
-command.option('--version', 'version').set().help("The binary version");
-command.option('--profile', 'profile').set().help("The profile to launch with");
-command.option('--dev', 'dev').bool().help("Start binary in development mode");
-command.option('--build', 'build').bool().help("Build all narwhalrunner extensions (from the active sea) in the profile before launch");
-command.option('--package', 'package').set().help("The package to launch for xulrunner apps");
+command.option('--app').set().help("The binary name");
+command.option('--version').set().help("The binary version");
+command.option('--profile').set().help("The profile to launch with");
+command.option('--dev').bool().help("Start binary in development mode");
+command.option('--chromebug').bool().help("Enable chromebug");
+command.option('--build').bool().help("Build all narwhalrunner extensions (from the active sea) in the profile before launch");
+command.option('--package').set().help("The package to launch for xulrunner apps");
 command.helpful();
 
 
