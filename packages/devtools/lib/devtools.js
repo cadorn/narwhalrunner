@@ -2,45 +2,54 @@
 function dump(obj) { print(require('test/jsdump').jsDump.parse(obj)) };
 
 
+
+
+
+
 var system = require("system");
 var fs = require('file');
 var os = require('os');
 var args = require("args");
-var parser = exports.parser = new args.Parser();
 var UTIL = require("util");
 var FILE = require("file");
 var MD5 = require("md5");
 var STRUCT = require("struct");
 var CONFIG = require("./config");
-var SEA = require("narwhal/tusk/sea");
-var TUSK = require("narwhal/tusk/tusk");
-var MANIFEST = require("narwhal/tusk/manifest");
 var STREAM = require('term').stream;
+var PINF = require("pinf", "pinf");
+var LOCATOR = require("package/locator", "pinf");
+var ARGS_UTIL = require("args-util", "util");
+var VALIDATOR = require("validator", "util");
 
+
+var parser = exports.parser = new args.Parser();
 parser.help('xulrunner developer tools');
-
 parser.helpful();
 
+PINF.setDatabase(PINF.getDefaultDatabase());
 
-
-var tusk = TUSK.Tusk().activate(),
-    seaPath = TUSK.getActive().getSea().getPath(),
-    config = CONFIG.Config(seaPath),
-    profilesPath = seaPath.join("build", "profiles"),
-    profileSeaKey = STRUCT.bin2hex(MD5.hash(profilesPath.valueOf())),
+var config = CONFIG.Config(PINF.getDatabase().getConfig("registry.pinf.org/cadorn.org/github/narwhalrunner/packages/devtools/config")),
+    profilesPath = PINF.getDatabase().getDataPath("registry.pinf.org/cadorn.org/github/narwhalrunner/packages/devtools/profiles"),
+    profileIdSeed = STRUCT.bin2hex(MD5.hash(system.env.PINF_WORKSPACE_HOME)),
     command;
+
 
 command = parser.command('launch', function(options) {
     
     var app = options.app,
         version = options.version,
         profile = options.profile,
-        packageName = options["package"];
+        packageName = options["package"],
+        build = (options.build)?VALIDATOR.validate("directory", options.build, {
+            "makeAbsolute": true,
+            "return": "FILE.Path"
+        }):null;
+
     
     if(!app) {
-        print("error: you must specify --app");
-        return;
+        app = "firefox";
     }
+    
     if(!version) {
         version = config.getLatestVersionForApp(app);
         if(!version) {
@@ -66,8 +75,8 @@ command = parser.command('launch', function(options) {
         
         var packagePath = seaPath.join("build", packageName);        
         
-        if(options.build) {
-            os.system("tusk package --package " + packageName + " build");
+        if(build) {
+            buildAtPath(build);
         }
         
         if(!packagePath.exists()) {
@@ -78,31 +87,21 @@ command = parser.command('launch', function(options) {
         if(app=="xulrunner") {
             cmd.push(packagePath.join("application.ini").valueOf());
         } else
-        if(app="firefox") {
+        if(app=="firefox") {
             cmd.push("-app " + packagePath.join("application.ini").valueOf());
         }
         
     } else
     if(profile) {
-        var profileDirectory = profilesPath.join(profile);
+        var profileDirectory = profilesPath.join(profile + "-" + profileIdSeed);
         if(!profileDirectory.exists(profileDirectory)) {
             print("error: profile with name '" + profile + "' does not exist at: " + profileDirectory);
             return;
         }        
-        cmd.push("-P " + profile + "-" + profileSeaKey);
+        cmd.push("-P " + profile + "-" + profileIdSeed);
 
-        if(options.build) {
-            
-            var extensionsDirectory = profileDirectory.join("extensions");
-            extensionsDirectory.listPaths().forEach(function(extensionDirectory) {
-                
-                var manifest = MANIFEST.Manifest(extensionDirectory.join("package.json"));
-                if(manifest.exists()) {
-
-                    // build the package
-                    os.system("tusk package --package " + manifest.manifest.dependencies[0] + " build");
-                }
-            });
+        if(build) {
+            buildAtPath(build);
         }
 
     } else
@@ -131,7 +130,7 @@ command.option('--version').set().help("The binary version");
 command.option('--profile').set().help("The profile to launch with");
 command.option('--dev').bool().help("Start binary in development mode");
 command.option('--chromebug').bool().help("Enable chromebug");
-command.option('--build').bool().help("Build all narwhalrunner extensions (from the active sea) in the profile before launch");
+command.option('--build').set().help("Build the program/package at the specified path before launching");
 command.option('--package').set().help("The package to launch for xulrunner apps");
 command.helpful();
 
@@ -158,7 +157,7 @@ command = parser.command('add-bin', function(options) {
         return;
     }
     
-    if(config.addBinary(app, version, path)) {
+    if(config.addBinary(app, version, path.valueOf())) {
         print("added binary for '"+app+"' with version '"+version+"'");
     } else {
         print("error: binary already exists for path");
@@ -170,9 +169,59 @@ command.helpful();
 
 
 
+command = parser.command('populate-profile', function(options) {
+    
+    var name = options.args[0];
+    
+    if(!name) {
+        print("error: you must specify a profile with the first argument");
+        return;
+    }
+
+    var profileDirectory = profilesPath.join(name + "-" + profileIdSeed);
+    if(!profileDirectory.exists()) {
+        print("error: profile with name '" + name + "' does not exist at: " + profileDirectory);
+        return;
+    }
+    
+    var id = "narwhal@narwhaljs.org";    
+    
+    var targetPath = profileDirectory.join("extensions", id);
+    targetPath.dirname().mkdirs();
+    
+    if(targetPath.exists()) {
+        print("error: extension already exists at path: " + targetPath);
+        return;
+    }
+    
+    var pkg = PINF.getDatabase().getProgram(LOCATOR.PackageLocator({
+            "catalog": "http://registry.pinf.org/cadorn.org/github/catalog.json",
+            "name": "narwhal-xulrunner",
+            "revision": "master"
+        })),
+        path = PINF.getDatabase().getBuildPathForPackage(pkg);
+
+    path = pkg.build({
+        "path": path,
+        "remoteProgram": false,
+        "remoteDependencies": false
+    });
+        
+    path.join("extension").symlink(targetPath);
+    print("Linked extension '" + id + "' from '" + path.join("extension") + "' to: " + targetPath);
+});
+command.help('Populate a profile with default extensions');
+command.arg("Name");
+command.helpful();
+
+
+
 command = parser.command('add-extension', function(options) {
     
-    var path = fs.Path(options.args[0]).absolute(),
+    var path = VALIDATOR.validate("directory", options.args[0], {
+            "makeAbsolute": true,
+            "return": "FILE.Path"
+        }),
         profile = options.profile,
         link = options.link;
     
@@ -183,8 +232,17 @@ command = parser.command('add-extension', function(options) {
     
     var manifestPath = path.join("install.rdf");
     if(!manifestPath.exists()) {
-        print("error: no install.rdf found at: " + manifestPath);
-        return;
+            
+        var buildPath = buildAtPath(path);
+        if(buildPath) {
+            path = buildPath.join("extension");
+            manifestPath = path.join("install.rdf");
+        }
+
+        if(!manifestPath.exists()) {
+            print("error: no install.rdf found at: " + manifestPath);
+            return;
+        }
     }
     
     if(!profile) {
@@ -192,7 +250,7 @@ command = parser.command('add-extension', function(options) {
         return;
     }
 
-    var profileDirectory = profilesPath.join(profile);
+    var profileDirectory = profilesPath.join(profile + "-" + profileIdSeed);
     if(!profileDirectory.exists(profileDirectory)) {
         print("error: profile with name '" + profile + "' does not exist at: " + profileDirectory);
         return;
@@ -206,10 +264,10 @@ command = parser.command('add-extension', function(options) {
         return;
     }
     id = id[1];
-    
+
     var targetPath = profileDirectory.join("extensions", id);
     targetPath.dirname().mkdirs();
-    
+
     if(targetPath.exists()) {
         print("error: extension already exists at path: " + targetPath);
         return;
@@ -237,7 +295,7 @@ command.helpful();
 
 
 command = parser.command('create-profile', function(options) {
-    
+
     var name = options.args[0],
         dev = options.dev,
         homepage = options.homepage;
@@ -249,7 +307,7 @@ command = parser.command('create-profile', function(options) {
     
     profilesPath.mkdirs();
     
-    var profileDirectory = profilesPath.join(name);
+    var profileDirectory = profilesPath.join(name + "-" + profileIdSeed);
     
     if(profileDirectory.exists()) {
         print("error: a profile directory already exists at: " + profileDirectory);
@@ -292,7 +350,7 @@ command = parser.command('create-profile', function(options) {
         return;
     }
     
-    cmd.push("-CreateProfile '" + name + "-" + profileSeaKey + " " + profileDirectory + "'");
+    cmd.push("-CreateProfile '" + name + "-" + profileIdSeed + " " + profileDirectory + "'");
     cmd = cmd.join(" ");
     
     print("Running: " + cmd);
@@ -305,7 +363,7 @@ command = parser.command('create-profile', function(options) {
     STREAM.print("  \0magenta(|----------------------------------|\0)");
     STREAM.print();
     
-    cmd = [path, "-P " + name + "-" + profileSeaKey, "-no-remote"].join(" ");
+    cmd = [path, "-P " + name + "-" + profileIdSeed, "-no-remote"].join(" ");
 
     print("Running: " + cmd);
     os.system(cmd);
@@ -327,10 +385,17 @@ command = parser.command('list-profiles', function(options) {
     if(!profilesPath.exists()) {
         print("no profiles found");
         return;
-    }    
+    }
+
+    var expr = new RegExp("([^-]*)-" + profileIdSeed),
+        m;
     
     profilesPath.listPaths().forEach(function(profileDirectory) {
-        print(profileDirectory.basename());        
+        
+        if(m = expr.exec(profileDirectory.basename().valueOf())) {
+
+            print(m[1]);        
+        }
     });
 });
 command.help("Create a firefox profile")
@@ -352,16 +417,16 @@ command = parser.command('list-bin', function(options) {
     var apps = {};
     
     binaries.forEach(function(info) {
-        if(!apps[info[0]]) {
-            apps[info[0]] = [];
+        if(!apps[info.app]) {
+            apps[info.app] = [];
         }
-        apps[info[0]].push([info[2], info[1]]);
+        apps[info.app].push(info);
     });
     
     UTIL.keys(apps).forEach(function(app) {
         STREAM.print("\0green("+app+"\0)");
         apps[app].forEach(function(info) {
-            STREAM.print("  \0yellow("+info[0]+"\0): " + info[1]);
+            STREAM.print("  \0yellow("+info.path+"\0): " + info.version);
         });
     });
 });
@@ -371,7 +436,7 @@ command.helpful();
 
 
 
-
+/*
 command = parser.command('inject-sample', function(options) {
     
     var sampleName = options.args[0];
@@ -412,7 +477,35 @@ command.help("Inject sample code into a package")
     .arg('name');
 command.option('--package').set().help("The package to inject the sample code into");
 command.helpful();
+*/
 
+
+
+function buildAtPath(path) {
+    
+    try {
+        
+        // path is not a path to an extension - see if it is a path to a program
+        var locator = PINF.locatorForDirectory(path),
+            workspace = PINF.getDatabase().getWorkspaceForSelector(path);
+        if(locator) {
+            locator.setRevision(workspace.getRevisionControlBranch());
+        
+            var pkg = PINF.getDatabase().getProgram(locator),
+                buildPath = PINF.getDatabase().getBuildPathForPackage(pkg);
+    
+            buildPath = pkg.build({
+                "path": buildPath,
+                "remoteProgram": false,
+                "remoteDependencies": false
+            });
+            
+            return buildPath;
+        }
+    } catch(e) {}
+
+    return false;
+}
 
 
 

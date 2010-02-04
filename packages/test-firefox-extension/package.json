@@ -13,13 +13,6 @@
             "revision": "master"
         }
     },
-    "build": {
-        "defaultTarget": "dev",
-        "targets": {
-            "dev": "extension:build/dev",
-            "dist": "extension:build/dist"
-        }
-    },
     "narwhalrunner": {
         "Type": "extension",
         "InternalName": "narwhalrunner-test-firefox-extension",
@@ -28,7 +21,7 @@
         "Version": "0.1",
         "Release": "",
         "Creator": "Christoph Dorn",
-        "Copyright": "Copyright (c) 2009 Christoph Dorn",
+        "Copyright": "Copyright (c) 2009-2010 Christoph Dorn",
         "Description": "A NarwhalRunner firefox extension for testing",
         "HomepageURL": "http://github.com/cadorn/narwhalrunner",
         "IconURL": "",
@@ -37,6 +30,14 @@
         "UpdateKey": "",
         "UpdateLinkURL": "",
         "UpdateInfoURL": ""
+    },
+    "pinf": {
+        "builder": {
+            "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
+            "name": "devtools",
+            "revision": "master",
+            "module": "builders/extension"
+        }
     },
     "repositories": [
         {

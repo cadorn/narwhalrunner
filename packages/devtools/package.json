@@ -26,6 +26,31 @@
         },
         "template": {
             "location": "http://github.com/gmosx/template/zipball/master"
+        },
+        "pinf": {
+            "catalog": "http://registry.pinf.org/cadorn.org/github/pinf/packages/catalog.json",
+            "name": "common",
+            "revision": "master"
+        },
+        "util": {
+            "catalog": "http://registry.pinf.org/cadorn.org/github/util/packages/catalog.json",
+            "name": "lib-js",
+            "revision": "master"
+        }
+    },
+    "pinf": {
+        "platforms": {
+            "narwhal-rhino": {
+                "catalog": "http://registry.pinf.org/cadorn.org/github/platforms/packages/narwhal/packages/catalog.json",
+                "name": "rhino",
+                "revision": "master"
+            }
+        },
+        "commands": {
+            "nr": {
+                "path": "bin/nr",
+                "platform": "narwhal-rhino"
+            }
         }
     }
 }

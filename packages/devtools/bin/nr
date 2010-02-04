@@ -1,3 +1,4 @@
-#!/usr/bin/env narwhal
+/*PINF_MACRO[NarwhalShebang]*/
+/*PINF_MACRO[LoadCommandEnvironment]*/
 
-require('devtools').main(system.args);
+require("devtools", "devtools").main(system.args);

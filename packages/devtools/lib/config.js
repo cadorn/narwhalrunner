@@ -8,63 +8,54 @@ var UTIL = require("util");
 
 
 
-var Config = exports.Config = function (path) {
+var Config = exports.Config = function (config) {
     if (!(this instanceof exports.Config))
-        return new exports.Config(path);
-    this.path = path.join("devtools.local.json");
-    this.config = (this.exists())?JSON.decode(this.path.read({charset:"utf-8"})):{};
-}
+        return new exports.Config(config);
+    this.config = config;
 
-Config.prototype.exists = function() {
-    return this.path.exists();
-}
-
-Config.prototype.save = function() {
-    this.path.dirname().mkdirs();
-    this.path.write(
-        JSON.encode(this.config, null, 4),
-        {charset: 'utf-8'}
-    );
+    if(!config.exists()) {
+        config.init();
+    }
 }
 
 Config.prototype.getBinaries = function() {
-    if(!UTIL.has(this.config, "binaries")) {
+    if(!this.config.has(["binaries"])) {
         return null;
     }
-    return this.config.binaries;
+    return this.config.get(["binaries"]);
 }
 
 Config.prototype.getBinaryForAppVersion = function(app, version) {
-    if(!UTIL.has(this.config, "binaries")) {
+    var binaries = this.getBinaries();
+    if(!binaries) {
         return null;
     }
     var binary = null;
-    this.config.binaries.forEach(function(info) {
-        if(binary) {
-            return;
-        }
-        if(info[0]==app && info[2]==version) {
-            binary = info[1];
+    binaries.forEach(function(info) {
+        if(binary) return;
+        if(info.app==app && info.version==version) {
+            binary = info.path;
         }
     });
     return binary;
 }
 
 Config.prototype.getLatestVersionForApp = function(app) {
-    if(!UTIL.has(this.config, "binaries")) {
+    var binaries = this.getBinaries();
+    if(!binaries) {
         return null;
     }
     var version = [0,0],
         tmp;
-    this.config.binaries.forEach(function(info) {
-        if(info[0]==app) {
-           tmp = info[2].split(".");
+    binaries.forEach(function(info) {
+        if(info.app==app) {
+           tmp = info.version.split(".");
            for( var i = 0 ; i<tmp.length ; i++ ) {
                tmp[i] = UTIL.padBegin(tmp[i],3);
            }
            tmp = "1" + tmp.join("");
            if(tmp>version[0]) {
-               version = [tmp, info[2]];
+               version = [tmp, info.version];
            }
         }
     });
@@ -72,12 +63,13 @@ Config.prototype.getLatestVersionForApp = function(app) {
 }
 
 Config.prototype.hasBinaryForPath = function(path) {
-    if(!UTIL.has(this.config, "binaries")) {
-        return false;
+    var binaries = this.getBinaries();
+    if(!binaries) {
+        return null;
     }
     var found = false;    
-    this.config.binaries.forEach(function(info) {
-        if(info[1]==path) {
+    binaries.forEach(function(info) {
+        if(info.path==path) {
             found = true;
         }
     });
@@ -89,14 +81,19 @@ Config.prototype.addBinary = function(app, version, path) {
     if(this.hasBinaryForPath(path)) {
         return false;
     }
-    
-    if(!UTIL.has(this.config, "binaries")) {
-        this.config.binaries = [];
+
+    var binaries = this.getBinaries();
+    if(!binaries) {
+        binaries = [];
     }
     
-    this.config.binaries.push([app, ""+path, version]);
+    binaries.push({
+        "app": app,
+        "version": version,
+        "path": path
+    });
     
-    this.save();
+    this.config.set(["binaries"], binaries);
     
     return true;
 }

@@ -14,18 +14,57 @@ Assumptions
 
 You have [firefox 3.5+](http://www.mozilla.com/en-US/firefox/) installed.
 
+You have the [narwhal-xulrunner extension](http://github.com/cadorn/narwhal-xulrunner) installed.
+
+You have [PINF](http://github.com/cadorn/pinf) installed *(NOTE: There is no release for PINF yet. Will be coming very soon.)*.
+
 You are on:
 
    * **Mac OS X**  - *fully tested*
    * UNIX - *should be working*
-   * Windows - *tusk-catalog* still needs some work:
-     * Primarily to do with symlinks and paths
+   * Windows - not tested
 
 Instructions
 ------------
 
-**NOTE: These instructions are outdated! New info will be available soon.**
+Install the pinf platform package for narwhalrunner:
+    
+    pinf install-platform --name narwhalrunner http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json pinf-platform master
+    
+Checkout the narwhalrunner workspace:
 
+    pinf checkout-workspace github.com/cadorn/narwhalrunner
+
+Activate the `narwhalrunner` platform for the workspace:
+
+    pinf activate-platform github.com/cadorn/narwhalrunner narwhalrunner
+    
+Add firefox binary
+
+    nr add-bin /Applications/Firefox.app/Contents/MacOS/firefox-bin
+
+Create test profile
+
+    nr create-profile --dev test
+    nr populate-profile test
+
+
+Demo: test-firefox-extension
+----------------------------
+
+Add test extension to profile
+
+    nr add-extension -l --profile test packages/test-firefox-extension
+
+Launch test profile
+
+    nr launch --dev --profile test
+
+
+
+
+
+**NOTE: The instructions below are outdated! New info will be available soon.**
 
 Clone Christoph Dorn's [**tusk-catalog** narwhal branch](http://github.com/cadorn/narwhal/tree/tusk-catalog) and the [narwhal-xulrunner](http://github.com/cadorn/narwhal-xulrunner) engine.
 
