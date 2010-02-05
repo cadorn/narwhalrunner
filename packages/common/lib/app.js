@@ -27,7 +27,7 @@ var App = exports.App = function (packageName) {
     }
 
     if(!UTIL.has(PACKAGES.uidCatalog, packageName)) {
-        throw "App package not found: " + packageName;
+        throw new AppError("App package not found: " + packageName);
     }
 
     this.path = PACKAGES.usingCatalog[PACKAGES.uidCatalog[packageName].id].directory;
@@ -35,7 +35,7 @@ var App = exports.App = function (packageName) {
 
     var manifestPath = this.path.join("package.json");
     if(!manifestPath.exists()) {
-        throw "no manifest found at: " + manifestPath;
+        throw new AppError("no manifest found at: " + manifestPath);
     }
     this.manifest = JSON.decode(manifestPath.read({charset:"utf-8"}));
     
@@ -122,13 +122,20 @@ App.prototype.registerProtocolHandler = function() {
                     packageRefId = parts.shift(),
                     baseName = parts[parts.length-1],
                     extension = baseName.split(".").pop();
-                    
-                var packageName = self.refIdMap[packageRefId];
-                
+
+                var packageName;
+                if(packageRefId==self.getAppPackage().getName()) {
+                    packageName = self.getAppPackage().getName();
+                } else {
+                    packageName = self.refIdMap[packageRefId];
+                }
+
                 var pkg;
                 if(!packageName || typeof packageName == "string") {
                     if(!UTIL.has(PACKAGES.usingCatalog, packageName)) {
-                        print("error: Package not found: " + packageName);
+
+                        system.log.warn(new AppError("Package not found packageName[" + packageName + "] packageRefId[" + packageRefId + "]"));
+
                         return {
                             status: 500,
                             headers: {"Content-Type":"text/plain"},
@@ -186,7 +193,7 @@ App.prototype.registerProtocolHandler = function() {
                         if(!UTIL.has(info, "contentType")) info.contentType = "text/css";
     
                     case "js":
-                        if(!UTIL.has(info, "contentType")) info.contentType = "application/vnd.mozilla.xul+xml";
+                        if(!UTIL.has(info, "contentType")) info.contentType = "application/x-javascript";
     
     
                     if(!UTIL.has(info, "binary")) info.binary = false;
@@ -217,12 +224,12 @@ App.prototype.registerProtocolHandler = function() {
                         if(body["decodeToString"]) {
                             body = body.decodeToString('utf-8');
                         }
-    
+
                         body = body.replace(/%%QueryString%%/g, chromeEnv["QUERY_STRING"]);
     
                         body = pkg.replaceTemplateVariables(body);
                     }
-       
+
                     return {
                         status: 200,
                         headers: {"Content-Type": info.contentType},
@@ -335,6 +342,19 @@ CHROME.Chrome.prototype.subscribeTo("load", function(chrome) {
 CHROME.Chrome.prototype.subscribeTo("focus", function(chrome) {
     activeChrome = chrome;
 });
+
+
+
+var AppError = exports.AppError = function(message) {
+    this.name = "AppError";
+    this.message = message;
+
+    // this lets us get a stack trace in Rhino
+    if (typeof Packages !== "undefined")
+        this.rhinoException = Packages.org.mozilla.javascript.JavaScriptException(this, null, 0);
+}
+AppError.prototype = new Error();
+
 
 
 

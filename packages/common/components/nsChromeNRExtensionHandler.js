@@ -210,7 +210,7 @@ ChromeExtensionHandler.prototype = {
   
   defaultPort : -1,
   
-  protocolFlags : nsIProtocolHandler.URI_STD,
+  protocolFlags : nsIProtocolHandler.URI_DANGEROUS_TO_LOAD,
   
   registerExtension : function(ext) {
     

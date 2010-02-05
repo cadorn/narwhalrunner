@@ -44,7 +44,16 @@ exports.Program = function (programPackage, options) {
                 "name": "narwhal-xulrunner",
                 "revision": "master"
             })),
-            buildPath = PINF.getDatabase().getBuildPathForPackage(pkg).join(pkg.getName(), "extension");
+            path = PINF.getDatabase().getBuildPathForPackage(pkg),
+            buildPath = path.join(pkg.getName(), "extension");
+
+            if(!buildPath.exists()) {
+                pkg.build({
+                    "path": path,
+                    "remoteProgram": false,
+                    "remoteDependencies": false
+                });
+            }
             
             var m = buildPath.join("install.rdf").read().toString().match(/<em:id>([^<]*)<\/em:id>/);
             if(!m) {

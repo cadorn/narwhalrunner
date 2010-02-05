@@ -20,7 +20,7 @@ var LOCATOR = require("package/locator", "http://registry.pinf.org/cadorn.org/gi
 exports.Program = function(program, buildOptions) {
 
     // PRIVATE
-    
+
     var rawPackageStore = {
         "get": function(locator) {
             if(locator.getForceRemote()) {
@@ -256,16 +256,16 @@ exports.Program = function(program, buildOptions) {
             });
         }
 
+        var sinks = {
+            "preferences": []
+        }
 
         // build program package
-        buildPackage(programPackage);
+        buildPackage(programPackage, sinks);
 
 
         
         // build all dependencies
-        var sinks = {
-            "preferences": []
-        }
         var visited = {};
         programPackage.getDescriptor().traverseEveryUsing(function(parentPackage, name, locator, stacks) {
             var key = ["packages", "using"].concat(stacks.names).concat([name, "@"]);
