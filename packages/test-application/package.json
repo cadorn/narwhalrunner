@@ -13,12 +13,6 @@
             "revision": "master"
         }
     },
-    "build": {
-        "defaultTarget": "dev",
-        "targets": {
-            "dev": "application:build/dev"
-        }
-    },
     "narwhalrunner": {
         "Type": "application",
         "InternalName": "narwhalrunner-test-application",
@@ -33,6 +27,14 @@
         "HomepageURL": "http://github.com/cadorn/narwhalrunner",
         "IconURL": "",
         "SeaPath": "chrome"
+    },
+    "pinf": {
+        "builder": {
+            "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
+            "name": "devtools",
+            "revision": "master",
+            "module": "builders/application"
+        }
     },
     "repositories": [
         {

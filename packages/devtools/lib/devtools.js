@@ -39,7 +39,10 @@ command = parser.command('launch', function(options) {
     var app = options.app,
         version = options.version,
         profile = options.profile,
-        packageName = options["package"],
+        program = (options["program"])?VALIDATOR.validate("directory", options["program"], {
+            "makeAbsolute": true,
+            "return": "FILE.Path"
+        }):null,
         build = (options.build)?VALIDATOR.validate("directory", options.build, {
             "makeAbsolute": true,
             "return": "FILE.Path"
@@ -66,29 +69,38 @@ command = parser.command('launch', function(options) {
         return;
     }
     
-    if(packageName) {
+    if(program) {
         
         if(profile) {
             print("error: you cannot specify --profile and --package at the same time");
             return;
         }
-        
-        var packagePath = seaPath.join("build", packageName);        
-        
+                
+        // path is not a path to an extension - see if it is a path to a program
+        var locator = PINF.locatorForDirectory(program),
+            workspace = PINF.getDatabase().getWorkspaceForSelector(program);
+        if(!locator) {
+            throw new Error("Program not found at: " + program);
+        }
+        locator.setRevision(workspace.getRevisionControlBranch());
+    
+        var pkg = PINF.getDatabase().getProgram(locator),
+            applicationPath = PINF.getDatabase().getBuildPathForPackage(pkg).join(pkg.getName(), "application");
+    
         if(build) {
             buildAtPath(build);
         }
         
-        if(!packagePath.exists()) {
-            print("error: package not found at: " + packagePath);
+        if(!applicationPath.exists()) {
+            print("error: application not found at: " + applicationPath);
             return;
         }
         
         if(app=="xulrunner") {
-            cmd.push(packagePath.join("application.ini").valueOf());
+            cmd.push(applicationPath.join("application.ini").valueOf());
         } else
         if(app=="firefox") {
-            cmd.push("-app " + packagePath.join("application.ini").valueOf());
+            cmd.push("-app " + applicationPath.join("application.ini").valueOf());
         }
         
     } else
@@ -131,7 +143,7 @@ command.option('--profile').set().help("The profile to launch with");
 command.option('--dev').bool().help("Start binary in development mode");
 command.option('--chromebug').bool().help("Enable chromebug");
 command.option('--build').set().help("Build the program/package at the specified path before launching");
-command.option('--package').set().help("The package to launch for xulrunner apps");
+command.option('--program').set().help("Path to program to launch for xulrunner apps");
 command.helpful();
 
 
@@ -183,7 +195,7 @@ command = parser.command('populate-profile', function(options) {
         print("error: profile with name '" + name + "' does not exist at: " + profileDirectory);
         return;
     }
-    
+
     var id = "narwhal@narwhaljs.org";    
     
     var targetPath = profileDirectory.join("extensions", id);

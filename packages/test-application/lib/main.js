@@ -1,15 +1,13 @@
 
-var CHROME = require("chrome", "common");
 var APP = require("app", "common");
-
 
 exports.main = function(args) {
     
     print("hello world from MAIN for test app!");    
 
-    CHROME.getConsoleService().logStringMessage("hello world from MAIN for test app!");
+    APP.getChrome().getConsoleService().logStringMessage("hello world from MAIN for test app!");
 
-    CHROME.getWindow().open(APP.getApp().getContentBaseUrl()+"test.xul",
+    APP.getChrome().getWindow().open(APP.getApp().getContentBaseUrl()+"test.xul",
                             "main",
                             "chrome,left=200,top=200");
         

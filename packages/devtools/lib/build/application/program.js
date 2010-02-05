@@ -2,21 +2,26 @@
 function dump(obj) { print(require('test/jsdump').jsDump.parse(obj)) };
 
 var UTIL = require("util");
-var PROGRAM = require("build/program", "common");
-var BUILD_UTIL = require("build/util", "common");
+var PROGRAM = require("../program");
+var BUILD_UTIL = require("../util");
+var PINF = require("pinf", "pinf");
+var LOCATOR = require("package/locator", "pinf");
 
 
-exports.Program = function (programPackage) {
+exports.Program = function (programPackage, options) {
 
     // PRIVATE
     
-    var Program = PROGRAM.Program(programPackage);
+    var Program = PROGRAM.Program(programPackage, options);
     
     // PUBLIC
+
+    Program.getBuildSubPath = function() {
+        return "application"
+    }
     
     Program.buildStaticPlatform = function(scope) {
         with(scope) {
-            
             var date =  new Date();
             vars["Program.BuildID"] = String(date.getFullYear()) +
                                       String(UTIL.padBegin(date.getMonth(),2)) +
@@ -28,9 +33,29 @@ exports.Program = function (programPackage) {
             BUILD_UTIL.copyWhile(fromPath, toPath, [
                 [BUILD_UTIL.replaceVariables, [vars]]
             ]);
-            
         }
     }
+    
+    Program.buildDynamicPlatform = function(scope) {
+        with(scope) {
+
+            var pkg = PINF.getDatabase().getProgram(LOCATOR.PackageLocator({
+                "catalog": "http://registry.pinf.org/cadorn.org/github/catalog.json",
+                "name": "narwhal-xulrunner",
+                "revision": "master"
+            })),
+            buildPath = PINF.getDatabase().getBuildPathForPackage(pkg).join(pkg.getName(), "extension");
+            
+            var m = buildPath.join("install.rdf").read().toString().match(/<em:id>([^<]*)<\/em:id>/);
+            if(!m) {
+                throw new Error("Unable to read extension ID from: " + buildPath.join("install.rdf"));
+            }
+            
+            toPath = Program.getTargetPath().join("extensions", m[1]);
+            toPath.dirname().mkdirs();
+            buildPath.symlink(toPath);
+        }
+    }    
         
     Program.getChromeOverlayPath = function() {
         return Program.getTargetPath().join("chrome", "overlay");
@@ -61,11 +86,11 @@ exports.Program = function (programPackage) {
     }
     
     Program.getPackagesPath = function() {
-        return Program.getTargetPath().join("chrome", "packages");
+        return Program.getTargetPath().join("packages");
     }
     
     Program.getUsingPath = function() {
-        return Program.getTargetPath().join("chrome", "using");
+        return Program.getTargetPath().join("using");
     }
     
     Program.getChromeManifestPath = function() {
@@ -77,7 +102,7 @@ exports.Program = function (programPackage) {
     }
 
     Program.getPackageJsonPath = function() {
-        return Program.getTargetPath().join("chrome", "package.json");
+        return Program.getTargetPath().join("package.json");
     }
 
     Program.getApplicationIniPath = function() {

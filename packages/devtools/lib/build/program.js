@@ -73,7 +73,6 @@ exports.Program = function(program, buildOptions) {
 
 
     var buildPath = buildOptions.path;
-    var targetPath = buildPath.join("extension");
 
 
     var Program = {};
@@ -83,7 +82,7 @@ exports.Program = function(program, buildOptions) {
     Program.platformPackage = platformPackage;
     
     Program.getTargetPath = function() {
-        return targetPath;
+        return buildPath.join(Program.getBuildSubPath());
     }
 
 
@@ -394,7 +393,10 @@ exports.Program = function(program, buildOptions) {
         print("Linked '" + toPath + "' to '" + fromPath + "'");    
         
 
-        Program.buildDynamicPlatform();    
+        Program.buildDynamicPlatform({
+            "fromPath": fromPath,
+            "toPath": toPath
+        });    
     }    
 
     Program.buildDynamicPlatform = function() {

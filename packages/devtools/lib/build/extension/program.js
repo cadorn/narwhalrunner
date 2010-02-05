@@ -14,7 +14,10 @@ exports.Program = function (program, options) {
     var Program = PROGRAM.Program(program, options);
     
     // PUBLIC
-    
+
+    Program.getBuildSubPath = function() {
+        return "extension"
+    }
 
     Program.buildStaticPlatform = function(scope) {
         with(scope) {
