@@ -49,12 +49,24 @@ exports.Container = function (pkgId, object, name) {
         });
     }
 
+    Container.logMessage = function(message)
+    {
+        var browser = getConsoleBrowser(),
+            document = browser.contentDocument;
+
+        document.getElementById("list").innerHTML += message + "\n";        
+    }
+
     return Container;
     
     // PRIVATE
     
     function getActionList() {
         return Container.getBinding("ActionList").getObject();
+    }
+
+    function getConsoleBrowser() {
+        return Container.getBinding("Console").getObject().getBrowser();
     }
 
     function clearUI() {

@@ -15,7 +15,14 @@
       __Package.RegisterContainerMacro__(this, "ui/sidebar", "Sidebar");
   </script>
 
-  <vbox id="ActionList" flex="1">
+  <vbox flex="1">
+
+      <vbox id="ActionList" flex="1">
+      </vbox>
+
+      <vbox id="Console" flex="1">
+      </vbox>
+
   </vbox>
 
 </page>

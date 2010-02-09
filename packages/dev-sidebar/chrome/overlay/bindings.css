@@ -6,3 +6,7 @@
 button.ActionButton {
   -moz-binding: url("__Package.OverlayBaseURL__bindings.xml#ActionButton");
 }
+
+#Console {
+  -moz-binding: url("__Package.OverlayBaseURL__bindings.xml#Console");
+}

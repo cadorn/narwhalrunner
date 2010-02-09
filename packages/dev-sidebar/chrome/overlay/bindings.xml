@@ -50,4 +50,56 @@
     </handlers>
 </binding>
 
+
+<binding id="Console">
+    <content>
+        <xul:vbox flex="1">
+            <xul:hbox>
+                <xul:button label="Clear" oncommand="clear()"/>
+                <xul:button label="Copy" oncommand="copy()"/>
+            </xul:hbox>
+            <xul:browser anonid="browser"
+                     disablehistory="true"
+                     src="__Package.ContentBaseURL__console-panel.htm"
+                     flex="1"/>
+        </xul:vbox>                     
+    </content>
+    <implementation>
+
+        <constructor><![CDATA[
+
+           var binding = __Package.RegisterBindingMacro__(this, "Console");
+            
+        ]]></constructor>
+
+        <method name="getBrowser">
+            <body><![CDATA[
+                return document.getAnonymousElementByAttribute(this, "anonid", "browser");            
+            ]]></body>
+        </method>
+
+        <method name="clear">
+            <body><![CDATA[
+                var browser = document.getAnonymousElementByAttribute(this, "anonid", "browser");
+                browser.reload();
+            ]]></body>
+        </method>
+
+        <method name="copy">
+            <body><![CDATA[
+                var browser = document.getAnonymousElementByAttribute(this, "anonid", "browser");
+                var data = browser.contentDocument.getElementById("list").innerHTML;
+
+                const gClipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"].  
+                  getService(Components.interfaces.nsIClipboardHelper);  
+                gClipboardHelper.copyString(data);  
+
+                alert("Console messages copied onto clipboard!");
+            ]]></body>
+        </method>
+
+    </implementation>
+
+</binding>
+
 </bindings>
