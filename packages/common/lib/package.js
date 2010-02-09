@@ -82,7 +82,7 @@ exports.Package = function (packagePath, locator) {
             "    Components.utils.import('resource://narwhal-xulrunner/sandbox.js', sandbox);" +
             "    var program = sandbox.get({'type': '" + appInfo["Type"]  + "', 'id': '" + appInfo["ID"]  + "'});" +
             "    return function(object, name) {" +
-            "        return program.require('app', '" + commonPackage.getTopLevelId() + "').getChrome().registerBinding('" + Package.getUid() + "', object, name);" +
+            "        return program.require('app', '" + commonPackage.getTopLevelId() + "').getChrome().registerBinding('" + Package.getTopLevelId() + "', object, name);" +
             "    };" +
             "}())";
         
@@ -92,7 +92,7 @@ exports.Package = function (packagePath, locator) {
             "    Components.utils.import('resource://narwhal-xulrunner/sandbox.js', sandbox);" +
             "    var program = sandbox.get({'type': '" + appInfo["Type"]  + "', 'id': '" + appInfo["ID"]  + "'});" +
             "    return function(object, module, name) {" +
-            "        return program.require('app', '" + commonPackage.getTopLevelId() + "').getChrome().registerContainer('" + Package.getUid() + "', object, module, name);" +
+            "        return program.require('app', '" + commonPackage.getTopLevelId() + "').getChrome().registerContainer('" + Package.getTopLevelId() + "', object, module, name);" +
             "    };" +
             "}())";
         }
