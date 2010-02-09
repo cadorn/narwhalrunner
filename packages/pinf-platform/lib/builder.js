@@ -19,25 +19,5 @@ Builder.prototype = BUILDER.Builder();
 
 Builder.prototype.build = function(pkg, options) {
 
-    var descriptor = this.pkg.getDescriptor(),
-        locator = this.getLocatorForSpec(descriptor.spec.using.devtools),
-        devtoolsPackage = this.getPackageForLocator(locator),
-        sourceBasePath = devtoolsPackage.getPath(),
-        sourcePath,
-        targetBasePath = options.path,
-        targetPath,
-        basename;
 
-    // TODO: Take OS into account when copying OS specific files
-/*    
-    targetPath = targetBasePath.join("bin");
-    sourcePath = sourceBasePath.join("bin");
-    [
-        "nr"
-    ].forEach(function(basename) {
-        targetPath.join(basename).dirname().mkdirs();
-        sourcePath.join(basename).symlink(targetPath.join(basename));
-        targetPath.join(basename).chmod(0755);
-    });
-*/
 }

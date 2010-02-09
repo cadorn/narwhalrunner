@@ -22,7 +22,7 @@
                  autoCheck="false"
                  type="checkbox"
                  group="sidebar"
-                 sidebarurl="__Package.ContentBaseURL__sidebar.xul"
+                 sidebarurl="__Package.OverlayBaseURL__sidebar.xul"
                  sidebartitle="&__PP__Sidebar.title;"
                  oncommand="toggleSidebar('__PP__broadcaster_Sidebar');" />
   </broadcasterset>

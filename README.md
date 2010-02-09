@@ -24,17 +24,9 @@ You are on:
 Instructions
 ------------
 
-Install the pinf platform package for narwhalrunner:
-    
-    pinf install-platform --name narwhalrunner http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json pinf-platform master
-    
-Checkout the narwhalrunner workspace:
+Checkout the narwhalrunner workspace and switch to it:
 
-    pinf checkout-workspace github.com/cadorn/narwhalrunner
-
-Activate the `narwhalrunner` platform for the workspace:
-
-    pinf activate-platform github.com/cadorn/narwhalrunner narwhalrunner
+    pinf checkout-workspace -s github.com/cadorn/narwhalrunner
     
 Add firefox binary
 

@@ -27,7 +27,7 @@ exports.Program = function(program, buildOptions) {
                 var pkg = buildOptions.builder.getPackageForLocator(locator);
                 return PACKAGE.Package(pkg.getPath());
             }
-            return PACKAGE.Package(buildOptions.path.join("raw", "using", locator.getFsPath()), locator);
+            return PACKAGE.Package(program.getBuildPath().join("raw", "using", locator.getFsPath()), locator);
         }
     }
     
@@ -72,7 +72,7 @@ exports.Program = function(program, buildOptions) {
 
 
 
-    var buildPath = buildOptions.path;
+    var buildPath = program.getBuildPath();
 
 
     var Program = {};
@@ -111,7 +111,7 @@ exports.Program = function(program, buildOptions) {
 
 // HACK: This is temporary until the program package is a "using" package as well        
         OS.command("rm -Rf " + sourcePath.join("packages", programPackage.getName(), "packages"));
-        var fromPath = buildOptions.path.join("raw", "package.json"),
+        var fromPath = program.getBuildPath().join("raw", "package.json"),
             toPath = sourcePath.join("packages", programPackage.getName(), "package.json");
         toPath.remove();
         fromPath.copy(toPath);

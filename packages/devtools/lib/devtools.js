@@ -211,14 +211,13 @@ command = parser.command('populate-profile', function(options) {
             "name": "narwhal-xulrunner",
             "revision": "master"
         })),
-        path = PINF.getDatabase().getBuildPathForPackage(pkg);
+        path;
 
     path = pkg.build({
-        "path": path,
         "remoteProgram": false,
         "remoteDependencies": false
     });
-        
+
     path.join("extension").symlink(targetPath);
     print("Linked extension '" + id + "' from '" + path.join("extension") + "' to: " + targetPath);
 });
@@ -280,9 +279,18 @@ command = parser.command('add-extension', function(options) {
     var targetPath = profileDirectory.join("extensions", id);
     targetPath.dirname().mkdirs();
 
+
     if(targetPath.exists()) {
-        print("error: extension already exists at path: " + targetPath);
-        return;
+        if(options.replace) {
+            if(targetPath.isLink()) {
+                targetPath.remove();
+            } else {
+                throw new Error("NYI - Remove old extension files");
+            }
+        } else {
+            print("error: extension already exists at path: " + targetPath);
+            return;
+        }
     }
     
     if(link) {        
@@ -301,8 +309,9 @@ command = parser.command('add-extension', function(options) {
 });
 command.help('Add an extension to a profile');
 command.arg('path');
-command.option('--profile', 'profile').set().help("The profile to add the extension to");
-command.option('-l', '--link', 'link').bool().help("Link the path instead of copying it");
+command.option('--profile').set().help("The profile to add the extension to");
+command.option('-l', '--link').bool().help("Link the path instead of copying it");
+command.option('--replace').bool().help("Replace existing extension if it exists");
 command.helpful();
 
 
@@ -406,7 +415,13 @@ command = parser.command('list-profiles', function(options) {
         
         if(m = expr.exec(profileDirectory.basename().valueOf())) {
 
-            print(m[1]);        
+            print(m[1]);
+            
+            profileDirectory.join("extensions").listPaths().forEach(function(item) {
+
+                print("    " + item.basename() + " : " + item.join("").canonical());
+                
+            });
         }
     });
 });

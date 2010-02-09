@@ -10,7 +10,7 @@
     <implementation>
 
         <constructor><![CDATA[
-            
+
            var binding = __Package.RegisterBindingMacro__(this, "ActionList");
             
         ]]></constructor>
