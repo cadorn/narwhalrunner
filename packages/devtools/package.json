@@ -51,6 +51,12 @@
                 "path": "bin/nr",
                 "platform": "narwhal-rhino"
             }
+        },
+        "builder": {
+            "catalog": "http://registry.pinf.org/cadorn.org/github/pinf/packages/catalog.json",
+            "name": "common",
+            "revision": "master",
+            "module": "builders/program-package"
         }
     }
 }

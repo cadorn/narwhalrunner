@@ -9,6 +9,7 @@ var UTIL = require("util");
 var OBSERVABLE = require("observable", "observable");
 var BINDING = require("./binding");
 var PACKAGES = require("packages");
+var PACKAGE = require("./package");
 
 var chromeIndex = 0;
 
@@ -45,6 +46,7 @@ Chrome.prototype.registerBinding = function(pkgId, object, name) {
 }
 
 Chrome.prototype.getBinding = function(pkgId, name) {
+    pkgId = normalizePackageID(pkgId);
     if(!UTIL.has(this.bindings, pkgId)) {
         return false;
     }
@@ -52,6 +54,18 @@ Chrome.prototype.getBinding = function(pkgId, name) {
         return false;
     }
     return this.bindings[pkgId][name];
+}
+
+function normalizePackageID(id) {
+
+    if(UTIL.has(PACKAGES.catalog, id)) {
+        var pkg = PACKAGE.Package(PACKAGES.catalog[id].directory);
+        // HACK: Suffix "master" for now
+        // TODO: Read proper version from catalog and append that
+        return pkg.getTopLevelId() + "/master";
+    }
+
+    return id;
 }
 
 Chrome.prototype.registerContainer = function(pkgId, object, module, name) {

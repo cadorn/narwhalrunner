@@ -97,3 +97,28 @@ Config.prototype.addBinary = function(app, version, path) {
     
     return true;
 }
+
+Config.prototype.updateBinary = function(app, version, path) {
+
+    if(!this.hasBinaryForPath(path)) {
+        throw new Error("binary does not exist");
+    }
+
+    var binaries = this.getBinaries();
+
+    var updated = false;    
+
+    for( var i=0 ; i<binaries.length ; i++ ) {
+        if(binaries[i].path==path && binaries[i].version!=version) {
+            binaries[i].version = version;
+            updated = true;
+            break;
+        }
+    };
+    
+    if(updated) {
+        this.config.set(["binaries"], binaries);
+    }
+    
+    return updated;
+}

@@ -60,6 +60,7 @@ exports.Package = function (packagePath, locator) {
             "Package.ReferenceId": id,
 
             "Package.OverlayBaseURL": "chrome://" + appInfo.InternalName + "-overlay/content/" + id + "/",
+            "Package.ChromeResourcesBaseURL": "resource://" + appInfo.InternalName + "-resources/" + id + "/",
             "Package.ModulesBaseURL": "resource://" + appInfo.InternalName + "-modules/" + id + "/",
             "Package.LocaleBaseURL": "chrome://" + appInfo.InternalName + "/locale/" + id + "/",
             "Package.SkinBaseURL": "chrome://" + appInfo.InternalName + "/skin/" + id + "/",
@@ -68,6 +69,8 @@ exports.Package = function (packagePath, locator) {
             "Package.AccessibleContentBaseURL": "narwhalrunner-accessible://" + appInfo.InternalName + "/" + Package.getReferenceId() + "/content-accessible/",
             
             "Package.ResourcesBaseURL": "narwhalrunner://" + appInfo.InternalName + "/" + id + "/resources/",
+
+            "Package.RoutedBaseURL": "narwhalrunner://" + appInfo.InternalName + "/" + id + "/",
 
             "Program.NarwhalURL": "chrome://" + appInfo.InternalName + "-overlay/content/" + appInfo["CommonPackage.ReferenceId"] + "/narwhal.js",
             "Program.NarwhalizeURL": "chrome://" + appInfo.InternalName + "-overlay/content/" + appInfo["CommonPackage.ReferenceId"] + "/narwhalize.js",
@@ -139,6 +142,10 @@ exports.Package = function (packagePath, locator) {
 
     Package.getModulesPath = function() {
         return Package.getPath().join("modules");
+    }
+
+    Package.getChromeResourcesPath = function() {
+        return Package.getPath().join("chrome", "resources");
     }
 
     Package.getComponentsPath = function() {

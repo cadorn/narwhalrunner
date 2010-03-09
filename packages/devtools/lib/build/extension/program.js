@@ -67,6 +67,10 @@ exports.Program = function (program, options) {
         return Program.getTargetPath().join("modules");
     }
     
+    Program.getChromeResourcesPath = function() {
+        return Program.getTargetPath().join("chrome", "resources");
+    }
+    
     Program.getComponentsPath = function() {
         return Program.getTargetPath().join("components");
     }

@@ -178,6 +178,7 @@ exports.Program = function(program, buildOptions) {
                 "chromeOverlay",
                 "preferences",
                 "modules",
+                "chromeResources",
                 "components",
                 "chromeLocale",
                 "chromeSkin"
@@ -206,6 +207,14 @@ exports.Program = function(program, buildOptions) {
             parts.forEach(function(part) {
                 fromPath = pkg["get" + part.substr(0,1).toUpperCase() + part.substr(1) + "Path"]();
                 if(fromPath.exists()) {
+                    if(part=="chromeResources") {
+                        // just link
+                        toPath = Program["get" + part.substr(0,1).toUpperCase() + part.substr(1) + "Path"]().join(id);
+                        toPath.mkdirs();
+                        fromPath.listPaths().forEach(function(sourceDir) {
+                            sourceDir.symlink(toPath.join(sourceDir.basename()));
+                        });
+                    } else
                     if(part=="chromeLocale" || part=="chromeSkin") {
                         // locales & skins need to be written into subdirectories
                         fromPath.listPaths().forEach(function(sourceDir) {

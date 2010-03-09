@@ -1,6 +1,13 @@
 {
     "uid": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/common/",
     "name": "common",
+    "dependencies": {
+        "jack": {
+            "catalog": "http://registry.pinf.org/cadorn.org/github/catalog.json",
+            "name": "jack",
+            "revision": "master"
+        }
+    },
     "using": {
         "observable": {
             "location": "http://github.com/nrstott/observable-js/zipball/master/"

@@ -1,6 +1,7 @@
 
 content  __Program.InternalName__-overlay  chrome/overlay/
 resource __Program.InternalName__-modules  modules/
+resource __Program.InternalName__-resources  chrome/resources/
 skin     __Program.InternalName__  classic/1.0  chrome/skin/classic/
 locale   __Program.InternalName__  en-US   chrome/locale/en-US/
 resource __Program.InternalName__-packages packages/

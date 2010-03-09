@@ -17,7 +17,7 @@ Builder.prototype = BUILDER.Builder();
 
 
 
-Builder.prototype.build = function(program, buildOptions) {
+Builder.prototype.build = function(targetPackage, buildOptions) {
 
     // TODO: print out help info if applicable
 
@@ -34,7 +34,7 @@ Builder.prototype.build = function(program, buildOptions) {
 
     buildOptions.builder = this;
 
-    var program = PROGRAM.Program(program, buildOptions);
+    var program = PROGRAM.Program(targetPackage, buildOptions);
     
     if(buildOptions.remoteProgram) {
         program.dist({

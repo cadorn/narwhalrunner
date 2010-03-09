@@ -45,7 +45,7 @@ exports.Program = function (programPackage, options) {
                 "revision": "master"
             })),
             path = PINF.getDatabase().getBuildPathForPackage(pkg),
-            buildPath = path.join(pkg.getName(), "extension");
+            buildPath = path.join("extension");
 
             if(!buildPath.exists()) {
                 pkg.build({
@@ -88,6 +88,10 @@ exports.Program = function (programPackage, options) {
     
     Program.getModulesPath = function() {
         return Program.getTargetPath().join("chrome", "modules");
+    }
+    
+    Program.getChromeResourcesPath = function() {
+        return Program.getTargetPath().join("chrome", "resources");
     }
     
     Program.getComponentsPath = function() {

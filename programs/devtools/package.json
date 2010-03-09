@@ -1,0 +1,18 @@
+{
+    "uid": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/programs/devtools/",
+    "name": "devtools",
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git://github.com/cadorn/narwhalrunner.git",
+            "path": "programs/devtools"
+        }
+    ],
+    "dependencies": {
+        "program": {
+            "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
+            "name": "devtools",
+            "revision": "master"
+        }
+    }
+}

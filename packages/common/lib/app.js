@@ -6,6 +6,7 @@ var OBSERVABLE = require("observable", "observable");
 var JSON = require("json");
 var UTIL = require("util");
 var FILE = require("file");
+var URI = require("uri");
 var BASE64 = require("base64");
 var MD5 = require("md5");
 var STRUCT = require("struct");
@@ -13,11 +14,17 @@ var MD5 = require("md5");
 var STRUCT = require("struct");
 var PACKAGES = require("packages");
 
+var CACHE = require("./cache");
 var PACKAGE = require("./package");
 var BINDING = require("./binding");
 var CONTAINER = require("./container");
 
 var CHROME = require("./chrome");
+
+var SANDBOX = require("sandbox");
+
+
+const RELOAD_ROUTE_RESPONDERS = true;
 
 
 var App = exports.App = function (packageName) {
@@ -54,20 +61,64 @@ var App = exports.App = function (packageName) {
     this.pkg = PACKAGE.Package(this.path).setAppInfo(this.manifest.narwhalrunner);
     this.pkgVars = this.pkg.getTemplateVariables();
 
+    // routes for packages - THIS IS THE NEW MODEL
+    this.routes = {};
+
     // populate package reference ID map to package ID
     this.refIdMap = {};
     var self = this;
     UTIL.keys(PACKAGES.usingCatalog).forEach(function(id) {
-        var pkg = PACKAGE.Package(PACKAGES.usingCatalog[id].directory);
-        if(pkg.hasUid()) {
-           self.refIdMap[pkg.setAppInfo(self.manifest.narwhalrunner).getReferenceId()] = id;
-       }
+        self.registerPackage(PACKAGE.Package(PACKAGES.usingCatalog[id].directory), id);
     });
+
+    this.cache = CACHE.Cache(this.getProfilePath().join("Cache", this.getInternalName()));
 }
 OBSERVABLE.mixin(App.prototype);
 
+App.prototype.registerPackage = function(pkg, id) {
+    var self = this;
+    if(pkg.hasUid()) {
+        if(!id) {
+            // HACK: Appending "master" until we have a better solution
+            // TODO: Determine revision properly
+            id = pkg.getTopLevelId() + "/master";
+        }
+        var refID = pkg.setAppInfo(this.manifest.narwhalrunner).getReferenceId();
+        this.refIdMap[refID] = id;
+
+        // check for path routing
+        // TODO: A routing helper should evolve over time to encapsulate all this functionality
+        var impl = pkg.getDescriptor().getImplementsForUri("http://registry.pinf.org/cadorn.org/github/pinf/@meta/routing/path/0.1.0");
+        if(impl) {
+            if(!this.routes[refID]) {
+                this.routes[refID] = [];
+            }
+            // initialize each route
+            UTIL.every(impl.mappings, function(mapping) {
+                if(mapping[1].type=="jsgi") {
+                    if(mapping[0].substr(0,1)=="/") {
+                        throw new Error("Only relative routhing paths are supported. Declared in: " + pkg.getPath());
+                    }
+                    self.routes[refID].push({
+                        "route": new RegExp("^\\/" + refID + "\\/" + mapping[0]),
+                        "module": mapping[1].module,
+                        "package": id
+                    });
+                } else {
+                    system.log.warn("Route type '" + mapping[1].type + "' not supported. Defined in: " + pkg.getPath());
+                }
+            });
+        }
+        
+    }
+}
+
 App.prototype.exists = function() {
     return this.path.exists();
+}
+
+App.prototype.getCache = function() {
+    return this.cache;
 }
 
 App.prototype.getAppPackage = function() {
@@ -80,6 +131,13 @@ App.prototype.getPackage = function(id) {
 
 App.prototype.getInternalName = function() {
     return this.getInfo().InternalName;
+}
+
+App.prototype.getProfilePath = function() {
+    var file = Cc["@mozilla.org/file/directory_service;1"].
+                    getService(Ci.nsIProperties).
+                        get("ProfD", Ci.nsIFile);
+    return FILE.Path(file.path);    
 }
 
 App.prototype.getInfo = function() {
@@ -115,10 +173,20 @@ App.prototype.registerProtocolHandler = function() {
         app: function(chromeEnv) {
 
             try {
-    
-                print("Processing: " + chromeEnv["PATH_INFO"]);
+
+                var pathInfo = chromeEnv["PATH_INFO"];
                 
-                var parts = chromeEnv["PATH_INFO"].substr(1).split("/"),
+                // HACK: Path correction for SmartClient (seems to have an issue with the narwhalrunner:// protocol)
+// @see http://forums.smartclient.com/showthread.php?t=9734
+//                var m = pathInfo.match(/^\/.*?narwhalrunner:\/\/[^\/]*\/(.*)$/);
+//                if(m) {
+//                    pathInfo = "/" + m[1];
+//                }
+
+
+                print("Processing: " + pathInfo);
+                
+                var parts = pathInfo.substr(1).split("/"),
                     packageRefId = parts.shift(),
                     baseName = parts[parts.length-1],
                     extension = baseName.split(".").pop();
@@ -129,6 +197,48 @@ App.prototype.registerProtocolHandler = function() {
                 } else {
                     packageName = self.refIdMap[packageRefId];
                 }
+                
+                // new logic
+                if(self.routes[packageRefId]) {
+                    var responderApp = false;
+                    self.routes[packageRefId].forEach(function(info) {
+                        if(responderApp) return;
+                        if(info.route.test(pathInfo)) {
+                            if(RELOAD_ROUTE_RESPONDERS) {
+                                // create a sandbox to allow for reloading                    
+                                var modules = {
+                                    "system": system,
+                                    "jar-loader": require("jar-loader")
+                                };
+                                try {
+                                    // some wildfire modules need to be singletons and survive reloads
+                                    modules["wildfire"] = require("wildfire");
+                                    modules["wildfire/binding/jack"] = require("wildfire/binding/jack");
+                                } catch(e) {}
+                                var sandbox = SANDBOX.Sandbox({
+                                    "system": system,
+                                    "loader": require.loader,
+                                    "debug": require.loader.debug,
+                                    "modules": modules
+                                });
+                                responderApp = sandbox(info.module, null, info["package"]).app;
+                            } else {
+                                responderApp = require(info.module, info["package"]).app;
+                            }
+                        }
+                    });
+                    if(responderApp) {
+                        var result = responderApp(chromeEnv);
+                        // base64 encode the body
+                        for( var i=0 ; i<result.body.length ; i++ ) {
+                            result.body[i] = BASE64.encode(result.body[i]);
+                        }
+                        return result;
+                    }
+                }
+                
+                
+                // old logic
 
                 var pkg;
                 if(!packageName || typeof packageName == "string") {
@@ -149,7 +259,15 @@ App.prototype.registerProtocolHandler = function() {
                 var filePath = pkg.getPath();
     
                 if(parts[0]=="resources") {
-                    // path is fine the way it is            
+                    // path is fine the way it is
+                    
+                    // if /resources/ is not found look for /chrome/resources/
+                    
+                    if(!filePath.join(parts.join("/")).exists() &&
+                       filePath.join("chrome", parts.join("/")).exists()) {
+                        filePath = filePath.join("chrome");
+                    }
+                    
                 } else {
                     // if a locale URL is accessed we default to en-US for now            
     //                if(parts[0]=="locale") {
@@ -228,6 +346,14 @@ App.prototype.registerProtocolHandler = function() {
                         body = body.replace(/%%QueryString%%/g, chromeEnv["QUERY_STRING"]);
     
                         body = pkg.replaceTemplateVariables(body);
+
+                        var m;
+                        while(m = body.match(/<\?narwhalrunner\s*\n([\s\S]*?)\n\s*\?>/)) {
+                            if(m) {
+                                var helper = require("__helper__", pkg.getUid());
+                                body = body.replace(m[0], helper.evaluate(m[1]));
+                            }
+                        }
                     }
 
                     return {
@@ -235,15 +361,15 @@ App.prototype.registerProtocolHandler = function() {
                         headers: {"Content-Type": info.contentType},
                         body: [body]
                     }
-                }   
-                
+                }
+
                 var result = app(chromeEnv);
-                
+
                 // base64 encode the body
                 for( var i=0 ; i<result.body.length ; i++ ) {
                     result.body[i] = BASE64.encode(result.body[i]);
                 }
-                
+
                 return result;
             } catch(e) {
                 system.log.error(e);

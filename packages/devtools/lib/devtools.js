@@ -85,7 +85,7 @@ command = parser.command('launch', function(options) {
         locator.setRevision(workspace.getRevisionControlBranch());
     
         var pkg = PINF.getDatabase().getProgram(locator),
-            applicationPath = PINF.getDatabase().getBuildPathForPackage(pkg).join(pkg.getName(), "application");
+            applicationPath = PINF.getDatabase().getBuildPathForPackage(pkg).join("application");
     
         if(build) {
             buildAtPath(build);
@@ -172,7 +172,10 @@ command = parser.command('add-bin', function(options) {
     if(config.addBinary(app, version, path.valueOf())) {
         print("added binary for '"+app+"' with version '"+version+"'");
     } else {
-        print("error: binary already exists for path");
+        // update version of binary
+       if(!config.updateBinary(app, version, path.valueOf())) {
+           print("error: binary with same version already exists for path");
+       }
     }
 });
 command.help("Add a xulrunner-based binary (firefox or xulrunner)")
@@ -408,18 +411,18 @@ command = parser.command('list-profiles', function(options) {
         return;
     }
 
-    var expr = new RegExp("([^-]*)-" + profileIdSeed),
+    var expr = new RegExp("^(.*?)-" + profileIdSeed + "$"),
         m;
     
     profilesPath.listPaths().forEach(function(profileDirectory) {
-        
+
         if(m = expr.exec(profileDirectory.basename().valueOf())) {
 
-            print(m[1]);
+            STREAM.print("\0yellow("+m[1] + "\0) ("+profileDirectory+")");
             
             profileDirectory.join("extensions").listPaths().forEach(function(item) {
 
-                print("    " + item.basename() + " : " + item.join("").canonical());
+                STREAM.print("    \0cyan(" + item.basename() + "\0) : " + item.join("").canonical());
                 
             });
         }
