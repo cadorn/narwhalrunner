@@ -8,7 +8,7 @@
             "path": "programs/devtools"
         }
     ],
-    "dependencies": {
+    "using": {
         "program": {
             "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
             "name": "devtools",

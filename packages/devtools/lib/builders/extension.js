@@ -1,23 +1,22 @@
 
-
 function dump(obj) { print(require('test/jsdump').jsDump.parse(obj)) };
 
-var BUILDER = require("builder", "http://registry.pinf.org/cadorn.org/github/pinf/packages/common/");
+
+var BUILDER = require("builder/program", "http://registry.pinf.org/cadorn.org/github/pinf/packages/common/");
 var PROGRAM = require("../build/extension/program");
 var ARGS = require("args");
 
 
-var Builder = exports.Builder = function(pkg, options) {
-    if (!(this instanceof exports.Builder))
-        return new exports.Builder(pkg, options);
-    this.construct(pkg, options);
+var ProgramBuilder = exports.ProgramBuilder = function() {
+    if (!(this instanceof exports.ProgramBuilder))
+        return new exports.ProgramBuilder();
 }
 
-Builder.prototype = BUILDER.Builder();
+ProgramBuilder.prototype = BUILDER.ProgramBuilder();
 
 
+ProgramBuilder.prototype.build = function(buildOptions) {
 
-Builder.prototype.build = function(targetPackage, buildOptions) {
 
     // TODO: print out help info if applicable
 
@@ -32,9 +31,7 @@ Builder.prototype.build = function(targetPackage, buildOptions) {
         }
     }
 
-    buildOptions.builder = this;
-
-    var program = PROGRAM.Program(targetPackage, buildOptions);
+    var program = PROGRAM.Program(this, buildOptions);
     
     if(buildOptions.remoteProgram) {
         program.dist({
@@ -43,4 +40,5 @@ Builder.prototype.build = function(targetPackage, buildOptions) {
     } else {
         program.build();
     }
+
 }

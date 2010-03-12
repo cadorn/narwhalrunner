@@ -1,4 +1,4 @@
 /*PINF_MACRO[NarwhalShebang]*/
 /*PINF_MACRO[LoadCommandEnvironment]*/
 
-require("devtools", "devtools").main(system.args);
+require("devtools", "registry.pinf.org/cadorn.org/github/narwhalrunner/packages/devtools/master").main(system.args);

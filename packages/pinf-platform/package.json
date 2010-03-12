@@ -8,12 +8,14 @@
             "path": "packages/pinf-platform"
         }
     ],
-    "pinf": {
-        "programs": {
-            "devtools": {
-                "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
-                "name": "devtools",
-                "revision": "master"
+    "implements": {
+        "http://registry.pinf.org/cadorn.org/github/pinf/@meta/platform/package/0.1.0": {
+            "programs": {
+                "devtools": {
+                    "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/programs/catalog.json",
+                    "name": "devtools",
+                    "revision": "master"
+                }
             }
         }
     }

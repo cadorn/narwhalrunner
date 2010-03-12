@@ -38,20 +38,24 @@
             "revision": "master"
         }
     },
+    "implements": {
+        "http://registry.pinf.org/cadorn.org/github/pinf/@meta/package/0.1.0": {
+            "programs": {
+                "narwhal-rhino": {
+                    "catalog": "http://registry.pinf.org/cadorn.org/github/platforms/packages/narwhal/packages/catalog.json",
+                    "name": "rhino",
+                    "revision": "master"
+                }
+            },
+            "commands": {
+                "nr": {
+                    "path": "bin/nr",
+                    "program": "narwhal-rhino"
+                }
+            }
+        }
+    },
     "pinf": {
-        "platforms": {
-            "narwhal-rhino": {
-                "catalog": "http://registry.pinf.org/cadorn.org/github/platforms/packages/narwhal/packages/catalog.json",
-                "name": "rhino",
-                "revision": "master"
-            }
-        },
-        "commands": {
-            "nr": {
-                "path": "bin/nr",
-                "platform": "narwhal-rhino"
-            }
-        },
         "builder": {
             "catalog": "http://registry.pinf.org/cadorn.org/github/pinf/packages/catalog.json",
             "name": "common",

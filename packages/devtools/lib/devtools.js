@@ -216,10 +216,13 @@ command = parser.command('populate-profile', function(options) {
         })),
         path;
 
+    path = pkg.getBuildPath();
+/*
     path = pkg.build({
         "remoteProgram": false,
         "remoteDependencies": false
     });
+*/
 
     path.join("extension").symlink(targetPath);
     print("Linked extension '" + id + "' from '" + path.join("extension") + "' to: " + targetPath);
@@ -522,14 +525,15 @@ function buildAtPath(path) {
             locator.setRevision(workspace.getRevisionControlBranch());
         
             var pkg = PINF.getDatabase().getProgram(locator),
-                buildPath = PINF.getDatabase().getBuildPathForPackage(pkg);
-    
+                buildPath = pkg.getBuildPath();
+/*    
+TODO: Reimplement
             buildPath = pkg.build({
                 "path": buildPath,
                 "remoteProgram": false,
                 "remoteDependencies": false
             });
-            
+*/            
             return buildPath;
         }
     } catch(e) {}

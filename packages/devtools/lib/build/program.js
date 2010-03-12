@@ -12,22 +12,39 @@ var BUILD_UTIL = require("./util");
 var PACKAGE = require("package", "common");
 var ARGS = require('args');
 var PACKAGES = require("packages");
-var LOCATOR = require("package/locator", "http://registry.pinf.org/cadorn.org/github/pinf/packages/common/");
-
+var LOCATOR = require("package/locator", "pinf");
+var PINF = require("pinf", "pinf");
+var TERM = require("term");
 
 // TODO: Refactor for clarity and simplicity
 
-exports.Program = function(program, buildOptions) {
+exports.Program = function(builder, buildOptions) {
+
+
+TERM.stream.print("\0green(*** Building narwhalrunner program ***\0)");
+TERM.stream.print("\0green(    sourcePackage: "+builder.sourcePackage.getPath()+"\0)");
+TERM.stream.print("\0green(    rawPackage   : "+builder.rawPackage.getPath()+"\0)");
+TERM.stream.print("\0green(    targetPackage: "+builder.targetPackage.getPath()+"\0)");
+    
+
+
+    var locator = builder.rawPackage.getDescriptor().getUsingLocatorForName("extension");
+    var program = PINF.getPackageForLocator(locator);
+    
+
+    
+
+    
 
     // PRIVATE
 
     var rawPackageStore = {
         "get": function(locator) {
             if(locator.getForceRemote()) {
-                var pkg = buildOptions.builder.getPackageForLocator(locator);
+                var pkg = PINF.getPackageForLocator(locator);
                 return PACKAGE.Package(pkg.getPath());
             }
-            return PACKAGE.Package(program.getBuildPath().join("raw", "using", locator.getFsPath()), locator);
+            return PACKAGE.Package(builder.rawPackage.getPath().join("using", locator.getFsPath()), locator);
         }
     }
     
@@ -72,7 +89,7 @@ exports.Program = function(program, buildOptions) {
 
 
 
-    var buildPath = program.getBuildPath();
+//    var buildPath = program.getBuildPath();
 
 
     var Program = {};
@@ -82,7 +99,8 @@ exports.Program = function(program, buildOptions) {
     Program.platformPackage = platformPackage;
     
     Program.getTargetPath = function() {
-        return buildPath.join(Program.getBuildSubPath());
+        
+        return builder.targetPackage.getPath();
     }
 
 
@@ -111,7 +129,7 @@ exports.Program = function(program, buildOptions) {
 
 // HACK: This is temporary until the program package is a "using" package as well        
         OS.command("rm -Rf " + sourcePath.join("packages", programPackage.getName(), "packages"));
-        var fromPath = program.getBuildPath().join("raw", "package.json"),
+        var fromPath = builder.rawPackage.getPath().join("package.json"),
             toPath = sourcePath.join("packages", programPackage.getName(), "package.json");
         toPath.remove();
         fromPath.copy(toPath);
@@ -393,7 +411,7 @@ exports.Program = function(program, buildOptions) {
 
 
         // link using packages
-        fromPath = buildPath.join("raw", "using");
+        fromPath = builder.rawPackage.getPath().join("using");
         toPath = usingPath;
         if(!toPath.exists()) {
             toPath.dirname().mkdirs();    
