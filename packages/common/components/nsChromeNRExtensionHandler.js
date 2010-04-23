@@ -339,7 +339,8 @@ ChromeExtensionHandler.prototype = {
   processRequest: function(handler, uri) {
 
     var env = {};
-        
+    
+    // JSGI 0.2
     env["REQUEST_METHOD"] = "GET";
     env["REQUEST_URI"] = uri.spec.substr(uri.prePath.length);
     env["SERVER_PROTOCOL"] = "HTTP/1.1";
@@ -359,6 +360,10 @@ ChromeExtensionHandler.prototype = {
     env["jack.multiprocess"] = true;
     env["jack.run_once"] = false;
     env["jack.url_scheme"] = "http"; // FIXME
+
+    // JSGI 0.3
+    env.pathInfo = parts[1];
+    // TODO: other variables
 
     // call the app
     var result = null;

@@ -523,18 +523,15 @@ function buildAtPath(path) {
             workspace = PINF.getDatabase().getWorkspaceForSelector(path);
         if(locator) {
             locator.setRevision(workspace.getRevisionControlBranch());
-        
-            var pkg = PINF.getDatabase().getProgram(locator),
-                buildPath = pkg.getBuildPath();
-/*    
-TODO: Reimplement
-            buildPath = pkg.build({
-                "path": buildPath,
+
+            var database = PINF.getDatabase();
+    
+            var pkg = database.buildProgram(locator, {
                 "remoteProgram": false,
                 "remoteDependencies": false
             });
-*/            
-            return buildPath;
+
+            return pkg.getBuildPath();
         }
     } catch(e) {}
 

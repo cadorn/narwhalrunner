@@ -13,6 +13,7 @@ var STRUCT = require("struct");
 var MD5 = require("md5");
 var STRUCT = require("struct");
 var PACKAGES = require("packages");
+var SYSTEM = require("system");
 
 var CACHE = require("./cache");
 var PACKAGE = require("./package");
@@ -22,9 +23,11 @@ var CONTAINER = require("./container");
 var CHROME = require("./chrome");
 
 var SANDBOX = require("sandbox");
+var LOADER = require("loader");
 
+var APPS = require("./apps");
 
-const RELOAD_ROUTE_RESPONDERS = true;
+const RELOAD_ROUTE_RESPONDERS = false;
 
 
 var App = exports.App = function (packageName) {
@@ -204,34 +207,67 @@ App.prototype.registerProtocolHandler = function() {
                     self.routes[packageRefId].forEach(function(info) {
                         if(responderApp) return;
                         if(info.route.test(pathInfo)) {
+
                             if(RELOAD_ROUTE_RESPONDERS) {
+/*                            
+ONE POSSIBLE SOLUTION:
                                 // create a sandbox to allow for reloading                    
                                 var modules = {
-                                    "system": system,
+                                    "system": SYSTEM,
                                     "jar-loader": require("jar-loader")
                                 };
+                                var loader = LOADER.Loader({
+                                    "paths": [
+                                        "chrome://narwhal-xulrunner/content/lib",
+                                        "chrome://narwhal-xulrunner/content/narwhal/engines/default/lib",
+                                        "chrome://narwhal-xulrunner/content/narwhal/lib"
+                                    ]
+                                });
                                 try {
                                     // some wildfire modules need to be singletons and survive reloads
                                     modules["wildfire"] = require("wildfire");
                                     modules["wildfire/binding/jack"] = require("wildfire/binding/jack");
                                 } catch(e) {}
                                 var sandbox = SANDBOX.Sandbox({
-                                    "system": system,
-                                    "loader": require.loader,
+                                    "system": SYSTEM,
+                                    "loader": loader,
                                     "debug": require.loader.debug,
                                     "modules": modules
                                 });
                                 responderApp = sandbox(info.module, null, info["package"]).app;
+ANOTHER POSSIBLE SOLUTION (preferred):
+                                var sandbox = {};
+                                Components.utils.import('resource://narwhal-xulrunner/sandbox.js', sandbox);
+                            
+                                // TODO: Add named sub-sandbox support to support dynamic reloading of a given set of modules
+                                var requestProgram = sandbox.get({
+                                    "type": "extension",
+                                    "id": self.program.id
+                                });
+                            
+                                responderApp = requestProgram.require(info.module, info["package"]).app;
+*/                            
                             } else {
                                 responderApp = require(info.module, info["package"]).app;
                             }
                         }
                     });
                     if(responderApp) {
+
                         var result = responderApp(chromeEnv);
-                        // base64 encode the body
-                        for( var i=0 ; i<result.body.length ; i++ ) {
-                            result.body[i] = BASE64.encode(result.body[i]);
+                        
+                        if(UTIL.isArrayLike(result.body)) {
+                            // base64 encode the body
+                            for( var i=0 ; i<result.body.length ; i++ ) {
+                                result.body[i] = BASE64.encode(result.body[i]);
+                            }
+                        } else
+                        if(UTIL.has(result.body, "forEach")) {
+                            var buffer = [];
+                            result.body.forEach(function(str) {
+                                buffer.push(str);
+                            });
+                            result.body = [BASE64.encode(buffer.join(""))];
                         }
                         return result;
                     }
@@ -313,6 +349,8 @@ App.prototype.registerProtocolHandler = function() {
                     case "js":
                         if(!UTIL.has(info, "contentType")) info.contentType = "application/x-javascript";
     
+                    case "json":
+                        if(!UTIL.has(info, "contentType")) info.contentType = "application/json";
     
                     if(!UTIL.has(info, "binary")) info.binary = false;
     
@@ -386,7 +424,7 @@ App.prototype.registerProtocolHandler = function() {
             wrappedJSObject.registerExtension(protocolHandler);
 }
 
-App.prototype.start = function(type, loaderWindow, args) {
+App.prototype.start = function(type, loaderWindow, args, program) {
     var self = this;
 
     if(self.status) {
@@ -397,10 +435,15 @@ App.prototype.start = function(type, loaderWindow, args) {
     self.status = "starting";
     self.type = type;
     self.loaderWindow = loaderWindow;
+    self.program = program;
 
     // Call the main.js module of the app once the loaderWindow is completely loaded
     self.onLoaderWindowLoad = function() {
-        self.programModule = require("main", self.manifest.name);
+        
+        // TODO: revision ("master") needs to be dynamically determined
+print("\n\n"+"LAUNCH: "+self.pkg.getTopLevelId() + "/master"+"\n\n");        
+
+        self.programModule = require("main", self.pkg.getTopLevelId() + "/master");
 
         try {
             self.programModule.main(args);
@@ -420,6 +463,17 @@ App.prototype.started = function() {
     if(this.type=="application" && this.loaderWindow) {
         this.loaderWindow.close();
     }
+
+    var self = this;
+    this.program.onAllReady = function() {
+        APPS.triggerAllReady(self);
+    }
+    // notify the narwhal-xulrunner sandbox program that we are ready
+    this.program.ready();
+}
+
+App.prototype.getProgram = function() {
+    return this.program;
 }
 
 App.prototype.onNewChrome = function(chrome) {

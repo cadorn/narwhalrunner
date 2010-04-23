@@ -76,8 +76,11 @@ TERM.stream.print("\0green(    targetPackage: "+builder.targetPackage.getPath()+
     info["Version"] = version;
 
 
+
     // determine common and platform packages
-    var commonPackage = rawPackageStore.get(buildOptions.uidLocators["http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/common/"]),
+//    var commonPackage = rawPackageStore.get(buildOptions.uidLocators["http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/common/"]),
+    // TODO: Ensure the locator being fetched is the corrent one when remote dependencies/versions are used
+    var commonPackage = rawPackageStore.get(programPackage.getDescriptor().getUsingLocatorForName("nr-common")),
         platformPackage = PACKAGE.Package(PACKAGES.usingCatalog[module["using"][info["Type"]]].directory);
 
 
