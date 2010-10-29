@@ -1,0 +1,31 @@
+{
+    "uid": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/programs/test-firefox-extension/",
+    "name": "test-firefox-extension",
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git://github.com/cadorn/narwhalrunner.git",
+            "path": "programs/test-firefox-extension"
+        }
+    ],
+    "using": {
+        "extension": {
+            "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
+            "name": "test-firefox-extension",
+            "revision": "master"
+        }
+    },
+    "implements": {
+        "http://registry.pinf.org/cadorn.org/github/pinf/@meta/program/package/0.1.0": {
+            "defaultBuilder": "extension",
+            "builders": {
+                "extension": {
+                    "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
+                    "name": "devtools",
+                    "revision": "master",
+                    "module": "builders/extension"
+                }
+            }
+        }
+    }
+}
