@@ -68,6 +68,13 @@ Examples
 You can find more sample applications and extensions in the [narwhalrunner-examples](http://github.com/cadorn/narwhalrunner-examples) project.    
 
 
+Preferences
+===========
+
+    extensions.XXX.NR_forceReloadDynamicProtocolResources: [true|false]
+
+
+
 Links
 =====
 

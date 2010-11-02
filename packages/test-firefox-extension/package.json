@@ -1,13 +1,20 @@
 {
     "uid": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/test-firefox-extension/",
     "name": "test-firefox-extension",
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git://github.com/cadorn/narwhalrunner.git",
+            "path": "packages/test-firefox-extension"
+        }
+    ],
     "using": {
-        "extension": {
+        "nr-extension": {
             "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
             "name": "extension",
             "revision": "master"
         },
-        "common": {
+        "nr-common": {
             "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
             "name": "common",
             "revision": "master"
@@ -18,32 +25,11 @@
         "InternalName": "narwhalrunner-test-firefox-extension",
         "ID": "test-firefox-extension@narwhalrunner.cadorn.github.com",
         "Name": "NarwhalRunner Test",
-        "Version": "0.1",
-        "Release": "",
+        "Vendor": "Christoph Dorn",
         "Creator": "Christoph Dorn",
         "Copyright": "Copyright (c) 2009-2010 Christoph Dorn",
         "Description": "A NarwhalRunner firefox extension for testing",
         "HomepageURL": "http://github.com/cadorn/narwhalrunner",
-        "IconURL": "",
-        "OptionsURL": "",
-        "UpdateURL": "",
-        "UpdateKey": "",
-        "UpdateLinkURL": "",
-        "UpdateInfoURL": ""
-    },
-    "pinf": {
-        "builder": {
-            "catalog": "http://registry.pinf.org/cadorn.org/github/narwhalrunner/packages/catalog.json",
-            "name": "devtools",
-            "revision": "master",
-            "module": "builders/extension"
-        }
-    },
-    "repositories": [
-        {
-            "type": "git",
-            "url": "git://github.com/cadorn/narwhalrunner.git",
-            "path": "packages/test-firefox-extension"
-        }
-    ]
+        "IconURL": ""
+    }
 }

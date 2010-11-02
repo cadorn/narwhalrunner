@@ -1,5 +1,5 @@
 
-var APP = require("app", "common").getApp();
+var APP = require("app", "nr-common").getApp();
 
 exports.main = function() {
     
