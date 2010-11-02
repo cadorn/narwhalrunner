@@ -16,12 +16,15 @@
 
         <em:homepageURL>%%Program.HomepageURL%%</em:homepageURL>
         <em:iconURL>%%Program.IconURL%%</em:iconURL>
+        
+<!--
         <em:optionsURL>%%Program.OptionsURL%%</em:optionsURL>
+-->
 
         <em:targetApplication>
             <RDF:Description>
                 <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-                <em:maxVersion>3.6.*</em:maxVersion>
+                <em:maxVersion>4.*</em:maxVersion>
                 <em:minVersion>3.0</em:minVersion>
             </RDF:Description>
         </em:targetApplication>

@@ -85,7 +85,7 @@ TERM.stream.print("\0green(    targetPackage: "+builder.targetPackage.getPath()+
 
 
     info["CommonPackage.ReferenceId"] = commonPackage.setAppInfo(info).getReferenceId();
-    info["ProgramPackage.Id"] = programPackage.getUid();
+    info["ProgramPackage.Id"] = programPackage.getTopLevelId();//getUid();
     programPackage.setAppInfo(info);
     platformPackage.setAppInfo(info);
     commonPackage.setAppInfo(info);
@@ -193,7 +193,7 @@ TERM.stream.print("\0green(    targetPackage: "+builder.targetPackage.getPath()+
     Program.buildStatic = function(options) {
         
         options = options || {};
-        if(!options["chrome.manifest.type"]) options["chrome.manifest.type"] = "Manifest";
+//        if(!options["chrome.manifest.type"]) options["chrome.manifest.type"] = "Manifest";
         
         var parts = [
                 "chromeOverlay",
@@ -222,7 +222,8 @@ TERM.stream.print("\0green(    targetPackage: "+builder.targetPackage.getPath()+
 
             var pkgId = pkg.getUid();
 
-            vars["module[package]"] = pkgId;
+//            vars["module[package]"] = pkgId;
+            vars["module[package]"] = pkg.getTopLevelId();
             
             // copy files that cannot be dynamically loaded
             parts.forEach(function(part) {
@@ -347,7 +348,10 @@ TERM.stream.print("\0green(    targetPackage: "+builder.targetPackage.getPath()+
 
 
         // write chrome manifest files
-        [options["chrome.manifest.type"]].forEach(function(manifestType) {
+        [
+            "Manifest",
+            "JarredManifest"
+        ].forEach(function(manifestType) {
             toPath = Program["getChrome" + manifestType + "Path"]();
             var templateVars = { "build": {"dependencies": []} };
             var rootTemplate;
@@ -404,6 +408,8 @@ TERM.stream.print("\0green(    targetPackage: "+builder.targetPackage.getPath()+
             toPath;
 
         // link program package
+/*        
+Program package is now a using package
         fromPath = programPackage.getPath();
         toPath = packagesPath.join(programPackage.getName());
         if(!toPath.exists()) {
@@ -411,7 +417,7 @@ TERM.stream.print("\0green(    targetPackage: "+builder.targetPackage.getPath()+
             fromPath.symlink(toPath);
         }
         print("Linked '" + toPath + "' to '" + fromPath + "'");    
-
+*/
 
         // link using packages
         fromPath = builder.rawPackage.getPath().join("using");

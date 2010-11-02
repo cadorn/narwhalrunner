@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------
- * nsChromeExtensionHandler
+ * nsChromeAExtensionHandler
  * By Ed Anuff <ed@anuff.com>
  *
  * Last modified: 04/13/2005 15:49 PST
@@ -54,7 +54,7 @@
  *
  *
  * For many extensions, using data: URLs to pass content back through
- * the ChromeExtensionHandler is the easiest mechanism.  See the following page
+ * the ChromeAExtensionHandler is the easiest mechanism.  See the following page
  * for more information on constructing data: URLs:
  *
  *  http://www.mozilla.org/quality/networking/testing/datatests.html
@@ -104,6 +104,9 @@ const nsIStandardURL = Components.interfaces.nsIStandardURL;
 const nsISupports = Components.interfaces.nsISupports;
 const nsIURI = Components.interfaces.nsIURI;
 
+Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+
+
 var tracingEnabled = false;
 
 function trace(msg) {
@@ -152,22 +155,41 @@ var ChromeExtensionModule = {
         throw Components.results.NS_ERROR_NO_AGGREGATION;
       }
                         
-      return new ChromeExtensionHandler().QueryInterface(iid);
+      return new ChromeAExtensionHandler().QueryInterface(iid);
     }
   }
 };
 
-function NSGetModule(compMgr, fileSpec) {
-    return ChromeExtensionModule;
+
+/**
+* XPCOMUtils.generateNSGetFactory was introduced in Mozilla 2 (Firefox 4).
+* XPCOMUtils.generateNSGetModule is for Mozilla 1.9.2 (Firefox 3.6).
+*/
+if (XPCOMUtils.generateNSGetFactory) {
+    dump("[narwhalrunner][nsChromeNRAExtensionHandler] XPCOMUtils.generateNSGetFactory\n");
+    let classes = {};
+    classes[ChromeExtensionModule.cid] = ChromeExtensionModule.myFactory;
+    var NSGetFactory = function(cid) {
+      let cidstring = cid.toString();
+      if (cidstring in classes)
+        return classes[cidstring];
+      throw Cr.NS_ERROR_FACTORY_NOT_REGISTERED;
+    }
+} else {
+    function NSGetModule(compMgr, fileSpec) {
+        return ChromeExtensionModule;
+    }
 }
+
+
 
 /*----------------------------------------------------------------------
  * The ChromeExtension Handler
  *----------------------------------------------------------------------
  */
 
-function ChromeExtensionHandler() {
-  trace("[ChromeExtensionHandler.<init>]");
+function ChromeAExtensionHandler() {
+  trace("[ChromeAExtensionHandler.<init>]");
   
   this.wrappedJSObject = this;
   
@@ -204,7 +226,7 @@ function ChromeExtensionHandler() {
 */  
 }
 
-ChromeExtensionHandler.prototype = {
+ChromeAExtensionHandler.prototype = {
 
   scheme: kSCHEME,
   
@@ -218,25 +240,25 @@ ChromeExtensionHandler.prototype = {
     var ext_spec = kSCHEME + "://" + ext.internalAppName + "/";
     ext_spec = ext_spec.toLowerCase();
     
-    trace("[ChromeExtensionHandler.registerExtension] " + ext_spec);
+    trace("[ChromeAExtensionHandler.registerExtension] " + ext_spec);
 
     if (this._extensions[ext_spec] != null) {
-      trace("[ChromeExtensionHandler.registerExtension] failed - extension already registered: " + ext_spec);
+      trace("[ChromeAExtensionHandler.registerExtension] failed - extension already registered: " + ext_spec);
     }
     else {
       this._extensions[ext_spec] = ext;
-      trace("[ChromeExtensionHandler.registerExtension] extension registered: " + ext_spec);
+      trace("[ChromeAExtensionHandler.registerExtension] extension registered: " + ext_spec);
     }
   },
   
   allowPort : function(port, scheme) {
-    trace("[ChromeExtensionHandler.allowPort]");
+    trace("[ChromeAExtensionHandler.allowPort]");
     
     return false;
   },
   
   newURI : function(spec, charset, baseURI) {
-    trace("[ChromeExtensionHandler.newURI] " + spec);
+    trace("[ChromeAExtensionHandler.newURI] " + spec);
       
     var new_url = Components.classes[kSTANDARDURL_CONTRACTID].createInstance(nsIStandardURL);
     new_url.init(kURLTYPE_STANDARD, -1, spec, charset, baseURI);    
@@ -246,7 +268,7 @@ ChromeExtensionHandler.prototype = {
   },
   
   newChannel : function(uri) {
-    trace("[ChromeExtensionHandler.newChannel] new channel requested for: " + uri.spec);
+    trace("[ChromeAExtensionHandler.newChannel] new channel requested for: " + uri.spec);
 
     var chrome_service = Components.classesByID[kCHROMEHANDLER_CID_STR].getService();
     chrome_service = chrome_service.QueryInterface(nsIProtocolHandler);
@@ -261,48 +283,48 @@ ChromeExtensionHandler.prototype = {
         
         if (uri_string.indexOf(ext_spec) == 0) {
 
-          trace("[ChromeExtensionHandler.newChannel] matched to registered extension: " + ext_spec);
+          trace("[ChromeAExtensionHandler.newChannel] matched to registered extension: " + ext_spec);
 
           if (this._system_principal == null) {
-            trace("[ChromeExtensionHandler.newChannel] no system principal cached");
+            trace("[ChromeAExtensionHandler.newChannel] no system principal cached");
 
             var ioService = Components.classesByID[kIOSERVICE_CID_STR].getService();
             ioService = ioService.QueryInterface(nsIIOService);
 
             var chrome_uri_str = kDUMMY_CHROME_URL;
 
-            trace("[ChromeExtensionHandler.newChannel] spoofing chrome channel to URL: " + chrome_uri_str);
+            trace("[ChromeAExtensionHandler.newChannel] spoofing chrome channel to URL: " + chrome_uri_str);
             
             var chrome_uri = chrome_service.newURI(chrome_uri_str, null, null);
             var chrome_channel = chrome_service.newChannel(chrome_uri);
 
-            trace("[ChromeExtensionHandler.newChannel] retrieving system principal from chrome channel");
+            trace("[ChromeAExtensionHandler.newChannel] retrieving system principal from chrome channel");
             
             this._system_principal = chrome_channel.owner;
 
             var chrome_request = chrome_channel.QueryInterface(nsIRequest);
             chrome_request.cancel(kNS_BINDING_ABORTED);
             
-            trace("[ChromeExtensionHandler.newChannel] system principal is cached");
+            trace("[ChromeAExtensionHandler.newChannel] system principal is cached");
             
           }
 
-          trace("[ChromeExtensionHandler.newChannel] retrieving extension channel for: " + ext_spec);
+          trace("[ChromeAExtensionHandler.newChannel] retrieving extension channel for: " + ext_spec);
           
           var ext_channel = this.processRequest(ext, uri); //ext.newChannel(uri);
 
           if (this._system_principal != null) {
-            trace("[ChromeExtensionHandler.newChannel] applying cached system principal to extension channel");
+            trace("[ChromeAExtensionHandler.newChannel] applying cached system principal to extension channel");
             
             ext_channel.owner = this._system_principal;
           }
           else {
-            trace("[ChromeExtensionHandler.newChannel] no cached system principal to apply to extension channel");
+            trace("[ChromeAExtensionHandler.newChannel] no cached system principal to apply to extension channel");
           }
 
           ext_channel.originalURI = uri;
 
-          trace("[ChromeExtensionHandler.newChannel] returning extension channel for: " + ext_spec);
+          trace("[ChromeAExtensionHandler.newChannel] returning extension channel for: " + ext_spec);
           
           return ext_channel;
 
@@ -310,25 +332,25 @@ ChromeExtensionHandler.prototype = {
 
       }
     
-      trace("[ChromeExtensionHandler.newChannel] passing request through to ChromeProtocolHandler::newChannel");
-      trace("[ChromeExtensionHandler.newChannel] requested uri = " + uri.spec);
+      trace("[ChromeAExtensionHandler.newChannel] passing request through to ChromeProtocolHandler::newChannel");
+      trace("[ChromeAExtensionHandler.newChannel] requested uri = " + uri.spec);
       
       if (uri_string.indexOf("chrome") != 0) {
         uri_string = uri.spec;
         uri_string = "chrome" + uri_string.substring(uri_string.indexOf(":"));
         
-        trace("[ChromeExtensionHandler.newChannel] requested uri fixed = " + uri_string);
+        trace("[ChromeAExtensionHandler.newChannel] requested uri fixed = " + uri_string);
         
         uri = chrome_service.newURI(uri_string, null, null);
         
-        trace("[ChromeExtensionHandler.newChannel] requested uri canonified = " + uri.spec);
+        trace("[ChromeAExtensionHandler.newChannel] requested uri canonified = " + uri.spec);
         
       }
       
       new_channel = chrome_service.newChannel(uri);
       
     } catch (e) {
-      trace("[ChromeExtensionHandler.newChannel] error - NS_ERROR_FAILURE");
+      trace("[ChromeAExtensionHandler.newChannel] error - NS_ERROR_FAILURE");
       
       throw Components.results.NS_ERROR_FAILURE;
     }
@@ -430,15 +452,17 @@ ChromeExtensionHandler.prototype = {
   },
   
   QueryInterface : function(iid) {
-    trace("[ChromeExtensionHandler.QueryInterface]");
+    trace("[ChromeAExtensionHandler.QueryInterface]");
 
     if (!iid.equals(Components.interfaces.nsIProtocolHandler) &&
       !iid.equals(Components.interfaces.nsISupports)) {
       
-      trace("[ChromeExtensionHandler.QueryInterface] error - NS_ERROR_NO_INTERFACE " + iid);
+      trace("[ChromeAExtensionHandler.QueryInterface] error - NS_ERROR_NO_INTERFACE " + iid);
       
       throw Components.results.NS_ERROR_NO_INTERFACE;
     }
     return this;
   }
 };
+
+

@@ -41,6 +41,7 @@ exports.Package = function (packagePath, locator) {
      */
     // TODO: Move to super and rename to getIdHash() based on this.id only
     Package.getReferenceId = function() {
+//        return STRUCT.bin2hex(MD5.hash(appInfo.InternalName + ":" + Package.getTopLevelId()));
         return STRUCT.bin2hex(MD5.hash(appInfo.InternalName + ":" + Package.getUid()));
     }
     Package.getPackagePrefix = function() {
@@ -49,6 +50,14 @@ exports.Package = function (packagePath, locator) {
     
     Package.getContentBaseUrl = function() {
         return "narwhalrunner://" + appInfo.InternalName + "/" + Package.getReferenceId() + "/content/";
+    }
+    
+    Package.getRoutedBaseUrl = function() {
+        return "narwhalrunner://" + appInfo.InternalName + "/" + Package.getReferenceId() + "/";
+    }
+    
+    Package.getSkinBaseUrl = function() {
+        return "chrome://" + appInfo.InternalName + "/skin/" + Package.getReferenceId() + "/";
     }
     
     Package.getTemplateVariables = function(commonPackage) {
@@ -63,14 +72,14 @@ exports.Package = function (packagePath, locator) {
             "Package.ChromeResourcesBaseURL": "resource://" + appInfo.InternalName + "-resources/" + id + "/",
             "Package.ModulesBaseURL": "resource://" + appInfo.InternalName + "-modules/" + id + "/",
             "Package.LocaleBaseURL": "chrome://" + appInfo.InternalName + "/locale/" + id + "/",
-            "Package.SkinBaseURL": "chrome://" + appInfo.InternalName + "/skin/" + id + "/",
+            "Package.SkinBaseURL": Package.getSkinBaseUrl(),
 
             "Package.ContentBaseURL": Package.getContentBaseUrl(),
             "Package.AccessibleContentBaseURL": "narwhalrunner-accessible://" + appInfo.InternalName + "/" + Package.getReferenceId() + "/content-accessible/",
             
             "Package.ResourcesBaseURL": "narwhalrunner://" + appInfo.InternalName + "/" + id + "/resources/",
 
-            "Package.RoutedBaseURL": "narwhalrunner://" + appInfo.InternalName + "/" + id + "/",
+            "Package.RoutedBaseURL": Package.getRoutedBaseUrl(),
 
             "Program.NarwhalURL": "chrome://" + appInfo.InternalName + "-overlay/content/" + appInfo["CommonPackage.ReferenceId"] + "/narwhal.js",
             "Program.NarwhalizeURL": "chrome://" + appInfo.InternalName + "-overlay/content/" + appInfo["CommonPackage.ReferenceId"] + "/narwhalize.js",

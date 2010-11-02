@@ -21,14 +21,24 @@ Cache.prototype.getPathForKey = function(key) {
 }
 
 Cache.prototype.getObject = function(key) {
+    var str = this.getString(key);
+    if(!str) return false;
+    return JSON.decode(str);
+}
+
+Cache.prototype.setObject = function(key, obj) {
+    this.setString(key, JSON.encode(obj, null, "    "));
+}
+
+Cache.prototype.getString = function(key) {
     var path = this.getPathForKey(key);
     if(!path.exists()) {
         return false;
     }
-    return JSON.decode(path.read());
+    return path.read();
 }
 
-Cache.prototype.setObject = function(key, obj) {
+Cache.prototype.setString = function(key, obj) {
     var path = this.getPathForKey(key);
     if(!path.dirname().exists()) {
         path.dirname().mkdirs();
@@ -36,5 +46,5 @@ Cache.prototype.setObject = function(key, obj) {
     if(path.exists()) {
         path.remove();
     }
-    path.write(JSON.encode(obj, null, "    "));
+    path.write(obj);
 }

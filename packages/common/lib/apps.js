@@ -8,12 +8,20 @@ exports.triggerAllReady = function(app) {
     APP.getProgram().onGlobalEvent(function(globalEvent) {
         if(onEventCallbacks[globalEvent.name]) {
             onEventCallbacks[globalEvent.name].forEach(function(callback) {
-                callback(globalEvent.app, globalEvent.event);
+                try {
+                    callback(globalEvent.app, globalEvent.event);
+                } catch(e) {
+                    system.log.error(e);
+                }
             });
         }
     });
     onReadyCallbacks.forEach(function(callback) {
-        callback();
+        try {
+            callback();
+        } catch(e) {
+            system.log.error(e);
+        }
     });
     onReadyCallbacks = [];
 }

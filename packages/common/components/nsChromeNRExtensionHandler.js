@@ -104,6 +104,9 @@ const nsIStandardURL = Components.interfaces.nsIStandardURL;
 const nsISupports = Components.interfaces.nsISupports;
 const nsIURI = Components.interfaces.nsIURI;
 
+Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+
+
 var tracingEnabled = false;
 
 function trace(msg) {
@@ -112,54 +115,7 @@ function trace(msg) {
   }
 };
 
-var ChromeExtensionModule = {
-  
-  /* CID for this class */
-  cid: kPROTOCOL_CID,
 
-  /* Contract ID for this class */
-  contractId: kPROTOCOL_CONTRACTID,
-
-  registerSelf : function(compMgr, fileSpec, location, type) {
-    compMgr = compMgr.QueryInterface(nsIComponentRegistrar);
-    compMgr.registerFactoryLocation(
-      kPROTOCOL_CID, 
-      kPROTOCOL_NAME, 
-      kPROTOCOL_CONTRACTID, 
-      fileSpec, 
-      location,
-      type
-    );
-  },
-  
-  getClassObject : function(compMgr, cid, iid) {
-    if (!cid.equals(kPROTOCOL_CID)) {
-      throw Components.results.NS_ERROR_NO_INTERFACE;
-    }
-    if (!iid.equals(nsIFactory)) {
-      throw Components.results.NS_ERROR_NOT_IMPLEMENTED;
-    }
-    return this.myFactory;
-  },
-  
-  canUnload : function(compMgr) {
-    return true;
-  },
-  
-  myFactory : {
-    createInstance : function(outer, iid) {
-      if (outer != null) {
-        throw Components.results.NS_ERROR_NO_AGGREGATION;
-      }
-                        
-      return new ChromeExtensionHandler().QueryInterface(iid);
-    }
-  }
-};
-
-function NSGetModule(compMgr, fileSpec) {
-    return ChromeExtensionModule;
-}
 
 /*----------------------------------------------------------------------
  * The ChromeExtension Handler
@@ -174,37 +130,20 @@ function ChromeExtensionHandler() {
   this._system_principal = null;
   
   this._extensions = new Object();
-
-/*  
-  var TestExt = {
-    pkg : "test",
-    
-    path : "test.xul",
-    
-    newChannel : function(uri) {
-    
-      var ioService = Components.classesByID[kIOSERVICE_CID_STR].getService();
-      ioService = ioService.QueryInterface(nsIIOService);
-
-      var uri_str = "data:,ChromeExtension%20test%20content";
-      
-      var ext_uri = ioService.newURI(uri_str, null, null);
-      var ext_channel = ioService.newChannelFromURI(ext_uri);
-      
-      return ext_channel;
-      
-    }  
-  };
-  
-  var TestExtSpec = kSCHEME + "://" + TestExt.pkg + "/content/" + TestExt;
-//  var TestExtSpec = kSCHEME + "://" + TestExt.pkg + "/content/" + TestExt.path;
-  TestExtSpec = TestExtSpec.toLowerCase();
-
-  this._extensions[TestExtSpec] = TestExt;
-*/  
 }
 
 ChromeExtensionHandler.prototype = {
+
+  classDescription: kPROTOCOL_NAME,  
+  classID:          kPROTOCOL_CID,  
+  contractID:       kPROTOCOL_CONTRACTID,  
+
+  _xpcom_categories: [{  
+     category: "JavaScript-global-privileged-property",
+     entry: "global",
+     service: true,  
+  }],
+
 
   scheme: kSCHEME,
   
@@ -442,3 +381,20 @@ ChromeExtensionHandler.prototype = {
     return this;
   }
 };
+
+
+
+
+/**
+* XPCOMUtils.generateNSGetFactory was introduced in Mozilla 2 (Firefox 4).
+* XPCOMUtils.generateNSGetModule is for Mozilla 1.9.2 (Firefox 3.6).
+*/
+var components = [ChromeExtensionHandler];
+if (XPCOMUtils.generateNSGetFactory) {
+    dump("[narwhalrunner][ChromeExtensionHandler] XPCOMUtils.generateNSGetFactory\n");
+
+    var NSGetFactory = XPCOMUtils.generateNSGetFactory(components);
+} else {
+    function NSGetModule(compMgr, fileSpec) XPCOMUtils.generateModule(components);
+}
+

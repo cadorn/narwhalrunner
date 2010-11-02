@@ -1,0 +1,9 @@
+
+# FF >= 4
+
+component {DA473A57-6AC8-4706-9B06-DA454C12028F} components/nsChromeNRExtensionHandler.js
+contract @mozilla.org/network/protocol;1?name=narwhalrunner {DA473A57-6AC8-4706-9B06-DA454C12028F}
+category JavaScript-global-privileged-property global @mozilla.org/network/protocol;1?name=narwhalrunner
+
+component {F804711E-B2F0-46C9-BCA9-6B4DB648167A} components/nsChromeNRAExtensionHandler.js
+contract @mozilla.org/network/protocol;1?name=narwhalrunner-accessible {F804711E-B2F0-46C9-BCA9-6B4DB648167A}

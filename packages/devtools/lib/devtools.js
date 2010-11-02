@@ -116,6 +116,16 @@ command = parser.command('launch', function(options) {
             buildAtPath(build);
         }
 
+        if(options.compreg) {
+            var compregFile = profileDirectory.join("compreg.dat");
+            if(compregFile.exists()) {
+                compregFile.remove();
+                print("Deleted: " + compregFile);
+            } else {
+                print("Skipping delete of compreg.dat as it does not exist at: " + compregFile);
+            }
+        }
+
     } else
     if(options.build) {
         print("error: you can only use the --build flag if --profile is also specified");
@@ -144,6 +154,7 @@ command.option('--dev').bool().help("Start binary in development mode");
 command.option('--chromebug').bool().help("Enable chromebug");
 command.option('--build').set().help("Build the program/package at the specified path before launching");
 command.option('--program').set().help("Path to program to launch for xulrunner apps");
+command.option('--compreg').set().help("Delete compreg.dat in profile folder before launch");
 command.helpful();
 
 
@@ -158,6 +169,10 @@ command = parser.command('add-bin', function(options) {
         version;
 
     if(parts = result.match(/Mozilla Firefox ([\d.ab]*), Copyright \(c\) 1998 - \d{4} mozilla.org/)) {
+        app = "firefox";
+        version = parts[1];
+    } else
+    if(parts = result.match(/Mozilla Firefox ([\d.ab]*)/)) {
         app = "firefox";
         version = parts[1];
     } else
