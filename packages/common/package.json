@@ -16,6 +16,21 @@
             "catalog": "http://registry.pinf.org/cadorn.org/github/pinf/packages/catalog.json",
             "name": "common",
             "revision": "master"
+        },
+        "requirejs": {
+            "catalog": "http://registry.pinf.org/cadorn.org/github/catalog.json",
+            "name": "requirejs",
+            "revision": "master"
+        },
+        "nodules": {
+            "catalog": "http://registry.pinf.org/cadorn.org/github/catalog.json",
+            "name": "nodules",
+            "revision": "master"
+        },
+        "transporter": {
+            "catalog": "http://registry.pinf.org/cadorn.org/github/catalog.json",
+            "name": "transporter",
+            "revision": "master"
         }
     },
     "repositories": [
@@ -24,5 +39,15 @@
             "url": "git://github.com/cadorn/narwhalrunner.git",
             "path": "packages/common"
         }
-    ]
+    ],
+    "implements": {
+        "http://registry.pinf.org/cadorn.org/github/pinf/@meta/routing/path/0.1.0": {
+            "mappings": {
+                "transport-program": {
+                    "type": "jsgi",
+                    "module": "responders/transport-program"
+                }
+            }
+        }
+    }
 }

@@ -55,11 +55,15 @@ exports.Package = function (packagePath, locator) {
     Package.getRoutedBaseUrl = function() {
         return "narwhalrunner://" + appInfo.InternalName + "/" + Package.getReferenceId() + "/";
     }
-    
+
+    Package.getTransportedProgramLoadUrl = function() {
+        return "narwhalrunner://" + appInfo.InternalName + "/" + appInfo["CommonPackage.ReferenceId"] + "/transport-program/" + Package.getReferenceId() + "/";
+    }
+
     Package.getSkinBaseUrl = function() {
         return "chrome://" + appInfo.InternalName + "/skin/" + Package.getReferenceId() + "/";
     }
-    
+
     Package.getTemplateVariables = function(commonPackage) {
         var name =  Package.getName();
         var id = Package.getReferenceId();
@@ -80,6 +84,7 @@ exports.Package = function (packagePath, locator) {
             "Package.ResourcesBaseURL": "narwhalrunner://" + appInfo.InternalName + "/" + id + "/resources/",
 
             "Package.RoutedBaseURL": Package.getRoutedBaseUrl(),
+            "Package.TransportedProgramLoadURL": Package.getTransportedProgramLoadUrl(),
 
             "Program.NarwhalURL": "chrome://" + appInfo.InternalName + "-overlay/content/" + appInfo["CommonPackage.ReferenceId"] + "/narwhal.js",
             "Program.NarwhalizeURL": "chrome://" + appInfo.InternalName + "-overlay/content/" + appInfo["CommonPackage.ReferenceId"] + "/narwhalize.js",

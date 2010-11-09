@@ -161,8 +161,10 @@ App.prototype.registerRoute = function(pkg, info, id) {
             }
         }
         if(found!==false) {
+//print("[narwhalrunner][registerRoute] replace route: " + route.rawRoute + " -> " + id + ":" + route.module);
             this.routes[refID][found] = route;
         } else {
+//print("[narwhalrunner][registerRoute] add route: " + route.rawRoute + " -> " + id + ":" + route.module);            
             this.routes[refID].push(route);
         }
     } else {
@@ -185,6 +187,13 @@ App.prototype.getAppPackage = function() {
 
 App.prototype.getPackage = function(id) {
     return PACKAGE.Package(PACKAGES.usingCatalog[id].directory, id).setAppInfo(this.manifest.narwhalrunner);
+}
+
+App.prototype.getPackageForRefId = function(id) {
+    if(!this.refIdMap[id]) {
+        return false;
+    }
+    return this.getPackage(this.refIdMap[id]);
 }
 
 App.prototype.getInternalName = function() {
@@ -357,6 +366,9 @@ ANOTHER POSSIBLE SOLUTION (preferred):
                             } else {
                                 
 //print("processing package: " + info["package"]);                                
+
+//print("[narwhalrunner][registerProtocolHandler][runApp] responderApp module: " + info.module);
+//print("[narwhalrunner][registerProtocolHandler][runApp] responderApp package: " + info["package"]);
                                 
                                 if(info.require) {
                                     responderModule = info.require(info.module, info["package"]);
@@ -397,6 +409,13 @@ ANOTHER POSSIBLE SOLUTION (preferred):
                         }
 
                         PROFILER.startTimer("protocolHandler", "jsgi");
+
+                        chromeEnv.narwhalrunner = {
+                            "packageReferenceId": packageRefId,
+                            "packageId": packageName
+                        }
+
+//print("[narwhalrunner][registerProtocolHandler][runApp] packageId: " + packageName);
 
                         var result = responderApp(chromeEnv);
 
