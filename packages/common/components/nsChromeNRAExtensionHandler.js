@@ -387,9 +387,12 @@ ChromeAExtensionHandler.prototype = {
     env.pathInfo = parts[1];
     // TODO: other variables
 
+    // custom
+    env.context = "public";
+
     // call the app
     var result = null;
-    
+        
     try
     {
         result = handler.app(env);

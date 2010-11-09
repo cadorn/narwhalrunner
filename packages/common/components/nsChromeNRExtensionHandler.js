@@ -304,6 +304,9 @@ ChromeExtensionHandler.prototype = {
     env.pathInfo = parts[1];
     // TODO: other variables
 
+    // custom
+    env.context = "chrome";
+
     // call the app
     var result = null;
     
