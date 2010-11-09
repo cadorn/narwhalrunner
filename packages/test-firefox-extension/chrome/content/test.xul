@@ -11,11 +11,22 @@
     <!-- Load a narwhal module for the package -->
     <script src="__Program.NarwhalizeURL__" type="application/x-javascript"></script>
     <script type="application/x-javascript">
-        require("test", "test-firefox-extension").main({});
+        onNarwhalized(function() {
+            require("test", "test-firefox-extension").main({});
+        });
     </script>
 
     <label value="__PP__"/>
 
     <html:img src="__Package.SkinBaseURL__image.png"/>
+
+    
+    <html:p>
+        <html:a href="__Package.ContentBaseURL__chrome-program.htm">Chrome Program</html:a>
+    </html:p>
+
+    <html:p>
+        <html:a href="__Package.AccessibleContentBaseURL__public-program.htm">Public Program</html:a>
+    </html:p>
 
 </window>

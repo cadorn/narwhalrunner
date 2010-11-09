@@ -12,5 +12,5 @@ exports.main = function(args) {
 
     // notify NarwhalRunner that extension is loaded    
     APP.started();
-    
+
 }

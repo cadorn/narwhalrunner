@@ -31,5 +31,19 @@
         "Description": "A NarwhalRunner firefox extension for testing",
         "HomepageURL": "http://github.com/cadorn/narwhalrunner",
         "IconURL": ""
+    },
+    "implements": {
+        "http://registry.pinf.org/cadorn.org/github/narwhalrunner/@meta/transport-program/0": {
+            "chrome-program": {
+                "context": "chrome",
+                "package": "chrome/package1",
+                "module": "main.js"
+            },
+            "public-program": {
+                "context": "public",
+                "package": "public/package1",
+                "module": "main.js"
+            }
+        }
     }
 }
