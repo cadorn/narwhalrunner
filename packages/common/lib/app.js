@@ -27,7 +27,6 @@ var APPS = require("./apps");
 
 var PROFILER = require("./profiler");
 
-
 const PREFS = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch2);
 
 const RELOAD_ROUTE_RESPONDERS = false;
@@ -85,6 +84,8 @@ var App = exports.App = function (packageName) {
     });
 
     this.cache = CACHE.Cache(this.getProfilePath().join("Cache", this.getInternalName()));
+
+    this.programTransportListeners = {};
 }
 OBSERVABLE.mixin(App.prototype);
 
@@ -170,6 +171,35 @@ App.prototype.registerRoute = function(pkg, info, id) {
     } else {
         throw new Error("Route type '" + info.type + "' not supported.");
     }
+}
+
+App.prototype.addProgramTransportListener = function(pkgId, programId, listener) {
+    var pkg = this.getPackage(pkgId);
+    if(!pkg) {
+        throw new Error("Could not load package for ID: " + pkgId);
+    }
+    var refID = pkg.getReferenceId();
+    if(!this.refIdMap[refID]) {
+        throw new Error("Could not find refID [" + refID + "] for package [" + pkgId + "] in refIdMap!");
+    }
+    if(!this.programTransportListeners[pkgId]) {
+        this.programTransportListeners[pkgId] = {};
+    }
+    if(!this.programTransportListeners[pkgId][programId]) {
+        this.programTransportListeners[pkgId][programId] = [];
+    }
+    if(this.programTransportListeners[pkgId][programId].indexOf(listener)>=0) {
+        throw new Error("Listener already exists for package [" + pkgId + "] and program [" + programId + "]");
+    }
+    this.programTransportListeners[pkgId][programId].push(listener);
+}
+
+App.prototype.removeProgramTransportListener = function(pkgId, programId, listener) {
+    if(!this.programTransportListeners[pkgId]) return;
+    if(!this.programTransportListeners[pkgId][programId]) return;
+    var index = this.programTransportListeners[pkgId][programId].indexOf(listener);
+    if(index==-1) return;
+    this.programTransportListeners[pkgId][programId].splice(index, 1);
 }
 
 
@@ -370,16 +400,25 @@ ANOTHER POSSIBLE SOLUTION (preferred):
 //print("[narwhalrunner][registerProtocolHandler][runApp] responderApp module: " + info.module);
 //print("[narwhalrunner][registerProtocolHandler][runApp] responderApp package: " + info["package"]);
                                 
-                                if(info.require) {
-                                    responderModule = info.require(info.module, info["package"]);
-                                    responderApp = responderModule.app({
-                                        "packageReferenceId": packageRefId
-                                    });
+                                if(!info.instances) {
+                                    if(info.require) {
+                                        responderModule = info.require(info.module, info["package"]);
+                                        responderApp = responderModule.app({
+                                            "packageReferenceId": packageRefId
+                                        });
+                                    } else {
+                                        responderModule = require(info.module, info["package"]);
+                                        responderApp = responderModule.app({
+                                            "packageReferenceId": packageRefId
+                                        });
+                                    }
+                                    info.instances = {
+                                        "module": responderModule,
+                                        "app": responderApp
+                                    };
                                 } else {
-                                    responderModule = require(info.module, info["package"]);
-                                    responderApp = responderModule.app({
-                                        "packageReferenceId": packageRefId
-                                    });
+                                    responderModule = info.instances.module;
+                                    responderApp = info.instances.app;
                                 }
                             }
                         }
@@ -419,10 +458,20 @@ ANOTHER POSSIBLE SOLUTION (preferred):
 
                         var result = responderApp(chromeEnv);
 
+                        if(!result) {
+                            return {
+                                status: 500,
+                                headers: {"Content-Type":"text/plain"},
+                                body: ["Internal Server Error", "</br>", "Error calling responder App"]
+                            }                
+                        }
+
                         if(UTIL.isArrayLike(result.body)) {
-                            // base64 encode the body
-                            for( var i=0 ; i<result.body.length ; i++ ) {
-                                result.body[i] = BASE64.encode(result.body[i]);
+                            if(!result.alreadyBase65Encoded) {
+                                // base64 encode the body
+                                for( var i=0 ; i<result.body.length ; i++ ) {
+                                    result.body[i] = BASE64.encode(result.body[i]);
+                                }
                             }
                         } else
                         if(UTIL.has(result.body, "forEach")) {
@@ -430,8 +479,13 @@ ANOTHER POSSIBLE SOLUTION (preferred):
                             result.body.forEach(function(str) {
                                 buffer.push(str);
                             });
-                            result.body = [BASE64.encode(buffer.join(""))];
+                            if(result.alreadyBase65Encoded) {
+                                result.body = [buffer.join("")];
+                            } else {
+                                result.body = [BASE64.encode(buffer.join(""))];
+                            }
                         }
+                        delete result.alreadyBase65Encoded;
 
                         if(responderModule.isCachable && responderModule.isCachable()) {
                             // write body to cache for faster access in future

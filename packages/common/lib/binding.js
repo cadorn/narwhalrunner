@@ -5,7 +5,7 @@ function dump(obj) { print(require('test/jsdump').jsDump.parse(obj)) };
 var UTIL = require("util");
 
 
-exports.Binding = function (pkgId, object, name) {
+exports.Binding = function (pkgId, object, name, id) {
 
     // PRIVATE
 

@@ -17,6 +17,7 @@ var OBSERVABLE = require("observable", "observable");
 var BINDING = require("./binding");
 var PACKAGES = require("packages");
 var PACKAGE = require("./package");
+var TAB_WATCHER = require("./tab-watcher");
 
 var chromeIndex = 0,
     chromes = [];
@@ -62,6 +63,7 @@ var Chrome = exports.Chrome = function(global) {
     self.instances = {};
     self.bindings = {};
     self.containers = {};
+    self.components = {};
 
 /*        
     NOTE: The focus event is not firing for some reason
@@ -71,33 +73,68 @@ var Chrome = exports.Chrome = function(global) {
         self.publish("focus", self);
     }, false);
 */
+
+    OBSERVABLE.mixin(self);
+
+    self.tabWatcher = TAB_WATCHER.TabWatcher(self);
+
     self.getWindow().addEventListener("load", function() {
-        self.publish("load", self);
+        
+        self.tabWatcher.attach();
+
+        Chrome.prototype.publish("load", self);
     }, false);
 
     self.getWindow().addEventListener("unload", function() {
-
-        for( var i=0, c=chromes.length ; i<c ; i++ ) {
-            if(chromes[i]===self) {
-                chromes.splice(i, 1);
+        try {
+            for( var i=0, c=chromes.length ; i<c ; i++ ) {
+                if(chromes[i]===self) {
+                    chromes.splice(i, 1);
+                }
             }
+
+            self.tabWatcher.unattach();
+    
+            UTIL.forEach(self.components, function(item) {
+                if(typeof item[1].destroy != "undefined") {
+                    try {
+                        item[1].destroy();
+                    } catch(e) {
+                        system.log.error(e);
+                    }
+                }
+            });
+
+            Chrome.prototype.publish("unload", self);
+            self.publish("unload", self);
+        } catch(e) {
+            system.log.error(e);
         }
-        
-        self.publish("unload", self);
     }, false);
 
-    self.publish("new", self);
+    Chrome.prototype.publish("new", self);
 }
 OBSERVABLE.mixin(Chrome.prototype);
 
-Chrome.prototype.registerBinding = function(pkgId, object, name) {
+Chrome.prototype.addComponent = function(id, component) {
+    this.components[id] = component;
+}
+
+Chrome.prototype.getComponent = function(id) {
+    return this.components[id];
+}
+
+Chrome.prototype.registerBinding = function(pkgId, object, name, id) {
     if(!UTIL.has(this.bindings, pkgId)) {
         this.bindings[pkgId] = {};
     }
-    return this.bindings[pkgId][name] = BINDING.Binding(pkgId, object, name);
+    if(!this.bindings[pkgId][name]) {
+        this.bindings[pkgId][name] = {};
+    }
+    return this.bindings[pkgId][name][id || ""] = BINDING.Binding(pkgId, object, name, id);
 }
 
-Chrome.prototype.getBinding = function(pkgId, name) {
+Chrome.prototype.getBinding = function(pkgId, name, id) {
     pkgId = normalizePackageID(pkgId);
     if(!UTIL.has(this.bindings, pkgId)) {
         return false;
@@ -105,7 +142,11 @@ Chrome.prototype.getBinding = function(pkgId, name) {
     if(!UTIL.has(this.bindings[pkgId], name)) {
         return false;
     }
-    return this.bindings[pkgId][name];
+    id = id || "";
+    if(!UTIL.has(this.bindings[pkgId][name], id)) {
+        return false;
+    }
+    return this.bindings[pkgId][name][id];
 }
 
 function normalizePackageID(id) {
@@ -181,6 +222,10 @@ Chrome.prototype.getBrowser = function() {
     return this.global.getBrowser();
 }
 
+Chrome.prototype.getTabWatcher = function() {
+    return this.tabWatcher;
+}
+
 
 /*
  * priority:
@@ -249,6 +294,13 @@ Chrome.prototype.openNewTab = function(url, postText) {
 
     return gBrowser.selectedTab;
 };
+
+
+Chrome.prototype.openNewWindow = function(url) {
+    if (!url) return;
+    return this.getWindow().open(url);
+};
+
 
 Chrome.prototype.getProfilePath = function() {
     var file = Cc["@mozilla.org/file/directory_service;1"].

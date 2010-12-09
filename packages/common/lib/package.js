@@ -48,6 +48,9 @@ exports.Package = function (packagePath, locator) {
         return "NRID_" + Package.getReferenceId() + "_";
     }
     
+    Package.getAccessibleContentBaseUrl = function() {
+        return "narwhalrunner-accessible://" + appInfo.InternalName + "/" + Package.getReferenceId() + "/content-accessible/"
+    }
     Package.getContentBaseUrl = function() {
         return "narwhalrunner://" + appInfo.InternalName + "/" + Package.getReferenceId() + "/content/";
     }
@@ -58,6 +61,10 @@ exports.Package = function (packagePath, locator) {
 
     Package.getTransportedProgramLoadUrl = function() {
         return "narwhalrunner://" + appInfo.InternalName + "/" + appInfo["CommonPackage.ReferenceId"] + "/transport-program/" + Package.getReferenceId() + "/";
+    }
+
+    Package.getPublicTransportedProgramLoadUrl = function() {
+        return "narwhalrunner-accessible://" + appInfo.InternalName + "/" + appInfo["CommonPackage.ReferenceId"] + "/transport-program/" + Package.getReferenceId() + "/";
     }
 
     Package.getSkinBaseUrl = function() {
@@ -79,12 +86,13 @@ exports.Package = function (packagePath, locator) {
             "Package.SkinBaseURL": Package.getSkinBaseUrl(),
 
             "Package.ContentBaseURL": Package.getContentBaseUrl(),
-            "Package.AccessibleContentBaseURL": "narwhalrunner-accessible://" + appInfo.InternalName + "/" + Package.getReferenceId() + "/content-accessible/",
+            "Package.AccessibleContentBaseURL": Package.getAccessibleContentBaseUrl(),
             
             "Package.ResourcesBaseURL": "narwhalrunner://" + appInfo.InternalName + "/" + id + "/resources/",
 
             "Package.RoutedBaseURL": Package.getRoutedBaseUrl(),
             "Package.TransportedProgramLoadURL": Package.getTransportedProgramLoadUrl(),
+            "Package.PublicTransportedProgramLoadURL": Package.getPublicTransportedProgramLoadUrl(),
 
             "Program.NarwhalURL": "chrome://" + appInfo.InternalName + "-overlay/content/" + appInfo["CommonPackage.ReferenceId"] + "/narwhal.js",
             "Program.NarwhalizeURL": "chrome://" + appInfo.InternalName + "-overlay/content/" + appInfo["CommonPackage.ReferenceId"] + "/narwhalize.js",
@@ -98,8 +106,8 @@ exports.Package = function (packagePath, locator) {
             "    var sandbox = {};" +
             "    Components.utils.import('resource://narwhal-xulrunner/sandbox.js', sandbox);" +
             "    var program = sandbox.get({'type': '" + appInfo["Type"]  + "', 'id': '" + appInfo["ID"]  + "'});" +
-            "    return function(object, name) {" +
-            "        return program.require('app', '" + commonPackage.getTopLevelId() + "').getChrome().registerBinding('" + Package.getTopLevelId() + "', object, name);" +
+            "    return function(object, name, id) {" +
+            "        return program.require('app', '" + commonPackage.getTopLevelId() + "').getChrome().registerBinding('" + Package.getTopLevelId() + "', object, name, id);" +
             "    };" +
             "}())";
         

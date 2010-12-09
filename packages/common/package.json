@@ -10,11 +10,18 @@
     },
     "using": {
         "observable": {
-            "location": "http://github.com/nrstott/observable-js/zipball/master/"
+            "catalog": "http://registry.pinf.org/cadorn.org/github/catalog.json",
+            "name": "observable",
+            "revision": "master"
         },
         "pinf-common": {
             "catalog": "http://registry.pinf.org/cadorn.org/github/pinf/packages/catalog.json",
             "name": "common",
+            "revision": "master"
+        },
+        "pinf-loader": {
+            "catalog": "http://registry.pinf.org/cadorn.org/github/pinf/packages/catalog.json",
+            "name": "loader",
             "revision": "master"
         },
         "requirejs": {
