@@ -1,7 +1,7 @@
 
 exports.main = function() {
 
-    var console = console || {"log": function(msg) { print(msg); }};
+    var console = (top && top.console) || {"log": function(msg) { print(msg); }};
     
     var PACKAGE1 = require("./package1");
     

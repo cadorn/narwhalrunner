@@ -1,6 +1,6 @@
 
-var PACKAGE1 = require("package1/package1");
-var PACKAGE3 = require("package3/package3");
+var PACKAGE1 = require("packageA/package1");
+var PACKAGE3 = require("packageB/package3");
 
 exports.announceNext = function(console) {
 

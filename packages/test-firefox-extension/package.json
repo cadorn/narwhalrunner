@@ -37,12 +37,12 @@
             "chrome-program": {
                 "context": "chrome",
                 "package": "chrome/package1",
-                "module": "main.js"
+                "module": "main"
             },
             "public-program": {
                 "context": "public",
                 "package": "public/package1",
-                "module": "main.js"
+                "module": "main"
             }
         }
     }
