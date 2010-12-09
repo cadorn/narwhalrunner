@@ -92,6 +92,8 @@ Links
     * [MDC: Multiple Item Package](https://developer.mozilla.org/en/Multiple_Item_Packaging)
     * [MDC: Extension Dependencies](https://wiki.mozilla.org/Extension_Dependencies)
     * [Semantic Versioning](http://semver.org/)
+    * [MozWiki: Content Process Event Handlers](https://wiki.mozilla.org/Content_Process_Event_Handlers)
+    * [MozWiki: Electrolysis/CPOW](https://wiki.mozilla.org/Content_Processes/JPW)
 
 
 License
