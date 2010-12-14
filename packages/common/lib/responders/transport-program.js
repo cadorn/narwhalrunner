@@ -241,14 +241,14 @@ print("TRANSPORTER.loader: id: "+id);
                     }
                 }
 
-                system.log.warn("File '" + path + "' not found at '" + file + "' for program: " + program.path);
+                system.log.warn("File '" + path + "' (uri '"+env.pathInfo+"') not found at '" + file + "' for program: " + program.path);
                 return {
                     "status": 404,
                     "headers": {
                         "content-type": "text/plain"
                     },
                     "body": [
-                        "File '" + path + "' not found for program: " + program.path
+                        "File '" + path + "' (uri '"+env.pathInfo+"') not found for program: " + program.path
                     ]
                 }
             }
