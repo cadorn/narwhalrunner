@@ -59,7 +59,7 @@ var App = exports.App = function (packageName) {
     
     PACKAGE.resolvePackageInfoVariables(this.manifest);
     
-    this.registerProtocolHandler();
+    this.protocolHandler = this.registerProtocolHandler();
     
     this.resourceURLs = {
         path: {},
@@ -86,6 +86,7 @@ var App = exports.App = function (packageName) {
     this.cache = CACHE.Cache(this.getProfilePath().join("Cache", this.getInternalName()));
 
     this.programTransportListeners = {};
+    this.protocolCache = null;
 }
 OBSERVABLE.mixin(App.prototype);
 
@@ -172,6 +173,50 @@ App.prototype.registerRoute = function(pkg, info, id) {
         throw new Error("Route type '" + info.type + "' not supported.");
     }
 }
+
+
+App.prototype.registerAppRoute = function(info) {
+
+    var refID = this.getAppPackage().getName();
+
+    if(!this.routes[refID]) {
+        this.routes[refID] = [];
+    }
+
+    if(info.type=="jsgi") {
+
+        if(info.route.substr(0,1)=="/") {
+            throw new Error("Only relative routhing paths are supported.");
+        }
+
+        var route = {
+            "rawRoute": "^\\/" + info.route,
+            "route": new RegExp("^\\/" + info.route),
+            "module": info.module,
+            "require": info.require || false,
+            "package": info["package"]
+        };
+        
+        // if route already exists, replace it
+        var found = false;
+        for( var i=0, s=this.routes[refID].length ; i<s ; i++ ) {
+            if(this.routes[refID][i].rawRoute==route.rawRoute) {
+                found = i;
+                break;
+            }
+        }
+        if(found!==false) {
+//print("[narwhalrunner][registerRoute] replace route: " + route.rawRoute + " -> " + id + ":" + route.module);
+            this.routes[refID][found] = route;
+        } else {
+//print("[narwhalrunner][registerRoute] add route: " + route.rawRoute + " -> " + id + ":" + route.module);            
+            this.routes[refID].push(route);
+        }
+    } else {
+        throw new Error("Route type '" + info.type + "' not supported.");
+    }
+}
+
 
 App.prototype.addProgramTransportListener = function(pkgId, programId, listener) {
     var pkg = this.getPackage(pkgId);
@@ -307,6 +352,16 @@ App.prototype.createSandbox = function(options) {
     return sandbox.create(options);
 }
 
+
+App.prototype.setProtocolCache = function(cache) {
+    this.protocolCache = cache;
+}
+
+// manual request handling
+App.prototype.handleProtocolRequest = function(env) {
+    return this.protocolHandler.app(env);
+}
+
 App.prototype.registerProtocolHandler = function() {
     var self = this;
     
@@ -319,6 +374,10 @@ App.prototype.registerProtocolHandler = function() {
         app: function(chromeEnv) {
 
             try {
+
+                var originalChromeEnv = UTIL.copy(chromeEnv);
+
+                chromeEnv.options = chromeEnv.options || {};
 
                 PROFILER.startTimer("protocolHandler", "overall");
 
@@ -345,14 +404,26 @@ App.prototype.registerProtocolHandler = function() {
                 } else {
                     packageName = self.refIdMap[packageRefId];
                 }
-                
+                // if no package name found we let app routes handle request
+                if(!packageName) {
+                    packageRefId = self.getAppPackage().getName();
+                }
+
                 // new logic
                 if(self.routes[packageRefId]) {
                     var responderModule = false;
                     var responderApp = false;
+                    var cachedResponse = false;
                     self.routes[packageRefId].forEach(function(info) {
-                        if(responderApp) return;
+                        if(responderApp || cachedResponse) return;
                         if(info.route.test(pathInfo)) {
+
+                            if(self.protocolCache) {
+                                cachedResponse = self.protocolCache.get(originalChromeEnv);
+                                if(cachedResponse) return;
+                            }
+
+//print("process request: " + originalChromeEnv["PATH_INFO"]);
 
                             if(RELOAD_ROUTE_RESPONDERS) {
 /*                            
@@ -423,8 +494,13 @@ ANOTHER POSSIBLE SOLUTION (preferred):
                             }
                         }
                     });
+                    
+                    if(cachedResponse) {
+                        return cachedResponse;
+                    }
+                    
                     if(responderApp) {
-
+/*
                         if(responderModule.isCachable && !self.getPreference("NR_forceReloadDynamicProtocolResources") && responderModule.isCachable()) {
                             
                             if(!responderModule.getHeaders) {
@@ -446,7 +522,7 @@ ANOTHER POSSIBLE SOLUTION (preferred):
                             }
                             
                         }
-
+*/
                         PROFILER.startTimer("protocolHandler", "jsgi");
 
                         chromeEnv.narwhalrunner = {
@@ -466,31 +542,39 @@ ANOTHER POSSIBLE SOLUTION (preferred):
                             }                
                         }
 
-                        if(UTIL.isArrayLike(result.body)) {
-                            if(!result.alreadyBase65Encoded) {
-                                // base64 encode the body
-                                for( var i=0 ; i<result.body.length ; i++ ) {
-                                    result.body[i] = BASE64.encode(result.body[i]);
+                        if(chromeEnv.options.skipBase65Encode!==true) {
+                            if(UTIL.isArrayLike(result.body)) {
+                                if(!result.alreadyBase65Encoded) {
+                                    // base64 encode the body
+                                    for( var i=0 ; i<result.body.length ; i++ ) {
+                                        result.body[i] = BASE64.encode(result.body[i]);
+                                    }
+                                }
+                            } else
+                            if(UTIL.has(result.body, "forEach")) {
+                                var buffer = [];
+                                result.body.forEach(function(str) {
+                                    buffer.push(str);
+                                });
+                                if(result.alreadyBase65Encoded) {
+                                    result.body = [buffer.join("")];
+                                } else {
+                                    result.body = [BASE64.encode(buffer.join(""))];
                                 }
                             }
-                        } else
-                        if(UTIL.has(result.body, "forEach")) {
-                            var buffer = [];
-                            result.body.forEach(function(str) {
-                                buffer.push(str);
-                            });
-                            if(result.alreadyBase65Encoded) {
-                                result.body = [buffer.join("")];
-                            } else {
-                                result.body = [BASE64.encode(buffer.join(""))];
-                            }
+                            delete result.alreadyBase65Encoded;
                         }
-                        delete result.alreadyBase65Encoded;
 
+                        if(self.protocolCache) {
+                            self.protocolCache.set(originalChromeEnv, result);
+                        }
+
+/*
                         if(responderModule.isCachable && responderModule.isCachable()) {
                             // write body to cache for faster access in future
                             self.getCache().setString([pathInfo, self.getVersion()], result.body.join(""));
                         }
+*/
 
                         PROFILER.stopTimer("protocolHandler", "jsgi");
                         PROFILER.stopTimer("protocolHandler", "overall");
@@ -691,6 +775,8 @@ ANOTHER POSSIBLE SOLUTION (preferred):
     Cc["@mozilla.org/network/protocol;1?name=narwhalrunner-accessible"].
         getService().
             wrappedJSObject.registerExtension(protocolHandler);
+            
+    return protocolHandler;
 }
 
 App.prototype.start = function(type, loaderWindow, args, program) {
