@@ -53,6 +53,10 @@
                 "transport-program": {
                     "type": "jsgi",
                     "module": "responders/transport-program"
+                },
+                "chrome-program": {
+                    "type": "jsgi",
+                    "module": "responders/chrome-program"
                 }
             }
         }
